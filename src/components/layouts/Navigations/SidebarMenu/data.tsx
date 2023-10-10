@@ -1,29 +1,22 @@
-import AccountBalance from "@mui/icons-material/AccountBalance";
-import AssignmentReturn from "@mui/icons-material/AssignmentReturn";
 import AssignmentTurnedInOutlined from "@mui/icons-material/AssignmentTurnedInOutlined";
 import BuildCircleOutlined from "@mui/icons-material/BuildCircleOutlined";
 import CallMadeOutlined from "@mui/icons-material/CallMadeOutlined";
-import CallMergeOutlined from "@mui/icons-material/CallMergeOutlined";
 import CallReceivedOutlined from "@mui/icons-material/CallReceivedOutlined";
-import CallSplitOutlined from "@mui/icons-material/CallSplitOutlined";
 import CircleOutlined from "@mui/icons-material/CircleOutlined";
-import CompareArrowsOutlined from "@mui/icons-material/CompareArrowsOutlined";
 import ContactsOutlined from "@mui/icons-material/ContactsOutlined";
-import Factory from "@mui/icons-material/Factory";
+import Diversity2 from "@mui/icons-material/Diversity2";
+import Diversity3 from "@mui/icons-material/Diversity3";
 import FormatListNumberedOutlined from "@mui/icons-material/FormatListNumberedOutlined";
-import FormatQuote from "@mui/icons-material/FormatQuote";
 import GroupAddOutlined from "@mui/icons-material/GroupAddOutlined";
+import Groups from "@mui/icons-material/Groups";
 import Hiking from "@mui/icons-material/Hiking";
 import ImportExportOutlined from "@mui/icons-material/ImportExportOutlined";
 import InsertChartOutlined from "@mui/icons-material/InsertChartOutlined";
 import Inventory2Outlined from "@mui/icons-material/Inventory2Outlined";
-import LocalActivityOutlined from "@mui/icons-material/LocalActivityOutlined";
 import LocalAtmOutlined from "@mui/icons-material/LocalAtmOutlined";
 import LocalOfferOutlined from "@mui/icons-material/LocalOfferOutlined";
-import LocalShippingOutlined from "@mui/icons-material/LocalShippingOutlined";
 import MenuBook from "@mui/icons-material/MenuBook";
 import MonetizationOnOutlined from "@mui/icons-material/MonetizationOnOutlined";
-import MoreHorizOutlined from "@mui/icons-material/MoreHorizOutlined";
 import MoreOutlined from "@mui/icons-material/MoreOutlined";
 import PaymentOutlined from "@mui/icons-material/PaymentOutlined";
 import PriceChange from "@mui/icons-material/PriceChange";
@@ -34,10 +27,6 @@ import SettingsApplicationsOutlined from "@mui/icons-material/SettingsApplicatio
 import ShoppingCartOutlined from "@mui/icons-material/ShoppingCartOutlined";
 import StorageOutlined from "@mui/icons-material/StorageOutlined";
 import StorefrontOutlined from "@mui/icons-material/StorefrontOutlined";
-import Undo from "@mui/icons-material/Undo";
-import Groups from "@mui/icons-material/Groups";
-import Diversity3 from "@mui/icons-material/Diversity3";
-import Diversity2 from "@mui/icons-material/Diversity2";
 
 export type DataMenuType = {
   id: string;
