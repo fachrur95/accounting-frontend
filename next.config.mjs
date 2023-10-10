@@ -4,10 +4,15 @@
  */
 await import("./src/env.mjs");
 
+import withPWA from "next-pwa";
+
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
-
+  swcMinify: true,
+  images: {
+    domains: ["lh3.googleusercontent.com", "res.cloudinary.com"],
+  },
   /**
    * If you are using `appDir` then you must comment the below `i18n` config out.
    *
@@ -19,4 +24,9 @@ const config = {
   },
 };
 
-export default config;
+const nextConfig = withPWA({
+  dest: "public",
+  disable: process.env.NODE_ENV !== "production",
+})(config);
+
+export default nextConfig;

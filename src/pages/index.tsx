@@ -3,8 +3,16 @@ import Head from "next/head";
 import Link from "next/link";
 
 import { api } from "@/utils/api";
+import type { MyPage } from "@/components/layouts/layoutTypes";
+import type { ISessionResponse } from "@/types/session";
+import type { GetServerSideProps } from "next";
+import { getServerAuthSession } from "@/server/auth";
+import axios from "axios";
+import { env } from "@/env.mjs";
 
-export default function Home() {
+const DashboardPage: MyPage<{ sessionData: ISessionResponse }> = ({
+  sessionData,
+}) => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
   return (
@@ -53,14 +61,14 @@ export default function Home() {
       </main>
     </>
   );
-}
+};
 
 function AuthShowcase() {
   const { data: sessionData } = useSession();
 
   const { data: secretMessage } = api.example.getSecretMessage.useQuery(
     undefined, // no input
-    { enabled: sessionData?.user !== undefined }
+    { enabled: sessionData?.user !== undefined },
   );
 
   return (
@@ -78,3 +86,39 @@ function AuthShowcase() {
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getServerAuthSession(ctx);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/api/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+  const accessToken = session.accessToken;
+  const sessionData = await axios
+    .get<ISessionResponse>(`${env.BACKEND_URL}/v1/auth/session`, {
+      withCredentials: true,
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+      return null;
+    });
+
+  return {
+    props: {
+      session,
+      sessionData,
+    },
+  };
+};
+
+export default DashboardPage;
+DashboardPage.Layout = "Dashboard";

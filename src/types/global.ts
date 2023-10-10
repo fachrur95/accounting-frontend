@@ -1,0 +1,1 @@
+export type FormSlugType = ["f" | "v", string | undefined];

@@ -3,10 +3,22 @@ import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
+  type DefaultUser,
+  type User,
+  type Session,
+  type Account,
+  type Profile,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+import CredentialsProvider from "next-auth/providers/credentials";
+// import DiscordProvider from "next-auth/providers/discord";
 
 import { env } from "@/env.mjs";
+import type { ITokenLoginResponse } from "@/types/token";
+import axios from "axios";
+import jwtDecode from "jwt-decode";
+import type { IJwtDecode } from "@/types/session";
+import type { JWT } from "next-auth/jwt";
+import { type AdapterUser } from "next-auth/adapters";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -21,8 +33,17 @@ declare module "next-auth" {
       // ...other properties
       // role: UserRole;
     };
+    accessToken: string;
+    refreshToken: string;
   }
 
+  interface User extends DefaultUser {
+    // ...other properties
+    // role: UserRole;
+    accessToken: string;
+    refreshToken: string;
+    // accessTokenExpires: number;
+  }
   // interface User {
   //   // ...other properties
   //   // role: UserRole;
@@ -42,12 +63,88 @@ export const authOptions: NextAuthOptions = {
         ...session.user,
         id: token.sub,
       },
+      accessToken: token.accessToken,
+      refreshToken: token.refreshToken,
     }),
+    jwt(
+      { token, user, trigger, session }:
+        {
+          token: JWT,
+          user: User | AdapterUser,
+          trigger?: "signIn" | "signUp" | "update",
+          session?: Session,
+          account: Account | null,
+          profile?: Profile,
+          isNewUser?: boolean
+        }) {
+      if (trigger === "update") {
+        return { ...token, accessToken: session?.accessToken, refreshToken: session?.refreshToken }
+      }
+      // console.log({ now: Date.now(), exp: user.accessTokenExpires, res: Date.now() > user.accessTokenExpires })
+      /* if (Date.now() > user.accessTokenExpires) {
+        return refreshAccessToken(token as unknown as User)
+      } */
+      if (user) {
+        token.id = user.id;
+        token.accessToken = user.accessToken;
+        token.refreshToken = user.refreshToken;
+      }
+      return token;
+    },
   },
   providers: [
-    DiscordProvider({
+    /* DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
+    }), */
+    CredentialsProvider({
+      id: "next-auth",
+      name: "Credentials",
+      credentials: {
+        email: {
+          label: "Email",
+          type: "text",
+          placeholder: "example@domain.com",
+        },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        // console.log({ test: typeof credentials?.callbackUrl })
+        if (!credentials?.email || !credentials.password) {
+          return null;
+        }
+
+        const user = await axios.post<ITokenLoginResponse>(
+          `${env.BACKEND_URL}/v1/auth/login`,
+          {
+            email: credentials.email,
+            password: credentials.password,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+          },
+        )
+          .then((response) => response.data)
+          .catch((err) => console.log(err));
+
+        if (!user) {
+          return null;
+        }
+
+        const session = jwtDecode<IJwtDecode>(user.tokens.access.token);
+
+        return {
+          id: session.sub,
+          name: session.name,
+          email: session.email,
+          image: null,
+          accessToken: user.tokens.access.token,
+          refreshToken: user.tokens.refresh.token,
+        };
+      },
     }),
     /**
      * ...add more providers here.
@@ -59,6 +156,9 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
+  session: {
+    strategy: "jwt",
+  },
 };
 
 /**

@@ -1,0 +1,1 @@
+export type RecalculateMethod = "AVG" | "FIFO" | "MANUAL";
