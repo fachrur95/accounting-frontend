@@ -6,7 +6,7 @@ import type { ITax } from "./tax";
 import type { ITransaction } from "./transaction";
 import type { Vector } from "./vector";
 
-export interface ITransactionDetail {
+export declare interface ITransactionDetail {
   id: string;
   qtyInput: number;
   priceInput: number;

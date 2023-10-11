@@ -2,7 +2,7 @@ import type { IAccountSubClass } from "./account-sub-class";
 import type { BalanceSheet } from "./balance-sheet";
 import type { Vector } from "./vector";
 
-export interface IAccountClass {
+export declare interface IAccountClass {
   id: string;
   type: BalanceSheet;
   code: string;
@@ -16,7 +16,7 @@ export interface IAccountClass {
   accountSubClasses?: IAccountSubClass[];
 }
 
-export type IAccountClassMutation = Pick<IAccountClass,
+export declare type IAccountClassMutation = Pick<IAccountClass,
   | "code"
   | "group"
   | "name"

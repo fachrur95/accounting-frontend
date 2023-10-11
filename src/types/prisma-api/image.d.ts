@@ -1,6 +1,6 @@
 import type { IItem } from "./item";
 
-export interface IImage {
+export declare interface IImage {
   id: string;
   imageUrl: string;
   createdAt: Date;

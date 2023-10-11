@@ -1,6 +1,4 @@
 import menuData from "@/components/layouts/Navigations/SidebarMenu/data";
-import type { IGeneralSettings } from "@/types/cores/generalSettings";
-import type { IRole } from "@/types/cores/roles";
 import { type StateCreator } from "zustand";
 
 type OpenMenuType = Record<string, boolean>
@@ -118,12 +116,8 @@ const defaultDeleting: DeletingType = {
 }
 
 export interface IAppPersistSlice {
-  generalSettings: IGeneralSettings | null,
-  menuRoles: IRole[],
-  setGeneralSettings: (data: IGeneralSettings) => void;
-  setMenuRoles: (data: IRole[]) => void;
-  openMenu: OpenMenuType;
   density: "compact" | "standard" | "comfortable";
+  openMenu: OpenMenuType;
   setOpenMenu: (url: string, check?: boolean) => void;
   notificationMessage: string | null;
   setNotificationMessage: (message: string) => void;
@@ -135,10 +129,6 @@ export interface IAppPersistSlice {
 }
 
 export const appPersistSlice: StateCreator<IAppPersistSlice> = (set) => ({
-  generalSettings: null,
-  menuRoles: [],
-  setGeneralSettings: (data => set((state) => ({ ...state, generalSettings: data }))),
-  setMenuRoles: (data => set((state) => ({ ...state, menuRoles: data }))),
   density: "standard",
   openMenu: initialStateMenu,
   setOpenMenu: ((url, check) => set((state) => ({ ...state, openMenu: { ...state.openMenu, [url]: check === true ? (state.openMenu[url] ? true : !state.openMenu[url]) : !state.openMenu[url] } }))),

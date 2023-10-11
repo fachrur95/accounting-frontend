@@ -1,7 +1,7 @@
 import type { TransactionType } from "./transaction-type";
 import type { IUnit } from "./unit";
 
-export interface IPrefix {
+export declare interface IPrefix {
   id: string;
   transactionType: TransactionType;
   name: string;

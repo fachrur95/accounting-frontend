@@ -2,7 +2,7 @@ import type { IAccountClass } from "./account-class";
 import type { IChartOfAccount } from "./chart-of-account";
 import type { Vector } from "./vector";
 
-export interface IAccountSubClass {
+export declare interface IAccountSubClass {
   id: string
   code: string
   group: string | null
@@ -17,7 +17,7 @@ export interface IAccountSubClass {
   chartOfAccounts?: IChartOfAccount[];
 }
 
-export type IAccountSubClassMutation = Pick<IAccountSubClass,
+export declare type IAccountSubClassMutation = Pick<IAccountSubClass,
   | "accountClassId"
   | "code"
   | "group"

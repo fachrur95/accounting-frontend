@@ -3,17 +3,17 @@ import type { TokenType } from "./prisma-api/token-type";
 import type { IUnit } from "./prisma-api/unit";
 import type { IUser } from "./prisma-api/user";
 
-export interface ISessionResponse extends Pick<IUser, "id" | "email" | "name" | "role"> {
+export declare interface ISessionResponse extends Pick<IUser, "id" | "email" | "name" | "role"> {
   session?: ISessionData;
 }
 
-export interface ISessionData {
+export declare interface ISessionData {
   institute?: IInstitute;
   unit?: IUnit;
   cashRegister?: ICashRegisterSession | null;
 }
 
-export interface ICashRegisterSession {
+export declare interface ICashRegisterSession {
   id: string;
   name: string;
   transactionId: string;
@@ -22,7 +22,7 @@ export interface ICashRegisterSession {
   openedBy: string;
 }
 
-export interface IJwtDecode {
+export declare interface IJwtDecode {
   session?: {
     institute: string | null;
     unit: string | null;

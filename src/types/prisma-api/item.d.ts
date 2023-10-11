@@ -5,7 +5,7 @@ import type { IMultipleUom } from "./multiple-uom";
 import type { ITax } from "./tax";
 import type { IUnit } from "./unit";
 
-export interface IItem {
+export declare interface IItem {
   id: string;
   code: string;
   name: string;
@@ -30,7 +30,7 @@ export interface IItem {
   itemCogs?: IItemCogs[];
 }
 
-export interface IItemMutation extends Pick<IItem,
+export declare interface IItemMutation extends Pick<IItem,
   | "itemCategoryId"
   | "taxId"
   | "code"

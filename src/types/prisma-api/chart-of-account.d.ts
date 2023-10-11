@@ -4,7 +4,7 @@ import type { ITransaction } from "./transaction";
 import type { ITransactionDetail } from "./transaction-detail";
 import type { IUnit } from "./unit";
 
-export interface IChartOfAccount {
+export declare interface IChartOfAccount {
   id: string;
   code: string;
   group: string | null;
@@ -24,7 +24,7 @@ export interface IChartOfAccount {
   transactions?: ITransaction[];
 }
 
-export type IChartOfAccountMutation = Pick<IChartOfAccount,
+export declare type IChartOfAccountMutation = Pick<IChartOfAccount,
   | "accountSubClassId"
   | "code"
   | "group"

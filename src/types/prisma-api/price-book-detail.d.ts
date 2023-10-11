@@ -1,7 +1,7 @@
 import type { IMultipleUom } from "./multiple-uom";
 import type { IPriceBook } from "./price-book";
 
-export interface IPriceBookDetail {
+export declare interface IPriceBookDetail {
   id: string;
   qty: number;
   price: number;

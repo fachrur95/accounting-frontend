@@ -1,7 +1,7 @@
 import type { ITransaction } from "./transaction";
 import type { IUnit } from "./unit";
 
-export interface ITerm {
+export declare interface ITerm {
   id: string;
   name: string;
   period: number;
@@ -16,7 +16,7 @@ export interface ITerm {
   transactions?: ITransaction[];
 }
 
-export type ITermMutation = Pick<ITerm,
+export declare type ITermMutation = Pick<ITerm,
   | "name"
   | "period"
   | "note"

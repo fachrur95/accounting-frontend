@@ -1,1 +1,1 @@
-export type RecalculateMethod = "AVG" | "FIFO" | "MANUAL";
+export declare type RecalculateMethod = "AVG" | "FIFO" | "MANUAL";

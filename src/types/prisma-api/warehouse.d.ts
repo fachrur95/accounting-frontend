@@ -1,7 +1,7 @@
 import type { ITransaction } from "./transaction";
 import type { IUnit } from "./unit";
 
-export interface IWarehouse {
+export declare interface IWarehouse {
   id: string;
   name: string;
   createdAt: Date;
@@ -14,7 +14,7 @@ export interface IWarehouse {
   transactionDestinations: ITransaction[];
 }
 
-export type IWarehouseMutation = Pick<IWarehouse,
+export declare type IWarehouseMutation = Pick<IWarehouse,
   | "unitId"
   | "name"
 >

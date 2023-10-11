@@ -7,7 +7,7 @@ import type { TransactionType } from "./transaction-type";
 import type { IUnit } from "./unit";
 import type { IWarehouse } from "./warehouse";
 
-export interface ITransaction {
+export declare interface ITransaction {
   id: string;
   transactionType: TransactionType;
   transactionNumber: string;

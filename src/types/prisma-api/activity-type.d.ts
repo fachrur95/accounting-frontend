@@ -1,4 +1,4 @@
-export type ActivityType =
+export declare type ActivityType =
   | "REGISTER"
   | "LOGIN"
   | "LOGOUT"

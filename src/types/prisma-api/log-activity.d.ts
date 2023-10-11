@@ -2,7 +2,7 @@ import type { ActivityType } from "./activity-type";
 import type { IUnit } from "./unit";
 import type { IUser } from "./user";
 
-export interface ILogActivity {
+export declare interface ILogActivity {
   id: string;
   message: string;
   data: string | null;

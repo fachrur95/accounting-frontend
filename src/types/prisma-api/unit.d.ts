@@ -21,7 +21,7 @@ import type { IUnitOfMeasure } from "./unit-of-measure";
 import type { IUserUnit } from "./user-unit";
 import type { IWarehouse } from "./warehouse";
 
-export interface IUnit {
+export declare interface IUnit {
   id: string;
   name: string;
   createdAt: Date;
@@ -53,7 +53,7 @@ export interface IUnit {
   financialClosings?: IFinancialClosing[];
 }
 
-export type IUnitMutation = Pick<IUnit,
+export declare type IUnitMutation = Pick<IUnit,
   | "instituteId"
   | "name"
 >

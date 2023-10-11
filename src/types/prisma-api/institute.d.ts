@@ -1,6 +1,6 @@
 import type { IUnit } from "./unit";
 
-export interface IInstitute {
+export declare interface IInstitute {
   id: string;
   name: string;
   createdAt: Date;
@@ -10,4 +10,4 @@ export interface IInstitute {
   units?: IUnit[];
 }
 
-export type IInstituteMutation = Pick<IInstitute, "name">
+export declare type IInstituteMutation = Pick<IInstitute, "name">

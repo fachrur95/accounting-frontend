@@ -1,7 +1,7 @@
 import type { RecalculateMethod } from "./recalculate-method";
 import type { IUnit } from "./unit";
 
-export interface IGeneralSetting {
+export declare interface IGeneralSetting {
   id: string;
   companyName: string;
   recalculateMethod: RecalculateMethod;

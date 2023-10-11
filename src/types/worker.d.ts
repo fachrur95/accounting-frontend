@@ -1,4 +1,4 @@
-export interface IEventDeleteWorker {
+export declare interface IEventDeleteWorker {
   path: WorkerPathType | null;
   variant?: "default" | "success" | "error",
   id: string | null;
@@ -6,7 +6,7 @@ export interface IEventDeleteWorker {
   progress?: number;
 }
 
-export type WorkerPathType =
+export declare type WorkerPathType =
   | "sales-invoice"
   | "sales-order"
   | "sales-quotation"
@@ -56,7 +56,7 @@ export type WorkerPathType =
   | "expedition"
   | "tax";
 
-export type DeleteWorkerEventType = {
+export declare type DeleteWorkerEventType = {
   route: "procedure";
   path: WorkerPathType;
   data: string[];

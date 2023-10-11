@@ -2,7 +2,7 @@ import type { IPeopleCategory } from "./people-category";
 import type { ITransaction } from "./transaction";
 import type { IUnit } from "./unit";
 
-export interface IPeople {
+export declare interface IPeople {
   id: string;
   code: string | null;
   name: string;
@@ -20,7 +20,7 @@ export interface IPeople {
   transactionCashiers?: ITransaction[];
 }
 
-export type IPeopleMutation = Pick<IPeople,
+export declare type IPeopleMutation = Pick<IPeople,
   | "peopleCategoryId"
   | "code"
   | "name"

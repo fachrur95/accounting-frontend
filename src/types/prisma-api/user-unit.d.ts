@@ -1,7 +1,7 @@
 import type { IUnit } from "./unit";
 import type { IUser } from "./user";
 
-export interface IUserUnit {
+export declare interface IUserUnit {
   id: string;
   createdAt: Date;
   createdBy: string;

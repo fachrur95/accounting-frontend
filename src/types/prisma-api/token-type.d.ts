@@ -1,4 +1,4 @@
-export type TokenType =
+export declare type TokenType =
   | "ACCESS"
   | "REFRESH"
   | "RESET_PASSWORD"

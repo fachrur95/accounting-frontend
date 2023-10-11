@@ -2,7 +2,7 @@ import type { IItem } from "./item";
 import type { ITransactionDetail } from "./transaction-detail";
 import type { IUnit } from "./unit";
 
-export interface ITax {
+export declare interface ITax {
   id: string;
   name: string;
   rate: number;
@@ -18,7 +18,7 @@ export interface ITax {
   transactionDetails?: ITransactionDetail[];
 }
 
-export type ITaxMutation = Pick<ITax,
+export declare type ITaxMutation = Pick<ITax,
   | "name"
   | "rate"
   | "note"

@@ -1,1 +1,1 @@
-export type BalanceSheet = "AKTIVA" | "PASIVA";
+export declare type BalanceSheet = "AKTIVA" | "PASIVA";

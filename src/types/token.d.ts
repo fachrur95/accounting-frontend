@@ -1,6 +1,6 @@
 import type { IUser } from "./prisma-api/user";
 
-export interface ITokenData {
+export declare interface ITokenData {
   access: {
     token: string;
     expires: Date;
@@ -10,10 +10,10 @@ export interface ITokenData {
     expires: Date;
   };
 }
-export interface ITokenResponse {
+export declare interface ITokenResponse {
   tokens: ITokenData
 }
 
-export interface ITokenLoginResponse extends ITokenResponse {
+export declare interface ITokenLoginResponse extends ITokenResponse {
   user?: IUser;
 }

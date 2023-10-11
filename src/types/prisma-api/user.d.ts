@@ -1,6 +1,6 @@
 import type { Role } from "./role";
 
-export interface IUser {
+export declare interface IUser {
   id: string;
   email: string;
   name: string | null;

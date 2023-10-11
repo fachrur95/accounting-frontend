@@ -1,7 +1,7 @@
 import type { IMultipleUom } from "./multiple-uom";
 import type { IUnit } from "./unit";
 
-export interface IUnitOfMeasure {
+export declare interface IUnitOfMeasure {
   id: string;
   code: string | null;
   name: string;
@@ -16,7 +16,7 @@ export interface IUnitOfMeasure {
   multipleUoms?: IMultipleUom[];
 }
 
-export type IUnitOfMeasureMutation = Pick<IUnitOfMeasure,
+export declare type IUnitOfMeasureMutation = Pick<IUnitOfMeasure,
   | "code"
   | "name"
   | "note"

@@ -4,7 +4,7 @@ import type { ITransactionDetail } from "./transaction-detail";
 import type { IUnit } from "./unit";
 import type { IUnitOfMeasure } from "./unit-of-measure";
 
-export interface IMultipleUom {
+export declare interface IMultipleUom {
   id: string;
   conversionQty: number;
   barcode: string | null;

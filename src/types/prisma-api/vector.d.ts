@@ -1,1 +1,1 @@
-export type Vector = "POSITIVE" | "NEGATIVE";
+export declare type Vector = "POSITIVE" | "NEGATIVE";

@@ -1,7 +1,7 @@
 import type { IItemCategory } from "./item-category";
 import type { IUnit } from "./unit";
 
-export interface IItemType {
+export declare interface IItemType {
   id: string;
   name: string;
   isStock: boolean;
@@ -20,7 +20,7 @@ export interface IItemType {
   itemCategories?: IItemCategory[];
 }
 
-export type IItemTypeMutation = Pick<IItemType,
+export declare type IItemTypeMutation = Pick<IItemType,
   | "name"
   | "isStock"
   | "isSale"

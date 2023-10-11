@@ -1,6 +1,6 @@
 import type { IUnit } from "./unit";
 
-export interface IFinancialClosing {
+export declare interface IFinancialClosing {
   id: string
   entryDate: Date
   createdAt: Date

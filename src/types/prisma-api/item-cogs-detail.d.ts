@@ -2,7 +2,7 @@ import type { IItemCogs } from "./item-cogs";
 import type { ITransactionDetail } from "./transaction-detail";
 import type { IUnit } from "./unit";
 
-export interface IItemCogsDetail {
+export declare interface IItemCogsDetail {
   id: string;
   qty: number;
   cogs: number;

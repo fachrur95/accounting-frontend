@@ -2,18 +2,14 @@ import type { IDataOption } from "@/types/options";
 import {
   Box,
   Button,
-  Chip,
   IconButton,
   Paper,
   TableFooter,
   Typography,
 } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  AutocompleteElement,
-  CheckboxElement,
   FormContainer,
-  RadioButtonGroup,
   // SelectElement,
   SwitchElement,
   TextFieldElement,
@@ -27,7 +23,6 @@ import Delete from "@mui/icons-material/Delete";
 import AutocompleteItemCategory from "../controls/autocompletes/masters/AutocompleteItemCategory";
 import AutocompleteTax from "../controls/autocompletes/masters/AutocompleteTax";
 import NumericFormatCustom from "../controls/NumericFormatCustom";
-import Collapse from "@mui/material/Collapse";
 import { api } from "@/utils/api";
 import Link from "next/link";
 import Backdrop from "@mui/material/Backdrop";
@@ -38,7 +33,6 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import { isJson } from "@/utils/helpers";
 import type { FormSlugType } from "@/types/global";
 import type { IItemMutation } from "@/types/prisma-api/item";
 import type { IItemCategory } from "@/types/prisma-api/item-category";
@@ -75,16 +69,16 @@ const MasterItemForm = (props: IMasterItemForm) => {
   const formContext = useForm<MasterItemBodyType>({ defaultValues });
   const { slug } = props;
 
-  // console.log({ mode });
+  console.log({ mode });
 
   const {
     control,
     setValue,
-    getValues,
+    // getValues,
     formState: { isSubmitting },
     // reset,
     // setError,
-    watch,
+    // watch,
   } = formContext;
 
   const {
@@ -96,7 +90,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
     name: "multipleUoms",
   });
 
-  const selectedCategory = watch("itemCategory");
+  // const selectedCategory = watch("itemCategory");
   // const currentVariantCategory = watch("variantCategories");
   // const currentVariants = watch("variants");
 
@@ -105,11 +99,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
       { id: selectedId ?? "" },
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
-
-  const { data: dataCategory } = api.itemCategory.findOne.useQuery(
-    { id: selectedCategory?.id ?? "" },
-    { enabled: !!selectedCategory },
-  );
 
   const onSubmit = (data: MasterItemBodyType) => {
     console.log({ data });
@@ -135,9 +124,22 @@ const MasterItemForm = (props: IMasterItemForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
+          if (
+            key === "itemCategory" ||
+            key === "multipleUoms" ||
+            key === "tax" ||
+            key === "files"
+          ) {
+            continue;
+          }
           setValue(
             key as keyof Partial<MasterItemBodyType>,
-            dataSelected[key as keyof Partial<MasterItemBodyType>],
+            dataSelected[
+              key as keyof Omit<
+                MasterItemBodyType,
+                "itemCategory" | "multipleUoms" | "tax" | "files"
+              >
+            ],
           );
         }
       }
@@ -290,7 +292,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
                         startIcon={<Add />}
                         onClick={() =>
                           void appendUnit({
-                            unitOfMeasureId: null,
+                            unitOfMeasure: null,
                             conversionQty: 0,
                             barcode: "",
                           })

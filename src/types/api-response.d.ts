@@ -1,4 +1,4 @@
-export interface PaginationResponse<T> {
+export declare interface PaginationResponse<T> {
   currentPage: number | null;
   totalPages: number;
   nextPage: boolean;
@@ -7,6 +7,6 @@ export interface PaginationResponse<T> {
   rows: T[];
 }
 
-export interface ApiCatchError {
+export declare interface ApiCatchError {
   message?: string;
 }

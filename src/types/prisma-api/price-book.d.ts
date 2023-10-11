@@ -2,7 +2,7 @@ import type { IPeopleCategory } from "./people-category";
 import type { IPriceBookDetail } from "./price-book-detail";
 import type { IUnit } from "./unit";
 
-export interface IPriceBook {
+export declare interface IPriceBook {
   id: string;
   name: string;
   startDate: Date | null;
@@ -20,7 +20,7 @@ export interface IPriceBook {
   priceBookDetails?: IPriceBookDetail[];
 }
 
-export interface IPriceBookMutation extends Pick<IPriceBook,
+export declare interface IPriceBookMutation extends Pick<IPriceBook,
   | "name"
   | "peopleCategoryId"
   | "startDate"

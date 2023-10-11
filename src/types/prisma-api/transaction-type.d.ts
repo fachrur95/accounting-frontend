@@ -1,4 +1,4 @@
-export type TransactionType =
+export declare type TransactionType =
   | "SALE_QUOTATION"
   | "SALE_ORDER"
   | "SALE_INVOICE"
