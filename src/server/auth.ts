@@ -8,12 +8,13 @@ import {
   type Session,
   type Account,
   type Profile,
+  type Awaitable,
 } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 // import DiscordProvider from "next-auth/providers/discord";
 
 import { env } from "@/env.mjs";
-import type { ITokenLoginResponse } from "@/types/token";
+import type { ITokenData, ITokenLoginResponse } from "@/types/token";
 import axios from "axios";
 import jwtDecode from "jwt-decode";
 import type { IJwtDecode } from "@/types/session";
@@ -50,6 +51,49 @@ declare module "next-auth" {
   // }
 }
 
+async function refreshAccessToken(tokenObject: User) {
+  try {
+    const url = `${env.BACKEND_URL}/v1/auth/refresh-tokens`;
+
+    const newTokens = await axios.post<ITokenData>(
+      url,
+      {
+        refreshToken: tokenObject.refreshToken
+      },
+      {
+        headers: {
+          withCredentials: true,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Bearer ${tokenObject.accessToken}`
+        },
+      },
+    )
+      .then((response) => response.data)
+      .catch((err) => {
+        console.log(err)
+        return undefined
+      });
+
+    if (!newTokens) {
+      return tokenObject;
+    }
+
+    return {
+      ...tokenObject,
+      accessToken: newTokens.access.token,
+      refreshToken: newTokens.refresh.token ?? tokenObject.refreshToken, // Fall back to old refresh token
+    }
+  } catch (error) {
+    console.log(error)
+
+    return {
+      ...tokenObject,
+      error: "RefreshAccessTokenError",
+    }
+  }
+}
+
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  *
@@ -65,8 +109,9 @@ export const authOptions: NextAuthOptions = {
       },
       accessToken: token.accessToken,
       refreshToken: token.refreshToken,
+      error: token.error ?? null,
     }),
-    jwt(
+    async jwt(
       { token, user, trigger, session }:
         {
           token: JWT,
@@ -80,10 +125,13 @@ export const authOptions: NextAuthOptions = {
       if (trigger === "update") {
         return { ...token, accessToken: session?.accessToken, refreshToken: session?.refreshToken }
       }
-      // console.log({ now: Date.now(), exp: user.accessTokenExpires, res: Date.now() > user.accessTokenExpires })
-      /* if (Date.now() > user.accessTokenExpires) {
-        return refreshAccessToken(token as unknown as User)
-      } */
+      // console.log({ accessToken: token.accessToken, refreshToken: token.refreshToken });
+      if (token.accessToken) {
+        const tokenData = jwtDecode<IJwtDecode>(token.accessToken as string);
+        if (Date.now() > tokenData.exp * 1000) {
+          return refreshAccessToken(token as unknown as User) as Awaitable<JWT>
+        }
+      }
       if (user) {
         token.id = user.id;
         token.accessToken = user.accessToken;
@@ -109,7 +157,6 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // console.log({ test: typeof credentials?.callbackUrl })
         if (!credentials?.email || !credentials.password) {
           return null;
         }
@@ -128,7 +175,10 @@ export const authOptions: NextAuthOptions = {
           },
         )
           .then((response) => response.data)
-          .catch((err) => console.log(err));
+          .catch((err) => {
+            console.log(err);
+            return undefined;
+          });
 
         if (!user) {
           return null;
