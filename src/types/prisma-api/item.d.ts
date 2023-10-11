@@ -4,6 +4,7 @@ import type { IItemCogs } from "./item-cogs";
 import type { IMultipleUom } from "./multiple-uom";
 import type { ITax } from "./tax";
 import type { IUnit } from "./unit";
+import type { IUnitOfMeasure } from "./unit-of-measure";
 
 export declare interface IItem {
   id: string;
@@ -40,8 +41,8 @@ export declare interface IItemMutation extends Pick<IItem,
   | "maxQty"
   | "note"
   | "isActive"
-  | "multipleUoms"
+// | "multipleUoms"
 > {
-  multipleUom: Pick<IMultipleUom, "unitOfMeasureId" | "conversionQty" | "barcode">[];
+  multipleUoms: (Pick<IMultipleUom, "unitOfMeasureId" | "conversionQty" | "barcode"> & { id?: string, unitOfMeasure: IUnitOfMeasure | null })[];
   files: string[];
 }

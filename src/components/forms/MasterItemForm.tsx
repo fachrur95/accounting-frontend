@@ -244,7 +244,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
                         <AutocompleteTax
                           name={`multipleUoms.${index}.unitOfMeasure`}
                           required
-                          type="uom"
                           autocompleteProps={{
                             size: "small",
                           }}
