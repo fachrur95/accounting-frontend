@@ -41,10 +41,12 @@ import TableRow from "@mui/material/TableRow";
 import { isJson } from "@/utils/helpers";
 import type { FormSlugType } from "@/types/global";
 import type { IItemMutation } from "@/types/prisma-api/item";
+import type { IItemCategory } from "@/types/prisma-api/item-category";
+import type { ITax } from "@/types/prisma-api/tax";
 
 type MasterItemBodyType = IItemMutation & {
-  itemCategory: IDataOption | null;
-  tax: IDataOption | null;
+  itemCategory: IDataOption | IItemCategory | null;
+  tax: IDataOption | ITax | null;
 };
 
 const defaultValues: MasterItemBodyType = {
