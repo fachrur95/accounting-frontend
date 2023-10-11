@@ -19,3 +19,11 @@ export interface ICashRegister {
   unit?: IUnit;
   transactions: ITransaction[];
 }
+
+export type ICashRegisterMutation = Pick<ICashRegister,
+  | "depositAccountId"
+  | "beginBalanceAccountId"
+  | "name"
+  | "note"
+  | "isActive"
+>

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { api } from "@/utils/api";
 import type { IDataOption } from "@/types/options";
-import type { InfiniteQueryResult } from "@/types/api-response";
+import type { PaginationResponse } from "@/types/api-response";
 import { useInView } from "react-intersection-observer";
 import { Box } from "@mui/material";
 import Done from "@mui/icons-material/Done";
-import type { IMasterItemType } from "@/types/masters/masterItem/masterItemType";
 import debounce from "lodash.debounce";
+import type { IItemType } from "@/types/prisma-api/item-type";
 
 const useInfiniteItemType = () => {
   const { ref, inView } = useInView();
@@ -14,19 +14,22 @@ const useInfiniteItemType = () => {
   const [options, setOptions] = useState<IDataOption[]>([]);
   const [countAll, setCountAll] = useState<number>(0);
   const { data, hasNextPage, fetchNextPage, isFetching } =
-    api.masterItemType.getAll.useInfiniteQuery(
-      { limit: 25, q: search },
+    api.itemType.findAll.useInfiniteQuery(
+      { limit: 25, search },
       {
-        getNextPageParam: (lastPage: InfiniteQueryResult<IMasterItemType>) =>
+        getNextPageParam: (lastPage: PaginationResponse<IItemType>) =>
           typeof lastPage.currentPage === "number" && options.length < countAll
             ? (lastPage.currentPage ?? 0) + 1
             : undefined,
-      }
+      },
     );
 
-  const onSearch = debounce((event?: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setSearch(event?.target.value ?? "");
-  }, 1000); // Menunda eksekusi selama 1000ms
+  const onSearch = debounce(
+    (event?: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setSearch(event?.target.value ?? "");
+    },
+    1000,
+  ); // Menunda eksekusi selama 1000ms
 
   const renderOption = (
     props: React.HtmlHTMLAttributes<HTMLLIElement>,
@@ -34,7 +37,7 @@ const useInfiniteItemType = () => {
     {
       selected,
       index,
-    }: { selected: boolean; index: number; inputValue: string }
+    }: { selected: boolean; index: number; inputValue: string },
   ) => {
     return (
       <li {...props}>
@@ -59,10 +62,10 @@ const useInfiniteItemType = () => {
     if (data) {
       const dataOptions: IDataOption[] = data?.pages
         .map((page) =>
-          page.result.map((row: IMasterItemType) => ({
+          page.rows.map((row: IItemType) => ({
             id: row.id,
-            label: row.masteritemtype_description,
-          }))
+            label: row.name,
+          })),
         )
         .flat();
       const dataCountAll: number = data.pages[0]?.countAll ?? 0;

@@ -1,34 +1,34 @@
 import { useEffect, useState } from "react";
 import { api } from "@/utils/api";
 import type { IDataOption } from "@/types/options";
-import type { InfiniteQueryResult } from "@/types/api-response";
+import type { PaginationResponse } from "@/types/api-response";
 import { useInView } from "react-intersection-observer";
 import { Box } from "@mui/material";
 import Done from "@mui/icons-material/Done";
-import type { IMasterItem, MasterItemType } from "@/types/masters/masterItem";
 import debounce from "lodash.debounce";
+import type { IItem } from "@/types/prisma-api/item";
 
-const useInfiniteItem = ({ type }: { type?: MasterItemType }) => {
+const useInfiniteItem = () => {
   const { ref, inView } = useInView();
   const [search, setSearch] = useState<string>("");
   const [options, setOptions] = useState<IDataOption[]>([]);
   const [countAll, setCountAll] = useState<number>(0);
   const { data, hasNextPage, fetchNextPage, isFetching } =
-    api.masterItem.getAll.useInfiniteQuery(
-      { type, limit: 25, q: search },
+    api.item.findAll.useInfiniteQuery(
+      { limit: 25, search },
       {
-        getNextPageParam: (lastPage: InfiniteQueryResult<IMasterItem>) =>
+        getNextPageParam: (lastPage: PaginationResponse<IItem>) =>
           typeof lastPage.currentPage === "number" && options.length < countAll
             ? (lastPage.currentPage ?? 0) + 1
             : undefined,
-      }
+      },
     );
 
   const onSearch = debounce(
     (event?: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setSearch(event?.target.value ?? "");
     },
-    1000
+    1000,
   ); // Menunda eksekusi selama 1000ms
 
   const renderOption = (
@@ -37,7 +37,7 @@ const useInfiniteItem = ({ type }: { type?: MasterItemType }) => {
     {
       selected,
       index,
-    }: { selected: boolean; index: number; inputValue: string }
+    }: { selected: boolean; index: number; inputValue: string },
   ) => {
     return (
       <li {...props}>
@@ -62,11 +62,10 @@ const useInfiniteItem = ({ type }: { type?: MasterItemType }) => {
     if (data) {
       const dataOptions: IDataOption[] = data?.pages
         .map((page) =>
-          page.result.map((row: IMasterItem) => ({
+          page.rows.map((row: IItem) => ({
             id: row.id,
-            label: row.masteritem_alias ?? "-",
-            title: row.masteritem_description,
-          }))
+            label: row.name ?? "-",
+          })),
         )
         .flat();
       const dataCountAll: number = data.pages[0]?.countAll ?? 0;

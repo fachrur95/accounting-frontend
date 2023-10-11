@@ -19,3 +19,18 @@ export interface IPriceBook {
   peopleCategory?: IPeopleCategory | null;
   priceBookDetails?: IPriceBookDetail[];
 }
+
+export interface IPriceBookMutation extends Pick<IPriceBook,
+  | "name"
+  | "peopleCategoryId"
+  | "startDate"
+  | "endDate"
+  | "note"
+  | "isActive"
+> {
+  priceBookDetail: Pick<IPriceBookDetail,
+    | "multipleUomId"
+    | "qty"
+    | "price"
+    | "discount">[];
+}

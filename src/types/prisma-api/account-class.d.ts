@@ -15,3 +15,11 @@ export interface IAccountClass {
   updatedBy: string | null;
   accountSubClasses?: IAccountSubClass[];
 }
+
+export type IAccountClassMutation = Pick<IAccountClass,
+  | "code"
+  | "group"
+  | "name"
+  | "type"
+  | "balanceSheetPosition"
+>

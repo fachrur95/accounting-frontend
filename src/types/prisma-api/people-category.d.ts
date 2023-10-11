@@ -20,3 +20,13 @@ export interface IPeopleCategory {
   peoples?: IPeople[];
   priceBooks?: IPriceBook[];
 }
+
+export type IPeopleCategoryMutation = Pick<IPeopleCategory,
+  | "code"
+  | "name"
+  | "isCustomer"
+  | "isSupplier"
+  | "isEmployee"
+  | "note"
+  | "isActive"
+>

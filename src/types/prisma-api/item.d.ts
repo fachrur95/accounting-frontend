@@ -29,3 +29,19 @@ export interface IItem {
   multipleUoms?: IMultipleUom[];
   itemCogs?: IItemCogs[];
 }
+
+export interface IItemMutation extends Pick<IItem,
+  | "itemCategoryId"
+  | "taxId"
+  | "code"
+  | "name"
+  | "description"
+  | "minQty"
+  | "maxQty"
+  | "note"
+  | "isActive"
+  | "multipleUoms"
+> {
+  multipleUom: Pick<IMultipleUom, "unitOfMeasureId" | "conversionQty" | "barcode">[];
+  files: string[];
+}

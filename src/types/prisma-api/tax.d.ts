@@ -17,3 +17,10 @@ export interface ITax {
   items?: IItem[];
   transactionDetails?: ITransactionDetail[];
 }
+
+export type ITaxMutation = Pick<ITax,
+  | "name"
+  | "rate"
+  | "note"
+  | "isActive"
+>

@@ -17,3 +17,10 @@ export interface IItemCategory {
   unit?: IUnit;
   items?: IItem[];
 }
+
+export type IItemCategoryMutation = Pick<IItemCategory,
+  | "itemTypeId"
+  | "name"
+  | "note"
+  | "isActive"
+>

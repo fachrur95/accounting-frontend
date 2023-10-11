@@ -13,3 +13,8 @@ export interface IWarehouse {
   transactions: ITransaction[];
   transactionDestinations: ITransaction[];
 }
+
+export type IWarehouseMutation = Pick<IWarehouse,
+  | "unitId"
+  | "name"
+>

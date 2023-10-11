@@ -52,3 +52,8 @@ export interface IUnit {
   logActivities?: ILogActivity[];
   financialClosings?: IFinancialClosing[];
 }
+
+export type IUnitMutation = Pick<IUnit,
+  | "instituteId"
+  | "name"
+>

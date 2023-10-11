@@ -10,7 +10,7 @@ import "@fontsource/roboto/700.css";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider as TwProvider } from "next-themes";
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 
 import Router from "next/router";
 import NProgress from "nprogress"; //nprogress module
@@ -20,6 +20,7 @@ import { api } from "@/utils/api";
 import type { IEventDeleteWorker } from "@/types/worker";
 import { WorkerContext } from "@/context/WorkerContext";
 import { useAppStore } from "@/utils/store";
+import { LoadingPage } from "@/components/layouts/LoadingPage";
 
 //Route Events.
 Router.events.on("routeChangeStart", () => NProgress.start());
@@ -32,6 +33,7 @@ const MyApp = ({
 }: MyAppProps) => {
   const Layout =
     Layouts[Component?.Layout ?? "Plain"] ?? ((page: unknown) => page);
+  const [isClient, setIsClient] = useState<boolean>(false);
 
   const deleteWorker = useRef<Worker>();
   const { setToast, setDeletingProcess } = useAppStore();
@@ -58,6 +60,14 @@ const MyApp = ({
       deleteWorker.current?.terminate();
     };
   }, [handleReceiveDeleteResponse]);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return <LoadingPage />;
+  }
 
   return (
     <TwProvider enableSystem={true} attribute="class" defaultTheme="system">

@@ -15,3 +15,10 @@ export interface ITerm {
   unit?: IUnit;
   transactions?: ITransaction[];
 }
+
+export type ITermMutation = Pick<ITerm,
+  | "name"
+  | "period"
+  | "note"
+  | "isActive"
+>

@@ -4,158 +4,100 @@ export interface IDataTab {
   url: string;
 }
 
-export const chequeTabs: IDataTab[] = [
-  {
-    id: "cheques-customer",
-    label: "Customer",
-    url: "/cashandbank/cheques/cheques-customer",
-  },
-  {
-    id: "cheques-supplier",
-    label: "Supplier",
-    url: "/cashandbank/cheques/cheques-supplier",
-  },
-];
-
-export const assemblyTabs: IDataTab[] = [
-  {
-    id: "assembly-direct",
-    label: "Direct",
-    url: "/productions/assemble/assembly-direct",
-  },
-  {
-    id: "assembly-order",
-    label: "Order",
-    url: "/productions/assemble/assembly-order",
-  },
-  {
-    id: "assembly-quote",
-    label: "Quote",
-    url: "/productions/assemble/assembly-quote",
-  },
-  {
-    id: "assembly-mass-direct",
-    label: "Mass",
-    url: "/productions/assemble/assembly-mass-direct",
-  },
-];
-
-export const disassemblyTabs: IDataTab[] = [
-  {
-    id: "disassembly-direct",
-    label: "Direct",
-    url: "/productions/disassemble/disassembly-direct",
-  },
-  {
-    id: "disassembly-order",
-    label: "Order",
-    url: "/productions/disassemble/disassembly-order",
-  },
-  {
-    id: "disassembly-quote",
-    label: "Quote",
-    url: "/productions/disassemble/disassembly-quote",
-  },
-];
-
-export const transferItemTabs: IDataTab[] = [
-  {
-    id: "transfer-item-direct",
-    label: "Direct",
-    url: "/inventories/transfer-item/transfer-item-direct",
-  },
-  {
-    id: "transfer-item-order",
-    label: "Order",
-    url: "/inventories/transfer-item/transfer-item-order",
-  },
-  {
-    id: "transfer-item-quote",
-    label: "Quote",
-    url: "/inventories/transfer-item/transfer-item-quote",
-  },
-];
-
-export const stockAdjustmentTabs: IDataTab[] = [
-  {
-    id: "stock-instruction",
-    label: "Instruction",
-    url: "/inventories/stock-opname/stock-instructions",
-  },
-  {
-    id: "opname-count",
-    label: "Opname Count",
-    url: "/inventories/stock-opname/opname-counts",
-  },
-  {
-    id: "stock-adjustment",
-    label: "Adjustment",
-    url: "/inventories/stock-opname/stock-adjustments",
-  },
-];
-
-export const itemsTabs: IDataTab[] = [
+export const productTabs: IDataTab[] = [
   {
     id: "item",
-    label: "Item",
-    url: "/masters/products/items",
+    label: "Barang",
+    url: "/masters/products",
   },
   {
     id: "item-category",
-    label: "Category",
-    url: "/masters/products/item-categories",
-  },
-  {
-    id: "bom",
-    label: "Recipe",
-    url: "/masters/products/bill-of-materials",
+    label: "Kategori",
+    url: "/masters/products/categories",
   },
   {
     id: "uom",
-    label: "Unit",
+    label: "Satuan",
     url: "/masters/products/unit-of-measures",
   },
   {
     id: "item-type",
-    label: "Type",
+    label: "Tipe",
     url: "/masters/products/item-types",
-  },
-  {
-    id: "brand",
-    label: "Brand",
-    url: "/masters/products/brands",
   },
 ];
 
-export const salesPurchaseTabs: IDataTab[] = [
+export const chartOfAccountTabs: IDataTab[] = [
   {
-    id: "expedition",
-    label: "Expedition",
-    url: "/masters/sales-purchases/expeditions",
+    id: "chart-of-account",
+    label: "Bagan Akun",
+    url: "/masters/chart-of-accounts",
   },
   {
-    id: "currency",
-    label: "Currency",
-    url: "/masters/sales-purchases/currencies",
+    id: "account-class",
+    label: "Akun Utama",
+    url: "/masters/chart-of-accounts/classes",
+  },
+  {
+    id: "account-sub-class",
+    label: "Sub Akun",
+    url: "/masters/chart-of-accounts/sub-classes",
+  },
+];
+
+export const customerTabs: IDataTab[] = [
+  {
+    id: "item",
+    label: "Pelanggan",
+    url: "/masters/contacts/customers",
+  },
+  {
+    id: "item-category",
+    label: "Kategori",
+    url: "/masters/contacts/customers/categories",
+  },
+];
+
+export const supplierTabs: IDataTab[] = [
+  {
+    id: "item",
+    label: "Pemasok",
+    url: "/masters/contacts/suppliers",
+  },
+  {
+    id: "item-category",
+    label: "Kategori",
+    url: "/masters/contacts/suppliers/categories",
+  },
+];
+
+export const employeeTabs: IDataTab[] = [
+  {
+    id: "item",
+    label: "Pemasok",
+    url: "/masters/contacts/employees",
+  },
+  {
+    id: "item-category",
+    label: "Kategori",
+    url: "/masters/contacts/employees/categories",
+  },
+];
+
+export const otherTabs: IDataTab[] = [
+  {
+    id: "warehouse",
+    label: "Gudang",
+    url: "/masters/other/warehouses",
   },
   {
     id: "tax",
-    label: "Tax",
-    url: "/masters/sales-purchases/taxes",
+    label: "Pajak",
+    url: "/masters/other/taxes",
   },
   {
-    id: "credit-term",
-    label: "Credit Term",
-    url: "/masters/sales-purchases/credit-terms",
-  },
-  {
-    id: "payment-method",
-    label: "Payment Method",
-    url: "/masters/sales-purchases/payment-methods",
-  },
-  {
-    id: "sales-commission",
-    label: "Commission",
-    url: "/masters/sales-purchases/sales-commissions",
+    id: "term",
+    label: "Termin",
+    url: "/masters/other/terms",
   },
 ];

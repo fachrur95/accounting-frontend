@@ -15,3 +15,10 @@ export interface IUnitOfMeasure {
   unit?: IUnit;
   multipleUoms?: IMultipleUom[];
 }
+
+export type IUnitOfMeasureMutation = Pick<IUnitOfMeasure,
+  | "code"
+  | "name"
+  | "note"
+  | "isActive"
+>

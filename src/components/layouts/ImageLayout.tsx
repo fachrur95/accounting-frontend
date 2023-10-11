@@ -6,7 +6,7 @@ const ImageLayout = (props: PropsWithChildren) => {
   return (
     <div>
       <Image
-        src="/img/bg-full.png"
+        src="/img/bg-full.jpg"
         alt="imageBackground"
         loading="lazy"
         fill

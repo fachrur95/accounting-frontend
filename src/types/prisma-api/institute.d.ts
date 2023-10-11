@@ -9,3 +9,5 @@ export interface IInstitute {
   updatedBy: string | null;
   units?: IUnit[];
 }
+
+export type IInstituteMutation = Pick<IInstitute, "name">

@@ -25,7 +25,7 @@ import {
 import Close from "@mui/icons-material/Close";
 import Add from "@mui/icons-material/Add";
 import Delete from "@mui/icons-material/Delete";
-import AutocompleteMasterItemCategory from "../controls/autocompletes/masters/AutocompleteMasterItemCategory";
+import AutocompleteMasterItemCategory from "../controls/autocompletes/masters/AutocompleteItemCategory";
 import AutocompleteMasterOther from "../controls/autocompletes/masters/AutocompleteMasterOther";
 import NumericFormatCustom from "../controls/NumericFormatCustom";
 import Collapse from "@mui/material/Collapse";
@@ -191,12 +191,12 @@ const MasterItemView = (props: IMasterItemForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.masterItem.getUnique.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false }
+      { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
   const { data: dataCategory } = api.masterItemCategory.getUnique.useQuery(
     { id: selectedCategory?.id ?? "" },
-    { enabled: !!selectedCategory }
+    { enabled: !!selectedCategory },
   );
 
   const handleRenderVariants = useCallback((): void => {
@@ -227,7 +227,7 @@ const MasterItemView = (props: IMasterItemForm) => {
     }
 
     const values = variantCategories.map(
-      (variantCategory) => variantCategory.values
+      (variantCategory) => variantCategory.values,
     );
     const cartesianValues = fastCartesian(values);
 
@@ -237,7 +237,7 @@ const MasterItemView = (props: IMasterItemForm) => {
           const newValue = value.join(" ");
           const foundMatch = variantsOld.find(
             (variant) =>
-              variant.description === newValue && variant.unit.id === unit.id
+              variant.description === newValue && variant.unit.id === unit.id,
           );
           return {
             id: foundMatch?.id,
@@ -292,7 +292,7 @@ const MasterItemView = (props: IMasterItemForm) => {
         (variantName, index) => ({
           name: variantName,
           values: variantValues?.[index] ?? [],
-        })
+        }),
       );
 
       setValue("variantCategories", dataVariantCategory);
@@ -376,11 +376,11 @@ const MasterItemView = (props: IMasterItemForm) => {
                     },
                     description:
                       variant.masteritem_description.split(
-                        `${dataSelected.masteritem_description}-`
+                        `${dataSelected.masteritem_description}-`,
                       )?.[1] ?? "-",
                     barcode: element.masteritemuom_barcode ?? "",
                     price: variant.masteritem_priceinputdefault,
-                  })) ?? []
+                  })) ?? [],
               ) ?? []
             ).flat();
             setValue("variants", dataVariants);
@@ -406,7 +406,7 @@ const MasterItemView = (props: IMasterItemForm) => {
                 | "masteritem_oleh"
                 | "masteritem_active"
               >
-            ]
+            ],
           );
         }
       }
@@ -417,47 +417,47 @@ const MasterItemView = (props: IMasterItemForm) => {
     if (dataCategory) {
       setValue(
         "stock",
-        dataCategory.masteritemtype?.masteritemtype_isstock ?? false
+        dataCategory.masteritemtype?.masteritemtype_isstock ?? false,
       );
       setValue(
         "sales",
-        dataCategory.masteritemtype?.masteritemtype_issold ?? false
+        dataCategory.masteritemtype?.masteritemtype_issold ?? false,
       );
       setValue(
         "purchase",
-        dataCategory.masteritemtype?.masteritemtype_ispurchase ?? false
+        dataCategory.masteritemtype?.masteritemtype_ispurchase ?? false,
       );
       setValue(
         "assembly",
-        dataCategory.masteritemtype?.masteritemtype_isassembly ?? false
+        dataCategory.masteritemtype?.masteritemtype_isassembly ?? false,
       );
       setValue(
         "disassembly",
-        dataCategory.masteritemtype?.masteritemtype_isdissassembly ?? false
+        dataCategory.masteritemtype?.masteritemtype_isdissassembly ?? false,
       );
       setValue(
         "transfer",
-        dataCategory.masteritemtype?.masteritemtype_istransfer ?? false
+        dataCategory.masteritemtype?.masteritemtype_istransfer ?? false,
       );
       setValue(
         "beginBalance",
-        dataCategory.masteritemtype?.masteritemtype_isbeginbalance ?? false
+        dataCategory.masteritemtype?.masteritemtype_isbeginbalance ?? false,
       );
       setValue(
         "adjust",
-        dataCategory.masteritemtype?.masteritemtype_isadjustment ?? false
+        dataCategory.masteritemtype?.masteritemtype_isadjustment ?? false,
       );
       setValue(
         "formula",
-        dataCategory.masteritemtype?.masteritemtype_isformula ?? false
+        dataCategory.masteritemtype?.masteritemtype_isformula ?? false,
       );
       setValue(
         "material",
-        dataCategory.masteritemtype?.masteritemtype_iscomponent ?? false
+        dataCategory.masteritemtype?.masteritemtype_iscomponent ?? false,
       );
       setValue(
         "modify",
-        dataCategory.masteritemtype?.masteritemtype_ismodifier ?? false
+        dataCategory.masteritemtype?.masteritemtype_ismodifier ?? false,
       );
     }
   }, [dataCategory, setValue]);
@@ -802,7 +802,7 @@ const MasterItemView = (props: IMasterItemForm) => {
                               },
                               renderTags: (
                                 value: readonly string[],
-                                getTagProps
+                                getTagProps,
                               ) =>
                                 value.map((option: string, index: number) => (
                                   // eslint-disable-next-line react/jsx-key

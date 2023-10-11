@@ -26,6 +26,8 @@ const DashboardHeader = (props: HeaderProps) => {
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     useState<null | HTMLElement>(null);
 
+  console.log({ sessionData });
+
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -86,26 +88,6 @@ const DashboardHeader = (props: HeaderProps) => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      {/* <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton
-          size="large"
-          aria-label="show 17 new notifications"
-          color="inherit"
-        >
-          <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem> */}
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           size="large"
@@ -142,7 +124,7 @@ const DashboardHeader = (props: HeaderProps) => {
           <div className="flex flex-row items-center gap-2">
             <Image
               alt="logo"
-              src="/img/logo-inline-white.png"
+              src="/img/logo-p2s3.png"
               loading="lazy"
               width={163}
               height={49}
@@ -158,24 +140,6 @@ const DashboardHeader = (props: HeaderProps) => {
             sx={{ display: { xs: "none", md: "flex" } }}
             className="items-center"
           >
-            {/* <IconButton
-              size="large"
-              aria-label="show 4 new mails"
-              color="inherit"
-            >
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              color="inherit"
-            >
-              <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton> */}
             <DeletingProcess />
             <div className="flex flex-row items-center gap-2">
               <div className="flex flex-col items-end justify-center">

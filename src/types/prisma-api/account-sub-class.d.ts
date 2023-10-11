@@ -16,3 +16,11 @@ export interface IAccountSubClass {
   accountClass?: IAccountClass;
   chartOfAccounts?: IChartOfAccount[];
 }
+
+export type IAccountSubClassMutation = Pick<IAccountSubClass,
+  | "accountClassId"
+  | "code"
+  | "group"
+  | "name"
+  | "balanceSheetPosition"
+>

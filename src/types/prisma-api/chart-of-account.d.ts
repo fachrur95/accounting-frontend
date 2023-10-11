@@ -23,3 +23,11 @@ export interface IChartOfAccount {
   transactionDetails?: ITransactionDetail[];
   transactions?: ITransaction[];
 }
+
+export type IChartOfAccountMutation = Pick<IChartOfAccount,
+  | "accountSubClassId"
+  | "code"
+  | "group"
+  | "name"
+  | "isActive"
+>

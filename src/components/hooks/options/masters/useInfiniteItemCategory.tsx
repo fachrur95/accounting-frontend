@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { api } from "@/utils/api";
 import type { IDataOption } from "@/types/options";
-import type { IMasterItemCategory } from "@/types/masters/masterItem/masterItemCategory";
-import type { InfiniteQueryResult } from "@/types/api-response";
+import type { PaginationResponse } from "@/types/api-response";
 import { useInView } from "react-intersection-observer";
 import { Box } from "@mui/material";
 import Done from "@mui/icons-material/Done";
 import debounce from "lodash.debounce";
+import type { IItemCategory } from "@/types/prisma-api/item-category";
 
 const useInfiniteItemCategory = () => {
   const { ref, inView } = useInView();
@@ -14,23 +14,21 @@ const useInfiniteItemCategory = () => {
   const [options, setOptions] = useState<IDataOption[]>([]);
   const [countAll, setCountAll] = useState<number>(0);
   const { data, hasNextPage, fetchNextPage, isFetching } =
-    api.masterItemCategory.getAll.useInfiniteQuery(
-      { limit: 25, q: search },
+    api.itemCategory.findAll.useInfiniteQuery(
+      { limit: 25, search },
       {
-        getNextPageParam: (
-          lastPage: InfiniteQueryResult<IMasterItemCategory>
-        ) =>
+        getNextPageParam: (lastPage: PaginationResponse<IItemCategory>) =>
           typeof lastPage.currentPage === "number" && options.length < countAll
             ? (lastPage.currentPage ?? 0) + 1
             : undefined,
-      }
+      },
     );
 
   const onSearch = debounce(
     (event?: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setSearch(event?.target.value ?? "");
     },
-    1000
+    1000,
   ); // Menunda eksekusi selama 1000ms
 
   const renderOption = (
@@ -39,7 +37,7 @@ const useInfiniteItemCategory = () => {
     {
       selected,
       index,
-    }: { selected: boolean; index: number; inputValue: string }
+    }: { selected: boolean; index: number; inputValue: string },
   ) => {
     return (
       <li {...props}>
@@ -64,10 +62,10 @@ const useInfiniteItemCategory = () => {
     if (data) {
       const dataOptions: IDataOption[] = data?.pages
         .map((page) =>
-          page.result.map((row: IMasterItemCategory) => ({
+          page.rows.map((row: IItemCategory) => ({
             id: row.id,
-            label: row.masteritemcategory_description,
-          }))
+            label: row.name,
+          })),
         )
         .flat();
       const dataCountAll: number = data.pages[0]?.countAll ?? 0;

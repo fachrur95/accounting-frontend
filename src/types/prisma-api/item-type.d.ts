@@ -19,3 +19,14 @@ export interface IItemType {
   unit?: IUnit;
   itemCategories?: IItemCategory[];
 }
+
+export type IItemTypeMutation = Pick<IItemType,
+  | "name"
+  | "isStock"
+  | "isSale"
+  | "isPurchase"
+  | "isAdjustment"
+  | "isTransfer"
+  | "note"
+  | "isActive"
+>

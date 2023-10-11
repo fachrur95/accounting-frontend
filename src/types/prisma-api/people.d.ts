@@ -19,3 +19,11 @@ export interface IPeople {
   transactionPeoples?: ITransaction[];
   transactionCashiers?: ITransaction[];
 }
+
+export type IPeopleMutation = Pick<IPeople,
+  | "peopleCategoryId"
+  | "code"
+  | "name"
+  | "note"
+  | "isActive"
+>

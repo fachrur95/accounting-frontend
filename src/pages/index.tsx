@@ -4,15 +4,12 @@ import Link from "next/link";
 
 import { api } from "@/utils/api";
 import type { MyPage } from "@/components/layouts/layoutTypes";
-import type { ISessionResponse } from "@/types/session";
+import type { IJwtDecode } from "@/types/session";
 import type { GetServerSideProps } from "next";
 import { getServerAuthSession } from "@/server/auth";
-import axios from "axios";
-import { env } from "@/env.mjs";
+import jwtDecode from "jwt-decode";
 
-const DashboardPage: MyPage<{ sessionData: ISessionResponse }> = ({
-  sessionData,
-}) => {
+const DashboardPage: MyPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
   return (
@@ -99,23 +96,27 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
   const accessToken = session.accessToken;
-  const sessionData = await axios
-    .get<ISessionResponse>(`${env.BACKEND_URL}/v1/auth/session`, {
-      withCredentials: true,
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-    .then((response) => {
-      return response.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      return null;
-    });
+  const tokenData = jwtDecode<IJwtDecode>(accessToken);
+  if (!tokenData.session?.institute) {
+    return {
+      redirect: {
+        destination: "/credentials/institute",
+        permanent: false,
+      },
+    };
+  }
+  if (!tokenData.session?.unit) {
+    return {
+      redirect: {
+        destination: "/credentials/unit",
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {
       session,
-      sessionData,
     },
   };
 };

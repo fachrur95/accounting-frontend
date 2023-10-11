@@ -1,4 +1,3 @@
-import AssignmentTurnedInOutlined from "@mui/icons-material/AssignmentTurnedInOutlined";
 import BuildCircleOutlined from "@mui/icons-material/BuildCircleOutlined";
 import CallMadeOutlined from "@mui/icons-material/CallMadeOutlined";
 import CallReceivedOutlined from "@mui/icons-material/CallReceivedOutlined";
@@ -12,10 +11,8 @@ import Groups from "@mui/icons-material/Groups";
 import Hiking from "@mui/icons-material/Hiking";
 import ImportExportOutlined from "@mui/icons-material/ImportExportOutlined";
 import InsertChartOutlined from "@mui/icons-material/InsertChartOutlined";
-import Inventory2Outlined from "@mui/icons-material/Inventory2Outlined";
 import LocalAtmOutlined from "@mui/icons-material/LocalAtmOutlined";
 import LocalOfferOutlined from "@mui/icons-material/LocalOfferOutlined";
-import MenuBook from "@mui/icons-material/MenuBook";
 import MonetizationOnOutlined from "@mui/icons-material/MonetizationOnOutlined";
 import MoreOutlined from "@mui/icons-material/MoreOutlined";
 import PaymentOutlined from "@mui/icons-material/PaymentOutlined";
@@ -68,7 +65,7 @@ const data: DataMenuType[] = [
         url: "/sales/sales-quotations",
         icon: <FormatQuote fontSize="small" />,
         children: [],
-      }, */
+      },
       {
         id: "sales-order",
         label: "pemesanan",
@@ -77,14 +74,14 @@ const data: DataMenuType[] = [
         icon: <MenuBook fontSize="small" />,
         children: [],
       },
-      /* {
+      {
         id: "sales-delivery",
         label: "delivery",
         depth: 1,
         url: "/sales/sales-deliveries",
         icon: <LocalShippingOutlined fontSize="small" />,
         children: [],
-      }, */
+      },
       {
         id: "sales-invoice",
         label: "penjualan",
@@ -93,7 +90,7 @@ const data: DataMenuType[] = [
         icon: <AssignmentTurnedInOutlined fontSize="small" />,
         children: [],
       },
-      /* {
+      {
         id: "sales-return",
         label: "return",
         depth: 1,
@@ -117,7 +114,7 @@ const data: DataMenuType[] = [
         url: "/purchase/purchase-quotations",
         icon: <FormatQuote fontSize="small" />,
         children: [],
-      }, */
+      },
       {
         id: "purchase-order",
         label: "pemesanan",
@@ -126,14 +123,14 @@ const data: DataMenuType[] = [
         icon: <MenuBook fontSize="small" />,
         children: [],
       },
-      /* {
+      {
         id: "purchase-delivery",
         label: "delivery",
         depth: 1,
         url: "/purchase/purchase-deliveries",
         icon: <LocalShippingOutlined fontSize="small" />,
         children: [],
-      }, */
+      },
       {
         id: "purchase-invoice",
         label: "pembelian",
@@ -142,7 +139,7 @@ const data: DataMenuType[] = [
         icon: <AssignmentTurnedInOutlined fontSize="small" />,
         children: [],
       },
-      /* {
+      {
         id: "purchase-return",
         label: "return",
         depth: 1,
@@ -153,55 +150,55 @@ const data: DataMenuType[] = [
     ],
   },
   {
-    id: "cashandbank",
+    id: "cash-and-bank",
     label: "kas dan bank",
     depth: 0,
-    url: "/cashandbank",
+    url: "/cash-and-bank",
     icon: <LocalAtmOutlined fontSize="small" />,
     children: [
       {
-        id: "receivable-payments",
+        id: "receivable-payment",
         label: "Terima Piutang",
         depth: 1,
-        url: "/cashandbank/receivable-payments",
+        url: "/cash-and-bank/receivable-payments",
         icon: <SaveAltOutlined fontSize="small" />,
         children: [],
       },
       {
-        id: "payable-payments",
+        id: "payable-payment",
         label: "bayar hutang",
         depth: 1,
-        url: "/cashandbank/payable-payments",
+        url: "/cash-and-bank/payable-payments",
         icon: <PaymentOutlined fontSize="small" />,
         children: [],
       },
       {
-        id: "expenses",
+        id: "expense",
         label: "pengeluaran",
         depth: 1,
-        url: "/cashandbank/expenses",
+        url: "/cash-and-bank/expenses",
         icon: <CallMadeOutlined fontSize="small" />,
         children: [],
       },
       {
-        id: "other-incomes",
+        id: "revenue",
         label: "Pemasukan",
         depth: 1,
-        url: "/cashandbank/other-incomes",
+        url: "/cash-and-bank/revenues",
         icon: <CallReceivedOutlined fontSize="small" />,
         children: [],
       },
       {
-        id: "transfer-funds",
+        id: "transfer-fund",
         label: "transfer dana",
         depth: 1,
-        url: "/cashandbank/transfer-funds",
+        url: "/cash-and-bank/transfer-funds",
         icon: <ImportExportOutlined fontSize="small" />,
         children: [],
       },
     ],
   },
-  {
+  /* {
     id: "inventories",
     label: "inventaris",
     depth: 0,
@@ -217,7 +214,7 @@ const data: DataMenuType[] = [
         children: [],
       },
     ],
-  },
+  }, */
   {
     id: "other",
     label: "lain-lain",
@@ -226,55 +223,63 @@ const data: DataMenuType[] = [
     icon: <MoreOutlined fontSize="small" />,
     children: [
       {
+        id: "stock-opname",
+        label: "stock opname",
+        depth: 1,
+        url: "/other/stock-opname",
+        icon: <ProductionQuantityLimits fontSize="small" />,
+        children: [],
+      },
+      {
         id: "journal-entry",
         label: "journal entry",
         depth: 1,
-        url: "/other/journal-entry",
+        url: "/other/journal-entries",
         icon: <CircleOutlined fontSize="small" />,
         children: [],
       },
       {
-        id: "all-trans",
+        id: "all-transaction",
         label: "semua transaksi",
         depth: 1,
-        url: "/other/all-trans",
+        url: "/other/all-transactions",
         icon: <CircleOutlined fontSize="small" />,
         children: [],
       },
     ],
   },
   {
-    id: "masters",
+    id: "master",
     label: "data",
     depth: 0,
     url: "/",
     icon: <StorageOutlined fontSize="small" />,
     children: [
       {
-        id: "products",
-        label: "products",
+        id: "product",
+        label: "produk",
         depth: 1,
         url: "/masters/products",
         icon: <LocalOfferOutlined fontSize="small" />,
         children: [],
       },
       {
-        id: "sales-prices",
+        id: "price-book",
         label: "harga jual",
         depth: 1,
-        url: "/masters/sales-prices",
+        url: "/masters/price-books",
         icon: <PriceChange fontSize="small" />,
         children: [],
       },
       {
-        id: "contacts",
+        id: "contact",
         label: "kontak",
         depth: 1,
         url: "/masters/contacts",
         icon: <ContactsOutlined fontSize="small" />,
         children: [
           {
-            id: "contact-customer",
+            id: "customer",
             label: "pelanggan",
             depth: 2,
             url: "/masters/contacts/customers",
@@ -282,7 +287,7 @@ const data: DataMenuType[] = [
             children: [],
           },
           {
-            id: "contact-supplier",
+            id: "supplier",
             label: "pemasok",
             depth: 2,
             url: "/masters/contacts/suppliers",
@@ -290,7 +295,7 @@ const data: DataMenuType[] = [
             children: [],
           },
           {
-            id: "contact-employee",
+            id: "employee",
             label: "karyawan",
             depth: 2,
             url: "/masters/contacts/employees",
@@ -300,7 +305,7 @@ const data: DataMenuType[] = [
         ],
       },
       {
-        id: "chart-of-accounts",
+        id: "chart-of-account",
         label: "bagan akun",
         depth: 1,
         url: "/masters/chart-of-accounts",
@@ -308,17 +313,17 @@ const data: DataMenuType[] = [
         children: [],
       },
       {
-        id: "others",
+        id: "other",
         label: "lain-lain",
         depth: 1,
-        url: "/masters/others",
+        url: "/masters/other",
         icon: <StorefrontOutlined fontSize="small" />,
         children: [],
       },
     ],
   },
   {
-    id: "reports",
+    id: "report",
     label: "laporan",
     depth: 0,
     url: "/reports",
@@ -326,7 +331,7 @@ const data: DataMenuType[] = [
     children: [],
   },
   {
-    id: "activities",
+    id: "activity",
     label: "aktivitas",
     depth: 0,
     url: "/activities",
@@ -334,7 +339,7 @@ const data: DataMenuType[] = [
     children: [],
   },
   {
-    id: "settings",
+    id: "setting",
     label: "pengaturan",
     depth: 0,
     url: "/settings",
