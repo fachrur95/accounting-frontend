@@ -83,8 +83,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
   const {
     control,
     setValue,
-    getValues,
-    watch,
     formState: { isSubmitting },
   } = formContext;
 
