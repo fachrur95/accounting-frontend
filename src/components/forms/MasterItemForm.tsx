@@ -36,6 +36,7 @@ import type { IItemCategory } from "@/types/prisma-api/item-category";
 import type { ITax } from "@/types/prisma-api/tax";
 import type { IMultipleUom } from "@/types/prisma-api/multiple-uom";
 import AutocompleteUnitOfMeasure from "../controls/autocompletes/masters/AutocompleteUnitOfMeasure";
+import type { IDataOption } from "@/types/options";
 
 /* type MasterItemBodyType = IItemMutation & {
   itemCategory: IDataOption | IItemCategory | null;
@@ -160,7 +161,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
             continue;
           }
           if (key === "multipleUoms") {
-            const multipleUnit = (dataSelected[key] as IMultipleUom[]) || null;
+            const multipleUnit = dataSelected[key] as IMultipleUom[];
 
             if (multipleUnit) {
               const dataUnit = multipleUnit.map((unit) => {
@@ -332,7 +333,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
                           required
                           autocompleteProps={{
                             size: "small",
-                            onChange: (_, data) =>
+                            onChange: (_, data: IDataOption | null) =>
                               index === 0 &&
                               setDefaultUnit(data?.label ?? null),
                           }}
