@@ -1,4 +1,4 @@
-import type { GridFilterItem } from "@mui/x-data-grid-pro";
+import type { GridFilterItem, GridFilterModel } from "@mui/x-data-grid-pro";
 
 export const variantNameShown = (name: string): string => {
   // const splitted = name.split(",");
@@ -136,26 +136,26 @@ export const convertOperator = ({ items }: { items: GridFilterItem[] }) => {
       el.operatorValue === "=" ||
       el.operatorValue === "is"
     ) {
-      return { ...el, operatorValue: "eq" };
+      return { ...el, operatorValue: "equals" };
     }
     if (el.operatorValue === "contains") {
-      return { ...el, operatorValue: "substring" };
+      return { ...el, operatorValue: "contains" };
     }
     if (el.operatorValue === "isAnyOf") {
       return { ...el, operatorValue: "in" };
     }
     if (el.operatorValue === "isNotEmpty") {
-      return { ...el, operatorValue: "ne", value: null };
+      return { ...el, operatorValue: "not", value: null };
     }
     if (el.operatorValue === "isEmpty") {
-      return { ...el, operatorValue: "is", value: null };
+      return { ...el, operatorValue: undefined, value: null };
     }
     if (
       el.operatorValue === "isNot" ||
       el.operatorValue === "not" ||
       el.operatorValue === "!="
     ) {
-      return { ...el, operatorValue: "ne" };
+      return { ...el, operatorValue: "not" };
     }
     if (
       el.operatorValue === "isAfter" ||
@@ -194,3 +194,17 @@ export const convertDateOnly = (val: number) => {
 
   // return `${date.getMonth() + 1}/${date.getDay()}/${date.getFullYear()}`;
 };
+
+export const convertFilterToURL = (filter: GridFilterModel, front: "&" | "?" = "&") => {
+  let url = `${front}filters[operator]=${filter.linkOperator ?? "or"}`;
+
+  filter.items.forEach((field, index) => {
+    url += `&filters[fields][${index}][field]=${field.columnField}`;
+    if (field.operatorValue) {
+      url += `&filters[fields][${index}][type]=${field.operatorValue}`;
+    }
+    url += `&filters[fields][${index}][value]=${field.value}`;
+  });
+
+  return url;
+}

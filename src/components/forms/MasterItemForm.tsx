@@ -1,4 +1,3 @@
-import type { IDataOption } from "@/types/options";
 import {
   Box,
   Button,
@@ -10,7 +9,6 @@ import {
 import React, { useEffect, useState } from "react";
 import {
   FormContainer,
-  // SelectElement,
   SwitchElement,
   TextFieldElement,
   TextareaAutosizeElement,
@@ -21,7 +19,6 @@ import Close from "@mui/icons-material/Close";
 import Add from "@mui/icons-material/Add";
 import Delete from "@mui/icons-material/Delete";
 import AutocompleteItemCategory from "../controls/autocompletes/masters/AutocompleteItemCategory";
-import AutocompleteTax from "../controls/autocompletes/masters/AutocompleteTax";
 import NumericFormatCustom from "../controls/NumericFormatCustom";
 import { api } from "@/utils/api";
 import Link from "next/link";
@@ -37,13 +34,22 @@ import type { FormSlugType } from "@/types/global";
 import type { IItemMutation } from "@/types/prisma-api/item";
 import type { IItemCategory } from "@/types/prisma-api/item-category";
 import type { ITax } from "@/types/prisma-api/tax";
+import type { IMultipleUom } from "@/types/prisma-api/multiple-uom";
+import AutocompleteUnitOfMeasure from "../controls/autocompletes/masters/AutocompleteUnitOfMeasure";
 
-type MasterItemBodyType = IItemMutation & {
+/* type MasterItemBodyType = IItemMutation & {
   itemCategory: IDataOption | IItemCategory | null;
   tax: IDataOption | ITax | null;
+}; */
+
+const defaultUom = {
+  unitOfMeasureId: "",
+  conversionQty: 1,
+  barcode: "",
+  unitOfMeasure: null,
 };
 
-const defaultValues: MasterItemBodyType = {
+const defaultValues: IItemMutation = {
   itemCategory: null,
   tax: null,
   itemCategoryId: "",
@@ -53,9 +59,10 @@ const defaultValues: MasterItemBodyType = {
   description: "",
   minQty: 0,
   maxQty: 0,
+  manualCogs: 0,
   note: "",
   isActive: true,
-  multipleUoms: [],
+  multipleUoms: [defaultUom],
   files: [],
 };
 
@@ -66,7 +73,8 @@ interface IMasterItemForm {
 const MasterItemForm = (props: IMasterItemForm) => {
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const formContext = useForm<MasterItemBodyType>({ defaultValues });
+  const [defaultUnit, setDefaultUnit] = useState<string | null>(null);
+  const formContext = useForm<IItemMutation>({ defaultValues });
   const { slug } = props;
 
   console.log({ mode });
@@ -74,11 +82,9 @@ const MasterItemForm = (props: IMasterItemForm) => {
   const {
     control,
     setValue,
-    // getValues,
+    getValues,
+    watch,
     formState: { isSubmitting },
-    // reset,
-    // setError,
-    // watch,
   } = formContext;
 
   const {
@@ -90,6 +96,15 @@ const MasterItemForm = (props: IMasterItemForm) => {
     name: "multipleUoms",
   });
 
+  // const test = useWatch(control, "multipleUoms[0].unitOfMeasure.name");
+
+  /* console.log({
+    test,
+    getValues: getValues(`multipleUoms[0]?.unitOfMeasure?.name`),
+    watch: watch(`multipleUoms[0]?.unitOfMeasure?.name`),
+  }); */
+
+  // const defaultUnit = watch("multipleUoms");
   // const selectedCategory = watch("itemCategory");
   // const currentVariantCategory = watch("variantCategories");
   // const currentVariants = watch("variants");
@@ -100,7 +115,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
-  const onSubmit = (data: MasterItemBodyType) => {
+  const onSubmit = (data: IItemMutation) => {
     console.log({ data });
   };
 
@@ -124,20 +139,82 @@ const MasterItemForm = (props: IMasterItemForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
-          if (
-            key === "itemCategory" ||
-            key === "multipleUoms" ||
-            key === "tax" ||
-            key === "files"
-          ) {
+          if (key === "itemCategory") {
+            const selectedCategory = dataSelected[key] as IItemCategory | null;
+            if (selectedCategory) {
+              setValue("itemCategory", {
+                id: selectedCategory.id,
+                label: selectedCategory.name,
+              });
+            }
             continue;
           }
+          if (key === "tax") {
+            const selectedTax = dataSelected[key] as ITax | null;
+            if (selectedTax) {
+              setValue("tax", {
+                id: selectedTax.id,
+                label: selectedTax.name,
+              });
+            }
+            continue;
+          }
+          if (key === "multipleUoms") {
+            const multipleUnit = (dataSelected[key] as IMultipleUom[]) || null;
+
+            if (multipleUnit) {
+              const dataUnit = multipleUnit.map((unit) => {
+                const selectedUnit = {
+                  id: unit.unitOfMeasure?.id ?? "",
+                  label: unit.unitOfMeasure?.name ?? "",
+                };
+                if (unit.conversionQty === 1) {
+                  setDefaultUnit(unit.unitOfMeasure.name);
+                }
+                return {
+                  id: unit.id,
+                  unitOfMeasure: selectedUnit,
+                  conversionQty: unit.conversionQty,
+                  barcode: unit.barcode,
+                };
+              });
+              setValue("multipleUoms", dataUnit);
+            }
+
+            continue;
+          }
+          if (key === "files") {
+            continue;
+          }
+          // "itemCategory" | "multipleUoms" | "tax" | "files" | "id"
+
           setValue(
-            key as keyof Partial<MasterItemBodyType>,
+            key as keyof (keyof Pick<
+              IItemMutation,
+              | "itemCategoryId"
+              | "taxId"
+              | "code"
+              | "name"
+              | "description"
+              | "minQty"
+              | "maxQty"
+              | "manualCogs"
+              | "note"
+              | "isActive"
+            >),
             dataSelected[
-              key as keyof Omit<
-                MasterItemBodyType,
-                "itemCategory" | "multipleUoms" | "tax" | "files"
+              key as keyof Pick<
+                IItemMutation,
+                | "itemCategoryId"
+                | "taxId"
+                | "code"
+                | "name"
+                | "description"
+                | "minQty"
+                | "maxQty"
+                | "manualCogs"
+                | "note"
+                | "isActive"
               >
             ],
           );
@@ -155,7 +232,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
         <CircularProgress color="inherit" />
       </Backdrop>
       <div className="mb-2 flex items-center gap-2">
-        <Link href="/masters/products/items">
+        <Link href="/masters/products">
           <IconButton>
             <Close />
           </IconButton>
@@ -199,18 +276,27 @@ const MasterItemForm = (props: IMasterItemForm) => {
                 inputComponent: NumericFormatCustom as never,
               }}
             />
+            <TextFieldElement
+              name="manualCogs"
+              label="HPP Manual (diisi jika pengaturan manual)"
+              InputProps={{
+                inputComponent: NumericFormatCustom as never,
+              }}
+            />
             <TextareaAutosizeElement
               name="note"
               label="Catatan"
               rows={3}
               className="col-start-1"
             />
-            <SwitchElement name="masteritem_active" label="Active" />
           </Box>
           <Box
             component={Paper}
             className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
           >
+            <SwitchElement name="isActive" label="Aktif" />
+          </Box>
+          <Box component={Paper}>
             <TableContainer component={Paper} elevation={0} variant="outlined">
               <Table size="small">
                 <TableHead>
@@ -218,12 +304,12 @@ const MasterItemForm = (props: IMasterItemForm) => {
                     <TableCell width="5%" align="right">
                       No
                     </TableCell>
-                    <TableCell width="35%">Unit</TableCell>
+                    <TableCell width="30%">Satuan</TableCell>
                     <TableCell width="15%" align="right">
                       Qty
                     </TableCell>
-                    <TableCell width="5%">Base</TableCell>
-                    <TableCell width="25%">Barcode</TableCell>
+                    <TableCell width="15%">Satuan Dasar</TableCell>
+                    <TableCell width="20%">Barcode</TableCell>
                     <TableCell width="5%" align="center">
                       <Delete />
                     </TableCell>
@@ -241,11 +327,14 @@ const MasterItemForm = (props: IMasterItemForm) => {
                         {index + 1}
                       </TableCell>
                       <TableCell align="right">
-                        <AutocompleteTax
+                        <AutocompleteUnitOfMeasure
                           name={`multipleUoms.${index}.unitOfMeasure`}
                           required
                           autocompleteProps={{
                             size: "small",
+                            onChange: (_, data) =>
+                              index === 0 &&
+                              setDefaultUnit(data?.label ?? null),
                           }}
                           textFieldProps={{
                             hiddenLabel: true,
@@ -258,12 +347,13 @@ const MasterItemForm = (props: IMasterItemForm) => {
                           hiddenLabel
                           InputProps={{
                             inputComponent: NumericFormatCustom as never,
+                            disabled: index === 0,
                           }}
                           fullWidth
                           size="small"
                         />
                       </TableCell>
-                      <TableCell>XX</TableCell>
+                      <TableCell>{defaultUnit ?? "-"}</TableCell>
                       <TableCell>
                         <TextFieldElement
                           name={`multipleUoms.${index}.barcode`}
@@ -277,6 +367,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
                           onClick={() => void removeUnit(index)}
                           color="error"
                           size="small"
+                          disabled={index === 0}
                         >
                           <Close />
                         </IconButton>
@@ -291,6 +382,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
                         startIcon={<Add />}
                         onClick={() =>
                           void appendUnit({
+                            unitOfMeasureId: "",
                             unitOfMeasure: null,
                             conversionQty: 0,
                             barcode: "",
@@ -299,7 +391,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
                         size="large"
                         fullWidth
                       >
-                        Add New
+                        Tambah Satuan
                       </Button>
                     </TableCell>
                   </TableRow>
