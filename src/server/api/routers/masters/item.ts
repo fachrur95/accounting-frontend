@@ -7,8 +7,8 @@ import { env } from "@/env.mjs";
 import { z } from "zod";
 import type { ApiCatchError, PaginationResponse } from "@/types/api-response";
 import type { IItem } from "@/types/prisma-api/item";
-import { convertFilterToURL } from "@/utils/helpers";
-import type { GridFilterModel } from "@mui/x-data-grid-pro";
+import { convertFilterToURL, convertSortToURL } from "@/utils/helpers";
+import type { GridFilterModel, GridSortModel } from "@mui/x-data-grid-pro";
 
 export const defaultUndefinedResult: PaginationResponse<IItem> = {
   rows: [],
@@ -36,10 +36,16 @@ export const itemRouter = createTRPCRouter({
             value: z.any(),
           })
         )
-      }).nullish()
+      }).nullish(),
+      sort: z.array(
+        z.object({
+          field: z.string(),
+          sort: z.enum(["asc", "desc"]).nullish().default("asc"),
+        })
+      ).nullish(),
     }),
   ).query(async ({ ctx, input }) => {
-    const { limit, cursor, search, filter } = input;
+    const { limit, cursor, search, filter, sort } = input;
 
     let url = `${GLOBAL_URL}?page=${cursor ?? 0}&limit=${limit}`;
 
@@ -49,6 +55,10 @@ export const itemRouter = createTRPCRouter({
 
     if (filter) {
       url += convertFilterToURL(filter as GridFilterModel)
+    }
+
+    if (sort) {
+      url += convertSortToURL(sort as GridSortModel)
     }
 
     const result = await axios.get<PaginationResponse<IItem>>(
@@ -89,10 +99,22 @@ export const itemRouter = createTRPCRouter({
   create: protectedProcedure.input(
     z.object({
       code: z.string(),
-      group: z.string().optional(),
+      description: z.string().nullish(),
+      itemCategoryId: z.string(),
+      taxId: z.string().nullish(),
       name: z.string(),
-      type: z.enum(["AKTIVA", "PASIVA"]),
-      balanceSheetPosition: z.enum(["POSITIVE", "NEGATIVE"]),
+      manualCogs: z.number(),
+      maxQty: z.number(),
+      minQty: z.number(),
+      note: z.string().nullish(),
+      isActive: z.boolean(),
+      multipleUoms: z.array(
+        z.object({
+          unitOfMeasureId: z.string(),
+          conversionQty: z.number(),
+          barcode: z.string().nullish(),
+        })
+      ).min(1),
     }),
   ).mutation(async ({ ctx, input }) => {
     try {
@@ -116,13 +138,27 @@ export const itemRouter = createTRPCRouter({
     z.object({
       id: z.string(),
       code: z.string(),
-      group: z.string().optional(),
+      description: z.string().nullish(),
+      itemCategoryId: z.string(),
+      taxId: z.string().nullish(),
       name: z.string(),
-      type: z.enum(["AKTIVA", "PASIVA"]),
-      balanceSheetPosition: z.enum(["POSITIVE", "NEGATIVE"]),
+      manualCogs: z.number(),
+      maxQty: z.number(),
+      minQty: z.number(),
+      note: z.string().nullish(),
+      isActive: z.boolean(),
+      multipleUoms: z.array(
+        z.object({
+          id: z.string().nullish(),
+          unitOfMeasureId: z.string(),
+          conversionQty: z.number(),
+          barcode: z.string().nullish(),
+        })
+      ).min(1),
     }),
   ).mutation(async ({ ctx, input }) => {
-    const { id, ...data } = input
+    const { id, ...data } = input;
+    console.log({ data });
     try {
       const result = await axios.patch<IItem>(
         `${GLOBAL_URL}/${id}`,

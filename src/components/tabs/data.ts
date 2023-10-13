@@ -47,12 +47,12 @@ export const chartOfAccountTabs: IDataTab[] = [
 
 export const customerTabs: IDataTab[] = [
   {
-    id: "item",
+    id: "customer",
     label: "Pelanggan",
     url: "/masters/contacts/customers",
   },
   {
-    id: "item-category",
+    id: "customer-category",
     label: "Kategori",
     url: "/masters/contacts/customers/categories",
   },
@@ -60,12 +60,12 @@ export const customerTabs: IDataTab[] = [
 
 export const supplierTabs: IDataTab[] = [
   {
-    id: "item",
+    id: "supplier",
     label: "Pemasok",
     url: "/masters/contacts/suppliers",
   },
   {
-    id: "item-category",
+    id: "supplier-category",
     label: "Kategori",
     url: "/masters/contacts/suppliers/categories",
   },
@@ -73,12 +73,12 @@ export const supplierTabs: IDataTab[] = [
 
 export const employeeTabs: IDataTab[] = [
   {
-    id: "item",
+    id: "employee",
     label: "Pemasok",
     url: "/masters/contacts/employees",
   },
   {
-    id: "item-category",
+    id: "employee-category",
     label: "Kategori",
     url: "/masters/contacts/employees/categories",
   },

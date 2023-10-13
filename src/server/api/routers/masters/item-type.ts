@@ -72,11 +72,14 @@ export const itemTypeRouter = createTRPCRouter({
   }),
   create: protectedProcedure.input(
     z.object({
-      code: z.string(),
-      group: z.string().optional(),
       name: z.string(),
-      type: z.enum(["AKTIVA", "PASIVA"]),
-      balanceSheetPosition: z.enum(["POSITIVE", "NEGATIVE"]),
+      isStock: z.boolean(),
+      isSale: z.boolean(),
+      isPurchase: z.boolean(),
+      isAdjustment: z.boolean(),
+      isTransfer: z.boolean(),
+      note: z.string().nullish(),
+      isActive: z.boolean(),
     }),
   ).mutation(async ({ ctx, input }) => {
     try {
@@ -99,11 +102,14 @@ export const itemTypeRouter = createTRPCRouter({
   update: protectedProcedure.input(
     z.object({
       id: z.string(),
-      code: z.string(),
-      group: z.string().optional(),
       name: z.string(),
-      type: z.enum(["AKTIVA", "PASIVA"]),
-      balanceSheetPosition: z.enum(["POSITIVE", "NEGATIVE"]),
+      isStock: z.boolean(),
+      isSale: z.boolean(),
+      isPurchase: z.boolean(),
+      isAdjustment: z.boolean(),
+      isTransfer: z.boolean(),
+      note: z.string().nullish(),
+      isActive: z.boolean(),
     }),
   ).mutation(async ({ ctx, input }) => {
     const { id, ...data } = input

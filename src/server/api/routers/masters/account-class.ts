@@ -73,7 +73,7 @@ export const accountClassRouter = createTRPCRouter({
   create: protectedProcedure.input(
     z.object({
       code: z.string(),
-      group: z.string().optional(),
+      group: z.string().nullish(),
       name: z.string(),
       type: z.enum(["AKTIVA", "PASIVA"]),
       balanceSheetPosition: z.enum(["POSITIVE", "NEGATIVE"]),
@@ -100,7 +100,7 @@ export const accountClassRouter = createTRPCRouter({
     z.object({
       id: z.string(),
       code: z.string(),
-      group: z.string().optional(),
+      group: z.string().nullish(),
       name: z.string(),
       type: z.enum(["AKTIVA", "PASIVA"]),
       balanceSheetPosition: z.enum(["POSITIVE", "NEGATIVE"]),

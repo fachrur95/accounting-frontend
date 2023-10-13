@@ -12,17 +12,16 @@ import { WorkerContext } from "@/context/WorkerContext";
 import { useAppStore } from "@/utils/store";
 
 const DeleteMultiple = ({
-  route,
   path,
   ids,
   handleRefresh,
 }: {
-  route: keyof DeletingType;
   path: WorkerPathType;
   ids: string[];
   handleRefresh?: () => void;
 }) => {
   // const { data } = useSession();
+  // console.log()
   const [open, setOpen] = useState<boolean>(false);
   const { deleteWorker } = useContext(WorkerContext);
   const { toast, setToast, isDeleting, setIsDeleting } = useAppStore();
@@ -31,7 +30,6 @@ const DeleteMultiple = ({
     setOpen(false);
     setIsDeleting(true);
     deleteWorker?.current?.postMessage({
-      route,
       path,
       data: ids,
     } as DeleteWorkerEventType);
@@ -59,8 +57,8 @@ const DeleteMultiple = ({
       </LoadingButton>
       <ConfirmationDialog
         open={open}
-        title="Delete Confirmation"
-        message="Are you sure to delete these?"
+        title="Konfirmasi Hapus"
+        message="Apakah Anda yakin ingin menghapus ini?"
         onClose={() => setOpen(false)}
         onSubmit={handleDelete}
       />

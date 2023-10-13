@@ -21,7 +21,7 @@ const ConfirmationDialog = ({
   onSubmit,
 }: ConfirmationDialog) => {
   return (
-    <ModalTransition open={open}>
+    <ModalTransition open={open} onClose={onClose}>
       <DialogTitle>{title ?? "Confirmation"}</DialogTitle>
       <DialogContent>
         <DialogContentText>{message ?? `Are you sure!`}</DialogContentText>

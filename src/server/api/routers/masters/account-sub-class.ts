@@ -72,10 +72,10 @@ export const accountSubClassRouter = createTRPCRouter({
   }),
   create: protectedProcedure.input(
     z.object({
+      accountClassId: z.string(),
       code: z.string(),
-      group: z.string().optional(),
+      group: z.string().nullish(),
       name: z.string(),
-      type: z.enum(["AKTIVA", "PASIVA"]),
       balanceSheetPosition: z.enum(["POSITIVE", "NEGATIVE"]),
     }),
   ).mutation(async ({ ctx, input }) => {
@@ -99,10 +99,10 @@ export const accountSubClassRouter = createTRPCRouter({
   update: protectedProcedure.input(
     z.object({
       id: z.string(),
+      accountClassId: z.string(),
       code: z.string(),
-      group: z.string().optional(),
+      group: z.string().nullish(),
       name: z.string(),
-      type: z.enum(["AKTIVA", "PASIVA"]),
       balanceSheetPosition: z.enum(["POSITIVE", "NEGATIVE"]),
     }),
   ).mutation(async ({ ctx, input }) => {

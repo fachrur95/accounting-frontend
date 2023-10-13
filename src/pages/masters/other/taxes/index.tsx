@@ -1,9 +1,54 @@
+import DeleteMultiple from "@/components/displays/DeleteMultiple";
 import type { MyPage } from "@/components/layouts/layoutTypes";
+import DataGridProAdv from "@/components/tables/datagrid/DataGridProAdv";
 import { getServerAuthSession } from "@/server/auth";
-import type { IJwtDecode } from "@/types/session";
+import type { PaginationResponse } from "@/types/api-response";
+import { api } from "@/utils/api";
+import { convertOperator } from "@/utils/helpers";
+import { useAppStore } from "@/utils/store";
+import Refresh from "@mui/icons-material/Refresh";
+import EditIcon from "@mui/icons-material/Edit";
+import Visibility from "@mui/icons-material/Visibility";
+import DeleteForever from "@mui/icons-material/DeleteForever";
+import Done from "@mui/icons-material/Done";
+import Close from "@mui/icons-material/Close";
+import Add from "@mui/icons-material/Add";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import IconButton from "@mui/material/IconButton";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import type {
+  GridColDef,
+  GridFilterModel,
+  GridInputSelectionModel,
+  GridRenderCellParams,
+  GridSelectionModel,
+  GridSortModel,
+  GridValueGetterParams,
+} from "@mui/x-data-grid-pro";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
-import React from "react";
+import Head from "next/head";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import CustomMenu from "@/components/displays/StyledMenu";
+import NavTabs from "@/components/tabs";
+import { productTabs } from "@/components/tabs/data";
+import { useRouter } from "next/router";
+import ModalTransition from "@/components/dialogs/ModalTransition";
+import MasterTaxForm from "@/components/forms/MasterTaxForm";
+import type { FormSlugType } from "@/types/global";
+import type { IJwtDecode } from "@/types/session";
+import type { ITax } from "@/types/prisma-api/tax";
+import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
+import type { WorkerPathType } from "@/types/worker";
+
+const sortDefault: GridSortModel = [{ field: "name", sort: "asc" }];
+
+const title = "Pajak";
+const path: WorkerPathType = "tax";
 
 const TaxesPage: MyPage = () => {
   return <div>TaxesPage</div>;

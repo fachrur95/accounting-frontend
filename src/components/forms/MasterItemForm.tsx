@@ -16,6 +16,8 @@ import {
 import Close from "@mui/icons-material/Close";
 import Add from "@mui/icons-material/Add";
 import Delete from "@mui/icons-material/Delete";
+import Edit from "@mui/icons-material/Edit";
+import Save from "@mui/icons-material/Save";
 import AutocompleteItemCategory from "../controls/autocompletes/masters/AutocompleteItemCategory";
 import NumericFormatCustom from "../controls/NumericFormatCustom";
 import { api } from "@/utils/api";
@@ -33,7 +35,10 @@ import type { IItemMutation } from "@/types/prisma-api/item";
 import type { ITax } from "@/types/prisma-api/tax";
 import AutocompleteUnitOfMeasure from "../controls/autocompletes/masters/AutocompleteUnitOfMeasure";
 import type { IDataOption } from "@/types/options";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
+import useNotification from "@/components/hooks/useNotification";
 // import type { IItemCategory } from "@/types/prisma-api/item-category";
 
 /* type MasterItemBodyType = IItemMutation & {
@@ -67,22 +72,24 @@ const defaultValues: IItemMutation = {
 
 interface IMasterItemForm {
   slug: FormSlugType;
+  showIn: "popup" | "page";
 }
 
 const MasterItemForm = (props: IMasterItemForm) => {
+  const { slug, showIn } = props;
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [defaultUnit, setDefaultUnit] = useState<string | null>(null);
   const formContext = useForm<IItemMutation>({ defaultValues });
-  const { slug } = props;
-
-  console.log({ mode });
+  const { setOpenNotification } = useNotification();
 
   const {
     control,
     setValue,
     formState: { isSubmitting },
+    handleSubmit,
+    setError,
   } = formContext;
 
   const {
@@ -113,8 +120,104 @@ const MasterItemForm = (props: IMasterItemForm) => {
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
+  const mutationCreate = api.item.create.useMutation({
+    onSuccess: () => void router.push("/masters/products"),
+    onError: (error) => {
+      const errors = error.data?.zodError?.fieldErrors;
+      if (errors) {
+        for (const field in errors) {
+          void setError(field as keyof IItemMutation, {
+            type: "custom",
+            message: errors[field]?.join(", "),
+          });
+        }
+      }
+    },
+  });
+
+  const mutationUpdate = api.item.update.useMutation({
+    onSuccess: () => void router.push("/masters/products"),
+    onError: (error) => {
+      const errors = error.data?.zodError?.fieldErrors;
+      if (errors) {
+        for (const field in errors) {
+          void setError(field as keyof IItemMutation, {
+            type: "custom",
+            message: errors[field]?.join(", "),
+          });
+        }
+      }
+    },
+  });
+
   const onSubmit = (data: IItemMutation) => {
-    console.log({ data });
+    // const check = data.multipleUoms.some((unit) => unit.unitOfMeasure === null)
+    let baseUnit: string | null = null;
+    let unitTemp: string | null | undefined = null;
+    let conversionQtyTemp = 1;
+    for (const [index, unit] of data.multipleUoms.entries()) {
+      if (unit.conversionQty === 1 && index === 0) {
+        if (!unit.unitOfMeasure) {
+          return setOpenNotification("Silahkan pilih satuan dasar!", {
+            variant: "error",
+          });
+        }
+        baseUnit = unit.unitOfMeasure.id;
+        continue;
+      }
+      if (
+        unit.unitOfMeasure?.id === baseUnit ||
+        unit.unitOfMeasure?.id === unitTemp
+      ) {
+        return setOpenNotification(
+          "Tidak boleh memilih satuan dasar yg sama lebih dari 1!",
+          {
+            variant: "error",
+          },
+        );
+      }
+      if (unit.conversionQty <= 1) {
+        return setOpenNotification(
+          "Nilai konversi selain satuan dasar harus bernilai > 1!",
+          {
+            variant: "error",
+          },
+        );
+      }
+      if (unit.conversionQty === conversionQtyTemp) {
+        return setOpenNotification(
+          "Nilai konversi tidak boleh bernilai sama satu dengan yg lain!",
+          {
+            variant: "error",
+          },
+        );
+      }
+      unitTemp = unit.unitOfMeasure?.id;
+      conversionQtyTemp = unit.conversionQty;
+    }
+    const dataSave: IItemMutation = {
+      ...data,
+      description:
+        data.description === "" || data.description === null
+          ? undefined
+          : data.description,
+      note: data.note === "" || data.note === null ? undefined : data.note,
+      itemCategoryId: data.itemCategory?.id ?? "",
+      taxId: data.tax?.id ?? undefined,
+      multipleUoms: data.multipleUoms.map((unit) => ({
+        ...unit,
+        unitOfMeasureId: unit.unitOfMeasure?.id ?? "",
+        barcode:
+          unit.barcode === "" || unit.barcode === null
+            ? undefined
+            : unit.barcode,
+      })),
+    };
+    // console.log({ dataSave });
+    if (selectedId) {
+      return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
+    }
+    return void mutationCreate.mutate(dataSave);
   };
 
   useEffect(() => {
@@ -229,247 +332,263 @@ const MasterItemForm = (props: IMasterItemForm) => {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
-      <div className="flex items-center justify-between">
-        <div className="mb-2 flex items-center gap-2">
-          <Link href="/masters/products">
-            <IconButton>
-              <Close />
-            </IconButton>
-          </Link>
-          <Typography variant="h6">Master Item</Typography>
-        </div>
-        <div>
-          {mode === "view" && selectedId ? (
-            <Button
-              variant="contained"
-              type="button"
-              fullWidth
-              onClick={() =>
-                router.push(
-                  {
-                    pathname: "/masters/products",
-                    query: { slug: ["f", selectedId] },
-                  },
-                  `/masters/products/f/${selectedId}`,
-                )
-              }
-            >
-              Sunting
-            </Button>
-          ) : (
-            <Button
-              variant="contained"
-              type="submit"
-              disabled={isSubmitting}
-              fullWidth
-            >
-              Simpan
-            </Button>
-          )}
-        </div>
-      </div>
-      <FormContainer formContext={formContext} onSuccess={onSubmit}>
-        <div className="grid gap-4">
-          <Box
-            component={Paper}
-            className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-          >
-            <TextFieldElement
-              name="code"
-              label="Kode"
-              required
-              InputProps={{
-                disabled: mode === "view",
-              }}
-            />
-            <TextFieldElement
-              name="name"
-              label="Nama Produk"
-              required
-              InputProps={{
-                disabled: mode === "view",
-              }}
-            />
-          </Box>
-          <Box
-            component={Paper}
-            className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-          >
-            <AutocompleteItemCategory
-              name="itemCategory"
-              label="Kategori Produk"
-              required
-              autocompleteProps={{
-                disabled: mode === "view",
-              }}
-            />
-          </Box>
-          <Box
-            component={Paper}
-            className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-          >
-            <TextFieldElement
-              name="minQty"
-              label="Minimum Stock"
-              InputProps={{
-                inputComponent: NumericFormatCustom as never,
-                disabled: mode === "view",
-              }}
-            />
-            <TextFieldElement
-              name="maxQty"
-              label="Maximum Stock"
-              InputProps={{
-                inputComponent: NumericFormatCustom as never,
-                disabled: mode === "view",
-              }}
-            />
-            <TextFieldElement
-              name="manualCogs"
-              label="HPP Manual (diisi jika pengaturan manual)"
-              InputProps={{
-                inputComponent: NumericFormatCustom as never,
-                disabled: mode === "view",
-              }}
-            />
-            <TextareaAutosizeElement
-              name="note"
-              label="Catatan"
-              rows={3}
-              className="col-start-1"
-              disabled={mode === "view"}
-            />
-          </Box>
-          <Box
-            component={Paper}
-            className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-          >
-            <SwitchElement
-              name="isActive"
-              label="Aktif"
-              switchProps={{ disabled: mode === "view" }}
-            />
-          </Box>
-          <div className="overflow-auto">
-            <Box component={Paper} className="table w-full table-fixed">
-              <TableContainer
-                component={Paper}
-                elevation={0}
-                variant="outlined"
-              >
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell width="5%" align="right">
-                        No
-                      </TableCell>
-                      <TableCell width="30%">Satuan</TableCell>
-                      <TableCell width="15%" align="right">
-                        Qty
-                      </TableCell>
-                      <TableCell width="15%">Satuan Dasar</TableCell>
-                      <TableCell width="20%">Barcode</TableCell>
-                      <TableCell width="5%" align="center">
-                        <Delete />
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {fieldsUnit.map((row, index) => (
-                      <TableRow
-                        key={row.id}
-                        sx={{
-                          "&:last-child td, &:last-child th": { border: 0 },
-                        }}
-                      >
-                        <TableCell component="th" scope="row" align="right">
-                          {index + 1}
-                        </TableCell>
-                        <TableCell align="right">
-                          <AutocompleteUnitOfMeasure
-                            name={`multipleUoms.${index}.unitOfMeasure`}
-                            required
-                            autocompleteProps={{
-                              size: "small",
-                              disabled: mode === "view",
-                              onChange: (_, data) => {
-                                if (index === 0) {
-                                  setDefaultUnit(
-                                    (data as IDataOption | null)?.label ?? null,
-                                  );
-                                }
-                              },
-                            }}
-                            textFieldProps={{
-                              hiddenLabel: true,
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <TextFieldElement
-                            name={`multipleUoms.${index}.conversionQty`}
-                            hiddenLabel
-                            InputProps={{
-                              inputComponent: NumericFormatCustom as never,
-                              disabled: index === 0,
-                            }}
-                            fullWidth
-                            size="small"
-                          />
-                        </TableCell>
-                        <TableCell>{defaultUnit ?? "-"}</TableCell>
-                        <TableCell>
-                          <TextFieldElement
-                            name={`multipleUoms.${index}.barcode`}
-                            hiddenLabel
-                            fullWidth
-                            size="small"
-                            InputProps={{
-                              disabled: index === 0,
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell align="center">
-                          <IconButton
-                            onClick={() => void removeUnit(index)}
-                            color="error"
-                            size="small"
-                            disabled={index === 0}
-                          >
-                            <Close />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                  {mode !== "view" && (
-                    <TableFooter>
-                      <TableRow>
-                        <TableCell colSpan={6}>
-                          <Button
-                            startIcon={<Add />}
-                            onClick={() =>
-                              void appendUnit({
-                                unitOfMeasureId: "",
-                                unitOfMeasure: null,
-                                conversionQty: 0,
-                                barcode: "",
-                              })
-                            }
-                            size="large"
-                            fullWidth
-                          >
-                            Tambah Satuan
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    </TableFooter>
-                  )}
-                </Table>
-              </TableContainer>
-            </Box>
+      {/* component={showIn === "page" ? Paper : undefined} */}
+      <DialogTitle>
+        <Box
+          component={showIn === "page" ? Paper : undefined}
+          className={`flex items-center justify-between ${
+            showIn === "page" ? "px-4 py-2" : ""
+          }`}
+        >
+          <div className="mb-2 flex items-center gap-2">
+            <Link href="/masters/products">
+              <IconButton color="error">
+                <Close />
+              </IconButton>
+            </Link>
+            <Typography variant="h6">Produk</Typography>
           </div>
-          {/* <Box className="flex flex-col justify-between md:flex-row">
+          <div>
+            {mode === "view" && selectedId ? (
+              <Button
+                variant="contained"
+                type="button"
+                size="large"
+                fullWidth
+                startIcon={<Edit />}
+                onClick={() => router.push(`/masters/products/f/${selectedId}`)}
+              >
+                Sunting
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                // type="submit"
+                color="success"
+                size="large"
+                disabled={isSubmitting}
+                fullWidth
+                startIcon={<Save />}
+                onClick={() => handleSubmit(onSubmit)()}
+              >
+                Simpan
+              </Button>
+            )}
+          </div>
+        </Box>
+      </DialogTitle>
+      <DialogContent>
+        <FormContainer formContext={formContext} onSuccess={onSubmit}>
+          <div className="grid gap-4">
+            <Box
+              component={Paper}
+              variant="outlined"
+              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+            >
+              <TextFieldElement
+                name="code"
+                label="Kode"
+                required
+                InputProps={{
+                  disabled: mode === "view",
+                }}
+              />
+              <TextFieldElement
+                name="name"
+                label="Nama Produk"
+                required
+                InputProps={{
+                  disabled: mode === "view",
+                }}
+              />
+            </Box>
+            <Box
+              component={Paper}
+              variant="outlined"
+              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+            >
+              <TextareaAutosizeElement
+                name="description"
+                label="Deskripsi"
+                rows={3}
+                className="col-start-1"
+                disabled={mode === "view"}
+              />
+              <AutocompleteItemCategory
+                name="itemCategory"
+                label="Kategori Produk"
+                required
+                autocompleteProps={{
+                  disabled: mode === "view",
+                }}
+              />
+            </Box>
+            <Box
+              component={Paper}
+              variant="outlined"
+              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+            >
+              <TextFieldElement
+                name="minQty"
+                label="Minimum Stock"
+                InputProps={{
+                  inputComponent: NumericFormatCustom as never,
+                  disabled: mode === "view",
+                }}
+              />
+              <TextFieldElement
+                name="maxQty"
+                label="Maximum Stock"
+                InputProps={{
+                  inputComponent: NumericFormatCustom as never,
+                  disabled: mode === "view",
+                }}
+              />
+              <TextFieldElement
+                name="manualCogs"
+                label="HPP Manual (diisi jika pengaturan manual)"
+                InputProps={{
+                  inputComponent: NumericFormatCustom as never,
+                  disabled: mode === "view",
+                }}
+              />
+              <TextareaAutosizeElement
+                name="note"
+                label="Catatan"
+                rows={3}
+                className="col-start-1"
+                disabled={mode === "view"}
+              />
+            </Box>
+            <Box
+              component={Paper}
+              variant="outlined"
+              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+            >
+              <SwitchElement
+                name="isActive"
+                label="Aktif"
+                switchProps={{ disabled: mode === "view" }}
+              />
+            </Box>
+            <div className="overflow-auto">
+              <Box component={Paper} className="table w-full table-fixed">
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  variant="outlined"
+                >
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell width="5%" align="right">
+                          No
+                        </TableCell>
+                        <TableCell width="30%">Satuan</TableCell>
+                        <TableCell width="15%" align="right">
+                          Qty
+                        </TableCell>
+                        <TableCell width="15%">Satuan Dasar</TableCell>
+                        <TableCell width="20%">Barcode</TableCell>
+                        <TableCell width="5%" align="center">
+                          <Delete />
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {fieldsUnit.map((row, index) => (
+                        <TableRow
+                          key={row.id}
+                          sx={{
+                            "&:last-child td, &:last-child th": { border: 0 },
+                          }}
+                        >
+                          <TableCell component="th" scope="row" align="right">
+                            {index + 1}
+                          </TableCell>
+                          <TableCell align="right">
+                            <AutocompleteUnitOfMeasure
+                              name={`multipleUoms.${index}.unitOfMeasure`}
+                              required
+                              autocompleteProps={{
+                                size: "small",
+                                disabled: mode === "view",
+                                onChange: (_, data) => {
+                                  if (index === 0) {
+                                    setDefaultUnit(
+                                      (data as IDataOption | null)?.label ??
+                                        null,
+                                    );
+                                  }
+                                },
+                              }}
+                              textFieldProps={{
+                                hiddenLabel: true,
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <TextFieldElement
+                              name={`multipleUoms.${index}.conversionQty`}
+                              hiddenLabel
+                              InputProps={{
+                                inputComponent: NumericFormatCustom as never,
+                                disabled: index === 0,
+                              }}
+                              fullWidth
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell>{defaultUnit ?? "-"}</TableCell>
+                          <TableCell>
+                            <TextFieldElement
+                              name={`multipleUoms.${index}.barcode`}
+                              hiddenLabel
+                              fullWidth
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            <IconButton
+                              onClick={() => void removeUnit(index)}
+                              color="error"
+                              size="small"
+                              disabled={index === 0}
+                            >
+                              <Close />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                    {mode !== "view" && (
+                      <TableFooter>
+                        <TableRow>
+                          <TableCell colSpan={6}>
+                            <Button
+                              startIcon={<Add />}
+                              onClick={() =>
+                                void appendUnit({
+                                  unitOfMeasureId: "",
+                                  unitOfMeasure: null,
+                                  conversionQty: 0,
+                                  barcode: "",
+                                })
+                              }
+                              size="large"
+                              fullWidth
+                            >
+                              Tambah Satuan
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      </TableFooter>
+                    )}
+                  </Table>
+                </TableContainer>
+              </Box>
+            </div>
+            {/* <Box className="flex flex-col justify-between md:flex-row">
             <div></div>
             <div>
               {mode === "view" ? (
@@ -501,8 +620,9 @@ const MasterItemForm = (props: IMasterItemForm) => {
               )}
             </div>
           </Box> */}
-        </div>
-      </FormContainer>
+          </div>
+        </FormContainer>
+      </DialogContent>
     </>
   );
 };

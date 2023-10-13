@@ -1,4 +1,6 @@
-import type { GridFilterItem, GridFilterModel } from "@mui/x-data-grid-pro";
+import type {
+  GridSortModel, GridFilterItem, GridFilterModel
+} from "@mui/x-data-grid-pro";
 
 export const variantNameShown = (name: string): string => {
   // const splitted = name.split(",");
@@ -204,6 +206,17 @@ export const convertFilterToURL = (filter: GridFilterModel, front: "&" | "?" = "
       url += `&filters[fields][${index}][type]=${field.operatorValue}`;
     }
     url += `&filters[fields][${index}][value]=${field.value}`;
+  });
+
+  return url;
+}
+
+export const convertSortToURL = (sorts: GridSortModel, front: "&" | "?" = "&") => {
+  let url = `${front}`;
+
+  sorts.forEach((row, index) => {
+    url += `&sorts[${index}][field]=${row.field}`;
+    url += `&sorts[${index}][sort]=${row.sort}`;
   });
 
   return url;

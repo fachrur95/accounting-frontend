@@ -60,8 +60,8 @@ export declare interface IItemMutation {
   code: string;
   name: string;
   description?: string;
-  minQty?: number;
-  maxQty?: number;
+  minQty: number;
+  maxQty: number;
   manualCogs?: number;
   note?: string;
   isActive: boolean;

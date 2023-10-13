@@ -6,23 +6,20 @@ import type { PaginationResponse } from "@/types/api-response";
 import { api } from "@/utils/api";
 import { convertOperator } from "@/utils/helpers";
 import { useAppStore } from "@/utils/store";
-import ArchiveIcon from "@mui/icons-material/Archive";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Refresh from "@mui/icons-material/Refresh";
 import EditIcon from "@mui/icons-material/Edit";
-import FileCopyIcon from "@mui/icons-material/FileCopy";
+import Visibility from "@mui/icons-material/Visibility";
+import DeleteForever from "@mui/icons-material/DeleteForever";
 import Done from "@mui/icons-material/Done";
 import Close from "@mui/icons-material/Close";
 import Add from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
-import DialogContent from "@mui/material/DialogContent";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import type {
-  GridCellParams,
   GridColDef,
   GridFilterModel,
   GridInputSelectionModel,
@@ -36,8 +33,6 @@ import { type GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-// import { LoadingPage } from "@/components/layouts/LoadingPage";
-// import useNotification from "@/components/hooks/useNotification";
 import CustomMenu from "@/components/displays/StyledMenu";
 import NavTabs from "@/components/tabs";
 import { productTabs } from "@/components/tabs/data";
@@ -47,13 +42,13 @@ import MasterItemForm from "@/components/forms/MasterItemForm";
 import type { FormSlugType } from "@/types/global";
 import type { IJwtDecode } from "@/types/session";
 import type { IItem } from "@/types/prisma-api/item";
+import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
+import type { WorkerPathType } from "@/types/worker";
 
-const sortDefault: GridSortModel = [
-  { field: "masteritem_description", sort: "asc" },
-];
+const sortDefault: GridSortModel = [{ field: "code", sort: "asc" }];
 
 const title = "Produk";
-const path = "items";
+const path: WorkerPathType = "item";
 
 const ProductsPage: MyPage = () => {
   const router = useRouter();
@@ -69,9 +64,7 @@ const ProductsPage: MyPage = () => {
   const [selectionModel, setSelectionModel] = useState<GridInputSelectionModel>(
     [],
   );
-  const [dataFilter, setDataFilter] = useState({ sortModel, filterModel });
-
-  // console.log({ filterModel: dataFilter.filterModel });
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const { search } = useAppStore();
 
@@ -87,8 +80,8 @@ const ProductsPage: MyPage = () => {
     {
       limit: 150,
       search,
-      filter: dataFilter.filterModel,
-      // filter: JSON.stringify(dataFilter),
+      filter: filterModel,
+      sort: sortModel,
     },
     {
       getNextPageParam: (lastPage: PaginationResponse<IItem>) =>
@@ -97,6 +90,19 @@ const ProductsPage: MyPage = () => {
           : undefined,
     },
   );
+
+  const mutationDelete = api.item.destroy.useMutation({
+    onSuccess: () => {
+      void refetch();
+    },
+  });
+
+  const handleDelete = (): void => {
+    if (!selectedId) return;
+
+    mutationDelete.mutate({ id: selectedId });
+    setSelectedId(null);
+  };
 
   const columns: GridColDef[] = [
     {
@@ -125,11 +131,10 @@ const ProductsPage: MyPage = () => {
       flex: 1,
       type: "string",
       valueGetter: (params: GridValueGetterParams<unknown, IItem>) => {
-        console.log({ multipleUoms: params.row.multipleUoms });
-        return params.row.multipleUoms?.[0]?.unitOfMeasure?.name;
+        return params.row.multipleUoms?.[0]?.unitOfMeasure?.name ?? "-";
       },
     },
-    {
+    /* {
       field: "tax.name",
       headerName: "Pajak",
       flex: 1,
@@ -137,7 +142,7 @@ const ProductsPage: MyPage = () => {
       valueGetter: (params: GridValueGetterParams<unknown, IItem>) => {
         return params.row.tax?.name;
       },
-    },
+    }, */
     {
       field: "isActive",
       headerName: "Aktif",
@@ -170,8 +175,21 @@ const ProductsPage: MyPage = () => {
             id={id}
             menus={[
               {
+                icon: <Visibility />,
+                label: "Lihat",
+                onClick: (params) =>
+                  params &&
+                  router.push(
+                    {
+                      pathname: "/masters/products",
+                      query: { slug: ["v", params] },
+                    },
+                    `/masters/products/v/${params}`,
+                  ),
+              },
+              {
                 icon: <EditIcon />,
-                label: "Edit",
+                label: "Sunting",
                 onClick: (params) =>
                   params &&
                   router.push(
@@ -183,20 +201,9 @@ const ProductsPage: MyPage = () => {
                   ),
               },
               {
-                icon: <FileCopyIcon />,
-                label: "Duplicate",
-                onClick: (params) => console.log(params),
-              },
-              { label: "divider" },
-              {
-                icon: <ArchiveIcon />,
-                label: "Archive",
-                onClick: (params) => console.log(params),
-              },
-              {
-                icon: <MoreHorizIcon />,
-                label: "More",
-                onClick: (params) => console.log(params),
+                icon: <DeleteForever />,
+                label: "Hapus",
+                onClick: (params) => params && setSelectedId(params),
               },
             ]}
           />
@@ -244,11 +251,8 @@ const ProductsPage: MyPage = () => {
   }, [data]);
 
   useEffect(() => {
-    setDataFilter({
-      sortModel,
-      filterModel,
-    });
-  }, [sortModel, filterModel]);
+    void refetch();
+  }, [router.query.slug, refetch]);
 
   if (isError) return <div>Error! {JSON.stringify(error)}</div>;
 
@@ -271,7 +275,6 @@ const ProductsPage: MyPage = () => {
             </Typography>
             <div>
               <DeleteMultiple
-                route="procedure"
                 path={path}
                 ids={selectionModel as string[]}
                 handleRefresh={() => void refetch()}
@@ -284,11 +287,10 @@ const ProductsPage: MyPage = () => {
                   pathname: "/masters/products",
                   query: { slug: ["f"] },
                 }}
-                // href="/masters/products/?slug=['f']"
                 as="/masters/products/f"
               >
                 <Button variant="contained" endIcon={<Add />}>
-                  Create New
+                  Tambah
                 </Button>
               </Link>
             </div>
@@ -334,11 +336,22 @@ const ProductsPage: MyPage = () => {
               handleClose={router.back}
               maxWidth="lg"
               fullWidth
+              scroll="paper"
             >
-              <DialogContent>
-                <MasterItemForm slug={router.query.slug as FormSlugType} />
-              </DialogContent>
+              <MasterItemForm
+                slug={router.query.slug as FormSlugType}
+                showIn="popup"
+              />
             </ModalTransition>
+          )}
+          {typeof selectedId === "string" && (
+            <ConfirmationDialog
+              open={typeof selectedId === "string"}
+              title="Konfirmasi Hapus"
+              message="Apakah Anda yakin ingin menghapus ini?"
+              onClose={() => setSelectedId(null)}
+              onSubmit={handleDelete}
+            />
           )}
         </Box>
       </Box>

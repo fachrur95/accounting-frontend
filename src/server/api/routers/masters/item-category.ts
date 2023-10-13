@@ -72,11 +72,10 @@ export const itemCategoryRouter = createTRPCRouter({
   }),
   create: protectedProcedure.input(
     z.object({
-      code: z.string(),
-      group: z.string().optional(),
+      itemTypeId: z.string(),
       name: z.string(),
-      type: z.enum(["AKTIVA", "PASIVA"]),
-      balanceSheetPosition: z.enum(["POSITIVE", "NEGATIVE"]),
+      note: z.string().nullish(),
+      isActive: z.boolean(),
     }),
   ).mutation(async ({ ctx, input }) => {
     try {
@@ -99,11 +98,10 @@ export const itemCategoryRouter = createTRPCRouter({
   update: protectedProcedure.input(
     z.object({
       id: z.string(),
-      code: z.string(),
-      group: z.string().optional(),
+      itemTypeId: z.string(),
       name: z.string(),
-      type: z.enum(["AKTIVA", "PASIVA"]),
-      balanceSheetPosition: z.enum(["POSITIVE", "NEGATIVE"]),
+      note: z.string().nullish(),
+      isActive: z.boolean(),
     }),
   ).mutation(async ({ ctx, input }) => {
     const { id, ...data } = input
