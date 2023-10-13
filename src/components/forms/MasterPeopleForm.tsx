@@ -14,43 +14,46 @@ import {
 import Close from "@mui/icons-material/Close";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
+import AutocompletePeopleCategory from "../controls/autocompletes/masters/AutocompletePeopleCategory";
 import { api } from "@/utils/api";
 import Link from "next/link";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import type { FormSlugType } from "@/types/global";
-import type { ITaxMutation } from "@/types/prisma-api/tax";
+import type { IPeopleMutation } from "@/types/prisma-api/people";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
-import NumericFormatCustom from "../controls/NumericFormatCustom";
 // import type { IItemCategory } from "@/types/prisma-api/item-category";
 
-/* type MasterItemBodyType = ITaxMutation & {
+/* type MasterItemBodyType = IPeopleMutation & {
   itemCategory: IDataOption | IItemCategory | null;
-  tax: IDataOption | ITaxMutation | null;
+  tax: IDataOption | ITax | null;
 }; */
 
-const defaultValues: ITaxMutation = {
+const defaultValues: IPeopleMutation = {
+  peopleCategoryId: "",
+  code: "",
   name: "",
-  rate: 0,
   note: "",
   isActive: true,
+  peopleCategory: null,
 };
 
-interface IMasterTaxForm {
+interface IMasterPeopleForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
+  forType: "customer" | "supplier" | "employee";
 }
 
-const basePath = "/masters/other/taxes";
-
-const MasterTaxForm = (props: IMasterTaxForm) => {
-  const { slug, showIn } = props;
+const MasterPeopleForm = (props: IMasterPeopleForm) => {
+  const { slug, showIn, forType } = props;
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const formContext = useForm<ITaxMutation>({ defaultValues });
+  const formContext = useForm<IPeopleMutation>({ defaultValues });
+
+  const basePath = `/masters/contacts/${forType}s`;
 
   const {
     setValue,
@@ -60,18 +63,18 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
   } = formContext;
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
-    api.tax.findOne.useQuery(
+    api.people.findOne.useQuery(
       { id: selectedId ?? "" },
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
-  const mutationCreate = api.tax.create.useMutation({
+  const mutationCreate = api.people.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof ITaxMutation, {
+          void setError(field as keyof IPeopleMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -80,13 +83,13 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
     },
   });
 
-  const mutationUpdate = api.tax.update.useMutation({
+  const mutationUpdate = api.people.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof ITaxMutation, {
+          void setError(field as keyof IPeopleMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -95,11 +98,13 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
     },
   });
 
-  const onSubmit = (data: ITaxMutation) => {
-    const dataSave: ITaxMutation = {
+  const onSubmit = (data: IPeopleMutation) => {
+    const dataSave: IPeopleMutation = {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
+      peopleCategoryId: data.peopleCategory?.id ?? "",
     };
+    console.log({ dataSave });
     if (selectedId) {
       return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }
@@ -126,9 +131,20 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
+          if (key === "peopleCategory") {
+            const selectedCategory = dataSelected[key]!;
+            if (selectedCategory) {
+              setValue("peopleCategory", {
+                id: selectedCategory.id,
+                label: selectedCategory.name,
+              });
+            }
+            continue;
+          }
           if (
+            key === "peopleCategoryId" ||
+            key === "code" ||
             key === "name" ||
-            key === "rate" ||
             key === "note" ||
             key === "isActive"
           ) {
@@ -161,7 +177,7 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">Pajak</Typography>
+            <Typography variant="h6">Kategori</Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (
@@ -201,6 +217,14 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
+                name="code"
+                label="Kode"
+                required
+                InputProps={{
+                  disabled: mode === "view",
+                }}
+              />
+              <TextFieldElement
                 name="name"
                 label="Nama"
                 required
@@ -214,13 +238,14 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
               variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
-              <TextFieldElement
-                name="rate"
-                label="Nilai (%)"
-                InputProps={{
-                  inputComponent: NumericFormatCustom as never,
+              <AutocompletePeopleCategory
+                name="peopleCategory"
+                label="Kategori"
+                required
+                autocompleteProps={{
                   disabled: mode === "view",
                 }}
+                type="customer"
               />
             </Box>
             <Box
@@ -251,4 +276,4 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
   );
 };
 
-export default MasterTaxForm;
+export default MasterPeopleForm;

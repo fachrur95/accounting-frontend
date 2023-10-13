@@ -20,7 +20,7 @@ export declare interface ITransactionDetail {
   amount: number;
   taxValue: number;
   total: number;
-  note: string | null;
+  note?: string | null;
   createdAt: Date;
   createdBy: string;
   updatedAt: Date;

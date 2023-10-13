@@ -5,7 +5,7 @@ export declare interface ITerm {
   id: string;
   name: string;
   period: number;
-  note: string | null;
+  note?: string | null;
   isActive: boolean;
   createdAt: Date;
   createdBy: string;

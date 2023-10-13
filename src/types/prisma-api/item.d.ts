@@ -12,7 +12,7 @@ export declare interface IItem {
   code: string;
   name: string;
   description: string | null;
-  note: string | null;
+  note?: string | null;
   isActive: boolean;
   minQty: number;
   maxQty: number;

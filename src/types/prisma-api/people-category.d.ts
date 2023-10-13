@@ -9,7 +9,7 @@ export declare interface IPeopleCategory {
   isCustomer: boolean;
   isSupplier: boolean;
   isEmployee: boolean;
-  note: string | null;
+  note?: string | null;
   isActive: boolean;
   createdAt: Date;
   createdBy: string;

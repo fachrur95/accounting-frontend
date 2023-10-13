@@ -1,3 +1,4 @@
+import type { IDataOption } from "../options";
 import type { IItem } from "./item";
 import type { IItemType } from "./item-type";
 import type { IUnit } from "./unit";
@@ -5,7 +6,7 @@ import type { IUnit } from "./unit";
 export declare interface IItemCategory {
   id: string
   name: string
-  note: string | null
+  note?: string | null
   isActive: boolean
   createdAt: Date
   createdBy: string
@@ -23,4 +24,6 @@ export declare type IItemCategoryMutation = Pick<IItemCategory,
   | "name"
   | "note"
   | "isActive"
->
+> & {
+  itemType: IDataOption | IItemType | null;
+}

@@ -19,18 +19,18 @@ import Link from "next/link";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import type { FormSlugType } from "@/types/global";
-import type { IUnitOfMeasure } from "@/types/prisma-api/unit-of-measure";
+import type { IUnitOfMeasureMutation } from "@/types/prisma-api/unit-of-measure";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 // import type { IItemCategory } from "@/types/prisma-api/item-category";
 
-/* type MasterItemBodyType = IUnitOfMeasure & {
+/* type MasterItemBodyType = IUnitOfMeasureMutation & {
   itemCategory: IDataOption | IItemCategory | null;
   tax: IDataOption | ITax | null;
 }; */
 
-const defaultValues: IUnitOfMeasure = {
+const defaultValues: IUnitOfMeasureMutation = {
   code: "",
   name: "",
   note: "",
@@ -49,7 +49,7 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const formContext = useForm<IUnitOfMeasure>({ defaultValues });
+  const formContext = useForm<IUnitOfMeasureMutation>({ defaultValues });
 
   const {
     setValue,
@@ -70,7 +70,7 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IUnitOfMeasure, {
+          void setError(field as keyof IUnitOfMeasureMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -85,7 +85,7 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IUnitOfMeasure, {
+          void setError(field as keyof IUnitOfMeasureMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -94,11 +94,15 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
     },
   });
 
-  const onSubmit = (data: IUnitOfMeasure) => {
+  const onSubmit = (data: IUnitOfMeasureMutation) => {
+    const dataSave: IUnitOfMeasureMutation = {
+      ...data,
+      note: data.note === "" || data.note === null ? undefined : data.note,
+    };
     if (selectedId) {
-      return void mutationUpdate.mutate({ ...data, id: selectedId });
+      return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }
-    return void mutationCreate.mutate(data);
+    return void mutationCreate.mutate(dataSave);
   };
 
   useEffect(() => {
@@ -156,7 +160,7 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">Tipe Produk</Typography>
+            <Typography variant="h6">Satuan Ukur</Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (
@@ -216,27 +220,6 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
               variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
-              <SwitchElement
-                name="isCustomer"
-                label="Pelanggan"
-                switchProps={{ disabled: mode === "view" }}
-              />
-              <SwitchElement
-                name="isSupplier"
-                label="Pemasok"
-                switchProps={{ disabled: mode === "view" }}
-              />
-              <SwitchElement
-                name="isEmployee"
-                label="Karyawan"
-                switchProps={{ disabled: mode === "view" }}
-              />
-            </Box>
-            <Box
-              component={Paper}
-              variant="outlined"
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
               <TextareaAutosizeElement
                 name="note"
                 label="Catatan"
@@ -250,6 +233,9 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
                 switchProps={{ disabled: mode === "view" }}
               />
             </Box>
+            <Button type="submit" disabled={isSubmitting} className="hidden">
+              Simpan
+            </Button>
           </div>
         </FormContainer>
       </DialogContent>

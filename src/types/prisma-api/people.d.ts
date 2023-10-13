@@ -1,3 +1,4 @@
+import type { IDataOption } from "../options";
 import type { IPeopleCategory } from "./people-category";
 import type { ITransaction } from "./transaction";
 import type { IUnit } from "./unit";
@@ -6,7 +7,7 @@ export declare interface IPeople {
   id: string;
   code: string | null;
   name: string;
-  note: string | null;
+  note?: string | null;
   isActive: boolean;
   createdAt: Date;
   createdBy: string;
@@ -26,4 +27,6 @@ export declare type IPeopleMutation = Pick<IPeople,
   | "name"
   | "note"
   | "isActive"
->
+> & {
+  peopleCategory: IDataOption | IPeopleCategory | null;
+}

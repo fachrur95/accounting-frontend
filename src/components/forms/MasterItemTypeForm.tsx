@@ -99,10 +99,14 @@ const MasterItemTypeForm = (props: IMasterItemTypeForm) => {
   });
 
   const onSubmit = (data: IItemTypeMutation) => {
+    const dataSave: IItemTypeMutation = {
+      ...data,
+      note: data.note === "" || data.note === null ? undefined : data.note,
+    };
     if (selectedId) {
-      return void mutationUpdate.mutate({ ...data, id: selectedId });
+      return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }
-    return void mutationCreate.mutate(data);
+    return void mutationCreate.mutate(dataSave);
   };
 
   useEffect(() => {
@@ -219,17 +223,17 @@ const MasterItemTypeForm = (props: IMasterItemTypeForm) => {
             >
               <SwitchElement
                 name="isStock"
-                label="Stok"
+                label="Distok"
                 switchProps={{ disabled: mode === "view" }}
               />
               <SwitchElement
                 name="isSale"
-                label="Penjualan"
+                label="Dijual"
                 switchProps={{ disabled: mode === "view" }}
               />
               <SwitchElement
                 name="isPurchase"
-                label="Pembelian"
+                label="Dibeli"
                 switchProps={{ disabled: mode === "view" }}
               />
               <SwitchElement
@@ -239,7 +243,7 @@ const MasterItemTypeForm = (props: IMasterItemTypeForm) => {
               />
               <SwitchElement
                 name="isTransfer"
-                label="Transfer"
+                label="Ditransfer"
                 switchProps={{ disabled: mode === "view" }}
               />
             </Box>
@@ -261,6 +265,9 @@ const MasterItemTypeForm = (props: IMasterItemTypeForm) => {
                 switchProps={{ disabled: mode === "view" }}
               />
             </Box>
+            <Button type="submit" disabled={isSubmitting} className="hidden">
+              Simpan
+            </Button>
           </div>
         </FormContainer>
       </DialogContent>

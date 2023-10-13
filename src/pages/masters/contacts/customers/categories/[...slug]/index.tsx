@@ -4,7 +4,7 @@ import type { IJwtDecode } from "@/types/session";
 import { useRouter } from "next/router";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
-import MasterItemForm from "@/components/forms/MasterItemForm";
+import MasterPeopleCategoryForm from "@/components/forms/MasterPeopleCategoryForm";
 import type { FormSlugType } from "@/types/global";
 import Head from "next/head";
 import React from "react";
@@ -21,7 +21,11 @@ const ProductFormSlugPage: MyPage = () => {
         <title>{`Gogabook | ${title}`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <MasterItemForm slug={slug as FormSlugType} showIn="page" />
+      <MasterPeopleCategoryForm
+        slug={slug as FormSlugType}
+        showIn="page"
+        forType="customer"
+      />
     </>
   );
 };

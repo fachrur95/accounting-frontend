@@ -20,7 +20,7 @@ export declare interface ITransaction {
   underPayment: number;
   entryDate: Date;
   dueDate: Date;
-  note: string | null;
+  note?: string | null;
   createdAt: Date;
   createdBy: string;
   updatedAt: Date;

@@ -80,16 +80,17 @@ export const employeeTabs: IDataTab[] = [
   {
     id: "employee-category",
     label: "Kategori",
+
     url: "/masters/contacts/employees/categories",
   },
 ];
 
 export const otherTabs: IDataTab[] = [
-  {
+  /* {
     id: "warehouse",
     label: "Gudang",
     url: "/masters/other/warehouses",
-  },
+  }, */
   {
     id: "tax",
     label: "Pajak",

@@ -1,4 +1,5 @@
-import type { IAccountClass } from "./account-class";
+import type { IDataOption } from "../options";
+import type { IAccountSubClass } from "./account-sub-class";
 import type { ICashRegister } from "./cash-register";
 import type { ITransaction } from "./transaction";
 import type { ITransactionDetail } from "./transaction-detail";
@@ -16,7 +17,7 @@ export declare interface IChartOfAccount {
   updatedBy: string | null;
   accountSubClassId: string;
   unitId: string;
-  accountSubClass?: IAccountClass;
+  accountSubClass?: IAccountSubClass;
   unit: IUnit;
   cashRegisterDeposits?: ICashRegister[];
   cashRegisterBeginBalances?: ICashRegister[];
@@ -30,4 +31,6 @@ export declare type IChartOfAccountMutation = Pick<IChartOfAccount,
   | "group"
   | "name"
   | "isActive"
->
+> & {
+  accountSubClass: IDataOption | IAccountSubClass | null;
+}

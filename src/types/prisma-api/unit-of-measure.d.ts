@@ -5,7 +5,7 @@ export declare interface IUnitOfMeasure {
   id: string;
   code: string | null;
   name: string;
-  note: string | null;
+  note?: string | null;
   isActive: boolean;
   createdAt: Date;
   createdBy: string;

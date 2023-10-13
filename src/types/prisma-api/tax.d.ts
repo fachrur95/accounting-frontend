@@ -6,7 +6,7 @@ export declare interface ITax {
   id: string;
   name: string;
   rate: number;
-  note: string | null;
+  note?: string | null;
   isActive: boolean;
   createdAt: Date;
   createdBy: string;

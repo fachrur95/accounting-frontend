@@ -1,3 +1,4 @@
+import type { IDataOption } from "../options";
 import type { IPeopleCategory } from "./people-category";
 import type { IPriceBookDetail } from "./price-book-detail";
 import type { IUnit } from "./unit";
@@ -7,7 +8,7 @@ export declare interface IPriceBook {
   name: string;
   startDate: Date | null;
   endDate: Date | null;
-  note: string | null;
+  note?: string | null;
   isActive: boolean;
   createdAt: Date;
   createdBy: string;
@@ -33,4 +34,5 @@ export declare interface IPriceBookMutation extends Pick<IPriceBook,
     | "qty"
     | "price"
     | "discount">[];
+  peopleCategory: IDataOption | IPeopleCategory | null;
 }

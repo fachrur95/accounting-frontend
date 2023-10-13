@@ -43,16 +43,17 @@ const defaultValues: IPeopleCategoryMutation = {
 interface IMasterPeopleCategoryForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
+  forType: "customer" | "supplier" | "employee";
 }
 
-const basePath = "/masters/contacts/customers";
-
 const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
-  const { slug, showIn } = props;
+  const { slug, showIn, forType } = props;
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const formContext = useForm<IPeopleCategoryMutation>({ defaultValues });
+
+  const basePath = `/masters/contacts/${forType}s/categories`;
 
   const {
     setValue,
@@ -98,10 +99,21 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
   });
 
   const onSubmit = (data: IPeopleCategoryMutation) => {
+    const dataSave: IPeopleCategoryMutation = {
+      ...data,
+      note: data.note === "" || data.note === null ? undefined : data.note,
+      ...(forType === "customer"
+        ? { isCustomer: true, isSupplier: false, isEmployee: false }
+        : forType === "supplier"
+        ? { isCustomer: false, isSupplier: true, isEmployee: false }
+        : forType === "employee"
+        ? { isCustomer: false, isSupplier: false, isEmployee: true }
+        : {}),
+    };
     if (selectedId) {
-      return void mutationUpdate.mutate({ ...data, id: selectedId });
+      return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }
-    return void mutationCreate.mutate(data);
+    return void mutationCreate.mutate(dataSave);
   };
 
   useEffect(() => {
@@ -162,7 +174,7 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">Tipe Produk</Typography>
+            <Typography variant="h6">Kategori</Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (
@@ -217,7 +229,7 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
                 }}
               />
             </Box>
-            <Box
+            {/* <Box
               component={Paper}
               variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
@@ -237,7 +249,7 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
                 label="Karyawan"
                 switchProps={{ disabled: mode === "view" }}
               />
-            </Box>
+            </Box> */}
             <Box
               component={Paper}
               variant="outlined"
@@ -256,6 +268,9 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
                 switchProps={{ disabled: mode === "view" }}
               />
             </Box>
+            <Button type="submit" disabled={isSubmitting} className="hidden">
+              Simpan
+            </Button>
           </div>
         </FormContainer>
       </DialogContent>

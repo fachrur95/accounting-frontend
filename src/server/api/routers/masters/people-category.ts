@@ -7,6 +7,8 @@ import { env } from "@/env.mjs";
 import { z } from "zod";
 import type { ApiCatchError, PaginationResponse } from "@/types/api-response";
 import type { IPeopleCategory } from "@/types/prisma-api/people-category";
+import { convertFilterToURL, convertSortToURL } from "@/utils/helpers";
+import type { GridFilterModel, GridSortModel } from "@mui/x-data-grid-pro";
 
 export const defaultUndefinedResult: PaginationResponse<IPeopleCategory> = {
   rows: [],
@@ -25,14 +27,64 @@ export const peopleCategoryRouter = createTRPCRouter({
       limit: z.number(),
       cursor: z.union([z.string(), z.number()]).nullish(),
       search: z.string().nullish(),
+      isCustomer: z.boolean().nullish(),
+      isSupplier: z.boolean().nullish(),
+      isEmployee: z.boolean().nullish(),
+      filter: z.object({
+        linkOperator: z.enum(["and", "or"]).optional(),
+        items: z.array(
+          z.object({
+            columnField: z.string(),
+            operatorValue: z.string().optional(),
+            value: z.any(),
+          })
+        )
+      }).nullish(),
+      sort: z.array(
+        z.object({
+          field: z.string(),
+          sort: z.enum(["asc", "desc"]).nullish().default("asc"),
+        })
+      ).nullish(),
+      type: z.enum(["customer", "supplier", "employee"]).nullish(),
     }),
   ).query(async ({ ctx, input }) => {
-    const { limit, cursor, search } = input;
+    const { limit, cursor, search, isCustomer, isSupplier, isEmployee, type, filter, sort } = input;
 
     let url = `${GLOBAL_URL}?page=${cursor ?? 0}&limit=${limit}`;
 
     if (search && search !== "") {
       url += `&search=${search}`;
+    }
+
+    if (isCustomer !== null && isCustomer !== undefined) {
+      url += `&isCustomer=${isCustomer}`;
+    }
+
+    if (isSupplier !== null && isSupplier !== undefined) {
+      url += `&isSupplier=${isSupplier}`;
+    }
+
+    if (isEmployee !== null && isEmployee !== undefined) {
+      url += `&isEmployee=${isEmployee}`;
+    }
+
+    if (type) {
+      url += `${type === "customer"
+        ? "&isCustomer=true"
+        : type === "supplier"
+          ? "&isSupplier=true"
+          : type === "employee"
+            ? "&isEmployee=true"
+            : ""}`
+    }
+
+    if (filter) {
+      url += convertFilterToURL(filter as GridFilterModel)
+    }
+
+    if (sort) {
+      url += convertSortToURL(sort as GridSortModel)
     }
 
     const result = await axios.get<PaginationResponse<IPeopleCategory>>(

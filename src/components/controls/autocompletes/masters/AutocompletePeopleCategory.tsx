@@ -1,5 +1,6 @@
 import useInfinitePeopleCategory from "@/components/hooks/options/masters/useInfinitePeopleCategory";
 import type { AutoDefault } from "@/types/options";
+import type { GridFilterModel } from "@mui/x-data-grid-pro";
 import React from "react";
 import { type FieldValues } from "react-hook-form";
 import {
@@ -16,29 +17,32 @@ const AutocompletePeopleCategory = <TFieldValues extends FieldValues>(
       boolean | undefined
     >,
     "options"
-  >,
+  > & {
+    type?: "customer" | "supplier" | "employee";
+  },
 ): JSX.Element => {
+  const { type, ...rest } = props;
   const {
     options: optionsItem,
     isFetching: isFetchingItem,
     renderOption: renderOptionItem,
     onSearch: onSearchItem,
-  } = useInfinitePeopleCategory();
+  } = useInfinitePeopleCategory({ type });
 
   return (
     <AutocompleteElement
-      {...props}
+      {...rest}
       options={optionsItem}
       loading={isFetchingItem}
       textFieldProps={{
-        ...props.textFieldProps,
+        ...rest.textFieldProps,
         onChange: onSearchItem,
       }}
       autocompleteProps={{
-        ...props.autocompleteProps,
+        ...rest.autocompleteProps,
         onClose: () => onSearchItem(),
         renderOption: renderOptionItem,
-        disableClearable: props.required,
+        disableClearable: rest.required,
       }}
     />
   );

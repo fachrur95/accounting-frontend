@@ -9,7 +9,7 @@ export declare interface IItemType {
   isPurchase: boolean;
   isAdjustment: boolean;
   isTransfer: boolean;
-  note: string | null;
+  note?: string | null;
   isActive: boolean;
   createdAt: Date;
   createdBy: string;

@@ -7,6 +7,8 @@ import { env } from "@/env.mjs";
 import { z } from "zod";
 import type { ApiCatchError, PaginationResponse } from "@/types/api-response";
 import type { IItemCategory } from "@/types/prisma-api/item-category";
+import { convertFilterToURL, convertSortToURL } from "@/utils/helpers";
+import type { GridFilterModel, GridSortModel } from "@mui/x-data-grid-pro";
 
 export const defaultUndefinedResult: PaginationResponse<IItemCategory> = {
   rows: [],
@@ -25,14 +27,38 @@ export const itemCategoryRouter = createTRPCRouter({
       limit: z.number(),
       cursor: z.union([z.string(), z.number()]).nullish(),
       search: z.string().nullish(),
+      filter: z.object({
+        linkOperator: z.enum(["and", "or"]).optional(),
+        items: z.array(
+          z.object({
+            columnField: z.string(),
+            operatorValue: z.string().optional(),
+            value: z.any(),
+          })
+        )
+      }).nullish(),
+      sort: z.array(
+        z.object({
+          field: z.string(),
+          sort: z.enum(["asc", "desc"]).nullish().default("asc"),
+        })
+      ).nullish(),
     }),
   ).query(async ({ ctx, input }) => {
-    const { limit, cursor, search } = input;
+    const { limit, cursor, search, filter, sort } = input;
 
     let url = `${GLOBAL_URL}?page=${cursor ?? 0}&limit=${limit}`;
 
     if (search && search !== "") {
       url += `&search=${search}`;
+    }
+
+    if (filter) {
+      url += convertFilterToURL(filter as GridFilterModel)
+    }
+
+    if (sort) {
+      url += convertSortToURL(sort as GridSortModel)
     }
 
     const result = await axios.get<PaginationResponse<IItemCategory>>(

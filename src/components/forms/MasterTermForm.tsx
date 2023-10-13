@@ -19,38 +19,38 @@ import Link from "next/link";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import type { FormSlugType } from "@/types/global";
-import type { ITax } from "@/types/prisma-api/tax";
+import type { ITermMutation } from "@/types/prisma-api/term";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import NumericFormatCustom from "../controls/NumericFormatCustom";
 // import type { IItemCategory } from "@/types/prisma-api/item-category";
 
-/* type MasterItemBodyType = ITax & {
+/* type MasterItemBodyType = ITermMutation & {
   itemCategory: IDataOption | IItemCategory | null;
-  tax: IDataOption | ITax | null;
+  tax: IDataOption | ITermMutation | null;
 }; */
 
-const defaultValues: ITax = {
+const defaultValues: ITermMutation = {
   name: "",
   period: 0,
   note: "",
   isActive: true,
 };
 
-interface IMasterTaxForm {
+interface IMasterTermForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
 }
 
-const basePath = "/masters/other/taxes";
+const basePath = "/masters/other/terms";
 
-const MasterTaxForm = (props: IMasterTaxForm) => {
+const MasterTermForm = (props: IMasterTermForm) => {
   const { slug, showIn } = props;
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const formContext = useForm<ITax>({ defaultValues });
+  const formContext = useForm<ITermMutation>({ defaultValues });
 
   const {
     setValue,
@@ -60,18 +60,18 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
   } = formContext;
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
-    api.unitOfMeasure.findOne.useQuery(
+    api.term.findOne.useQuery(
       { id: selectedId ?? "" },
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
-  const mutationCreate = api.unitOfMeasure.create.useMutation({
+  const mutationCreate = api.term.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof ITax, {
+          void setError(field as keyof ITermMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -80,13 +80,13 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
     },
   });
 
-  const mutationUpdate = api.unitOfMeasure.update.useMutation({
+  const mutationUpdate = api.term.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof ITax, {
+          void setError(field as keyof ITermMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -95,11 +95,15 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
     },
   });
 
-  const onSubmit = (data: ITax) => {
+  const onSubmit = (data: ITermMutation) => {
+    const dataSave: ITermMutation = {
+      ...data,
+      note: data.note === "" || data.note === null ? undefined : data.note,
+    };
     if (selectedId) {
-      return void mutationUpdate.mutate({ ...data, id: selectedId });
+      return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }
-    return void mutationCreate.mutate(data);
+    return void mutationCreate.mutate(dataSave);
   };
 
   useEffect(() => {
@@ -157,7 +161,7 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">Tipe Produk</Typography>
+            <Typography variant="h6">Termin</Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (
@@ -237,6 +241,9 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
                 switchProps={{ disabled: mode === "view" }}
               />
             </Box>
+            <Button type="submit" disabled={isSubmitting} className="hidden">
+              Simpan
+            </Button>
           </div>
         </FormContainer>
       </DialogContent>
@@ -244,4 +251,4 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
   );
 };
 
-export default MasterTaxForm;
+export default MasterTermForm;

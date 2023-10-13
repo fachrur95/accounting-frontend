@@ -26,7 +26,6 @@ import type {
   GridRenderCellParams,
   GridSelectionModel,
   GridSortModel,
-  GridValueGetterParams,
 } from "@mui/x-data-grid-pro";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";

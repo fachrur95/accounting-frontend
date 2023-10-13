@@ -7,7 +7,6 @@ import Delete from "@mui/icons-material/Delete";
 // import { useAppStore } from "@/utils/store";
 import type { DeleteWorkerEventType, WorkerPathType } from "@/types/worker";
 // import { useAppStore } from "@/utils/store";
-import type { DeletingType } from "@/utils/store/slices/appPersist";
 import { WorkerContext } from "@/context/WorkerContext";
 import { useAppStore } from "@/utils/store";
 

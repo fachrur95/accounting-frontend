@@ -1,3 +1,4 @@
+import type { IDataOption } from "../options";
 import type { IAccountClass } from "./account-class";
 import type { IChartOfAccount } from "./chart-of-account";
 import type { Vector } from "./vector";
@@ -23,4 +24,6 @@ export declare type IAccountSubClassMutation = Pick<IAccountSubClass,
   | "group"
   | "name"
   | "balanceSheetPosition"
->
+> & {
+  accountClass: IDataOption | IAccountClass | null;
+}

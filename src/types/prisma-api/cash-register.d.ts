@@ -5,7 +5,7 @@ import type { IUnit } from "./unit";
 export declare interface ICashRegister {
   id: string;
   name: string;
-  note: string | null;
+  note?: string | null;
   isActive: boolean;
   createdAt: Date;
   createdBy: string;

@@ -7,15 +7,20 @@ import Box from "@mui/material/Box";
 import Done from "@mui/icons-material/Done";
 import debounce from "lodash.debounce";
 import type { IPeople } from "@/types/prisma-api/people";
+import type { GridFilterModel } from "@mui/x-data-grid-pro";
 
-const useInfinitePeople = () => {
+const useInfinitePeople = ({
+  type,
+}: {
+  type?: "customer" | "supplier" | "employee";
+}) => {
   const { ref, inView } = useInView();
   const [search, setSearch] = useState<string>("");
   const [options, setOptions] = useState<IDataOption[]>([]);
   const [countAll, setCountAll] = useState<number>(0);
   const { data, hasNextPage, fetchNextPage, isFetching } =
     api.people.findAll.useInfiniteQuery(
-      { limit: 25, search },
+      { limit: 25, search, type },
       {
         getNextPageParam: (lastPage: PaginationResponse<IPeople>) =>
           typeof lastPage.currentPage === "number" && options.length < countAll
