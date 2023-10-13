@@ -1,4 +1,6 @@
-import { ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { type DataMenuType } from "./data";

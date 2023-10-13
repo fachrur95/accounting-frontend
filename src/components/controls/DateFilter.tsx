@@ -1,7 +1,8 @@
 import React from "react";
 import { FormContainer, type UseFormReturn } from "react-hook-form-mui";
 import DatePicker from "./DatePicker";
-import { Box, Paper } from "@mui/material";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
 
 export type FilterDateFormType = {
   startDate: Date;

@@ -28,7 +28,7 @@ export declare interface IItem {
   itemCategory?: IItemCategory;
   tax?: ITax | null;
   images?: IImage[];
-  multipleUoms?: IMultipleUom[];
+  multipleUoms: IMultipleUom[];
   itemCogs?: IItemCogs[];
 }
 

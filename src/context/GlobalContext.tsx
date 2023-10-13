@@ -1,5 +1,6 @@
 import { darkTheme, lightTheme } from "@/styles/theme";
-import { CssBaseline, ThemeProvider as MuiProvider } from "@mui/material";
+import { ThemeProvider as MuiProvider } from "@mui/material";
+import CssBaseline from "@mui/material/CssBaseline";
 import { SnackbarProvider } from "notistack";
 import { useTheme } from "next-themes";
 import {
@@ -20,7 +21,7 @@ const globalContextDefaultValues: GlobalContextType = {
 };
 
 const GlobalContext = createContext<GlobalContextType>(
-  globalContextDefaultValues
+  globalContextDefaultValues,
 );
 
 export function useGlobalContext() {

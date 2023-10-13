@@ -2,7 +2,8 @@ import React from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Link from "next/link";
-import { AppBar, Paper } from "@mui/material";
+import AppBar from "@mui/material/AppBar";
+import Paper from "@mui/material/Paper";
 import { type IDataTab } from "./data";
 import { useRouter } from "next/router";
 

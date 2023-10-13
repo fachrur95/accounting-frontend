@@ -1,15 +1,13 @@
 import DarkMode from "@mui/icons-material/DarkMode";
 import LightMode from "@mui/icons-material/LightMode";
 import SettingsBrightness from "@mui/icons-material/SettingsBrightness";
-import {
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  MenuList,
-} from "@mui/material";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MenuList from "@mui/material/MenuList";
 import { useTheme } from "next-themes";
 import React, { useState } from "react";
 
@@ -41,7 +39,7 @@ const ThemeChanger = () => {
 
   const handleMenuItemClick = (
     _: React.MouseEvent<HTMLElement>,
-    themeName: string
+    themeName: string,
   ) => {
     setTheme(themeName);
     setAnchorEl(null);

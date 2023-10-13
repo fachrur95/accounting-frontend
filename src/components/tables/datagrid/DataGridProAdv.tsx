@@ -19,7 +19,7 @@ import {
 import { styled } from "@mui/material/styles";
 import React from "react";
 import type { DataGridProProps } from "@mui/x-data-grid-pro";
-import { Box } from "@mui/material";
+import Box from "@mui/material/Box";
 import SearchInput from "@/components/controls/SearchInput";
 
 LicenseInfo.setLicenseKey(env.NEXT_PUBLIC_LICENSE_MUIGRID ?? "");

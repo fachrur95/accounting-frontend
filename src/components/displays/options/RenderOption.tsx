@@ -1,5 +1,5 @@
 import type { IDataOption } from "@/types/options";
-import { Box } from "@mui/material";
+import Box from "@mui/material/Box";
 import React, { useEffect } from "react";
 import Done from "@mui/icons-material/Done";
 import { useInView } from "react-intersection-observer";
@@ -22,7 +22,7 @@ const RenderOption = React.forwardRef<HTMLLIElement, IRenderOptionProps>(
       hasNextPage,
       fetchNextPage,
     }: IRenderOptionProps,
-    ref
+    ref,
   ) => {
     const { ref: refInView, inView } = useInView();
 
@@ -47,7 +47,7 @@ const RenderOption = React.forwardRef<HTMLLIElement, IRenderOptionProps>(
         )}
       </li>
     );
-  }
+  },
 );
 RenderOption.displayName = "RenderOption";
 

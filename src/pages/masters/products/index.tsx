@@ -14,18 +14,15 @@ import FileCopyIcon from "@mui/icons-material/FileCopy";
 import Done from "@mui/icons-material/Done";
 import Close from "@mui/icons-material/Close";
 import Add from "@mui/icons-material/Add";
-import {
-  Box,
-  Button,
-  Chip,
-  DialogContent,
-  // DialogTitle,
-  IconButton,
-  Link as MuiLink,
-  Paper,
-  Typography,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import DialogContent from "@mui/material/DialogContent";
+import IconButton from "@mui/material/IconButton";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 import type {
+  GridCellParams,
   GridColDef,
   GridFilterModel,
   GridInputSelectionModel,
@@ -106,20 +103,6 @@ const ProductsPage: MyPage = () => {
       field: "code",
       headerName: "Kode",
       flex: 1,
-      renderCell: (params: GridRenderCellParams<unknown, IItem, unknown>) => {
-        const display = params.row.code;
-        return (
-          <Link
-            href={{
-              pathname: "/masters/products",
-              query: { slug: ["v", params.row.id] },
-            }}
-            as={`/masters/products/v/${params.row.id}`}
-          >
-            <MuiLink component="button">{display}</MuiLink>
-          </Link>
-        );
-      },
     },
     {
       field: "name",
@@ -136,15 +119,16 @@ const ProductsPage: MyPage = () => {
         return params.row.itemCategory?.name ?? "-";
       },
     },
-    /* {
-      field: "masterother_description_unit",
+    {
+      field: "multipleUoms",
       headerName: "Unit",
       flex: 1,
       type: "string",
       valueGetter: (params: GridValueGetterParams<unknown, IItem>) => {
-        return params.row.item_uom?.masterother_description;
+        console.log({ multipleUoms: params.row.multipleUoms });
+        return params.row.multipleUoms?.[0]?.unitOfMeasure?.name;
       },
-    }, */
+    },
     {
       field: "tax.name",
       headerName: "Pajak",
@@ -323,6 +307,24 @@ const ProductsPage: MyPage = () => {
             onSortModelChange={handleSortChange}
             onFilterModelChange={handleFilterChange}
             onSelectionModelChange={handleSelectionChange}
+            onRowDoubleClick={(params) =>
+              router.push(
+                {
+                  pathname: "/masters/products",
+                  query: { slug: ["v", params.row.id] },
+                },
+                `/masters/products/v/${params.row.id}`,
+              )
+            }
+            /* onRowDoubleClick={(params: GridCellParams<unknown, IItem, unknown>) =>
+              router.push(
+                {
+                  pathname: "/masters/products",
+                  query: { slug: ["f", params.row.id] },
+                },
+                `/masters/products/f/${params.row.id}`,
+              )
+            } */
             checkboxSelection
             disableSelectionOnClick
           />

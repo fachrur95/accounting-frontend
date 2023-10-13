@@ -51,8 +51,6 @@ export const itemRouter = createTRPCRouter({
       url += convertFilterToURL(filter as GridFilterModel)
     }
 
-    console.log({ url });
-
     const result = await axios.get<PaginationResponse<IItem>>(
       url,
       {

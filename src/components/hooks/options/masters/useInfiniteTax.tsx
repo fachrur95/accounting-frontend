@@ -3,7 +3,7 @@ import { api } from "@/utils/api";
 import type { IDataOption } from "@/types/options";
 import type { PaginationResponse } from "@/types/api-response";
 import { useInView } from "react-intersection-observer";
-import { Box } from "@mui/material";
+import Box from "@mui/material/Box";
 import Done from "@mui/icons-material/Done";
 import debounce from "lodash.debounce";
 import type { ITax } from "@/types/prisma-api/tax";
@@ -28,8 +28,8 @@ const useInfiniteTax = () => {
     (event?: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setSearch(event?.target.value ?? "");
     },
-    1000,
-  ); // Menunda eksekusi selama 1000ms
+    500,
+  ); // Menunda eksekusi selama 500ms
 
   const renderOption = (
     props: React.HtmlHTMLAttributes<HTMLLIElement>,

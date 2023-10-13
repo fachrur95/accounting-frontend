@@ -1,11 +1,9 @@
-import {
-  Box,
-  Button,
-  IconButton,
-  Paper,
-  TableFooter,
-  Typography,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Paper from "@mui/material/Paper";
+import TableFooter from "@mui/material/TableFooter";
+import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import {
   FormContainer,
@@ -32,11 +30,11 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import type { FormSlugType } from "@/types/global";
 import type { IItemMutation } from "@/types/prisma-api/item";
-import type { IItemCategory } from "@/types/prisma-api/item-category";
 import type { ITax } from "@/types/prisma-api/tax";
-import type { IMultipleUom } from "@/types/prisma-api/multiple-uom";
 import AutocompleteUnitOfMeasure from "../controls/autocompletes/masters/AutocompleteUnitOfMeasure";
 import type { IDataOption } from "@/types/options";
+import { useRouter } from "next/router";
+// import type { IItemCategory } from "@/types/prisma-api/item-category";
 
 /* type MasterItemBodyType = IItemMutation & {
   itemCategory: IDataOption | IItemCategory | null;
@@ -72,6 +70,7 @@ interface IMasterItemForm {
 }
 
 const MasterItemForm = (props: IMasterItemForm) => {
+  const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [defaultUnit, setDefaultUnit] = useState<string | null>(null);
@@ -139,7 +138,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
           if (key === "itemCategory") {
-            const selectedCategory = dataSelected[key] as IItemCategory | null;
+            const selectedCategory = dataSelected[key]!;
             if (selectedCategory) {
               setValue("itemCategory", {
                 id: selectedCategory.id,
@@ -159,16 +158,16 @@ const MasterItemForm = (props: IMasterItemForm) => {
             continue;
           }
           if (key === "multipleUoms") {
-            const multipleUnit = dataSelected[key] as IMultipleUom[];
+            const multipleUnit = dataSelected[key]!;
 
-            if (multipleUnit) {
+            if (multipleUnit.length > 0) {
               const dataUnit = multipleUnit.map((unit) => {
                 const selectedUnit = {
                   id: unit.unitOfMeasure?.id ?? "",
                   label: unit.unitOfMeasure?.name ?? "",
                 };
                 if (unit.conversionQty === 1) {
-                  setDefaultUnit(unit.unitOfMeasure.name);
+                  setDefaultUnit(unit.unitOfMeasure?.name ?? "");
                 }
                 return {
                   id: unit.id,
@@ -230,13 +229,44 @@ const MasterItemForm = (props: IMasterItemForm) => {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
-      <div className="mb-2 flex items-center gap-2">
-        <Link href="/masters/products">
-          <IconButton>
-            <Close />
-          </IconButton>
-        </Link>
-        <Typography variant="h6">Master Item</Typography>
+      <div className="flex items-center justify-between">
+        <div className="mb-2 flex items-center gap-2">
+          <Link href="/masters/products">
+            <IconButton>
+              <Close />
+            </IconButton>
+          </Link>
+          <Typography variant="h6">Master Item</Typography>
+        </div>
+        <div>
+          {mode === "view" && selectedId ? (
+            <Button
+              variant="contained"
+              type="button"
+              fullWidth
+              onClick={() =>
+                router.push(
+                  {
+                    pathname: "/masters/products",
+                    query: { slug: ["f", selectedId] },
+                  },
+                  `/masters/products/f/${selectedId}`,
+                )
+              }
+            >
+              Sunting
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              type="submit"
+              disabled={isSubmitting}
+              fullWidth
+            >
+              Simpan
+            </Button>
+          )}
+        </div>
       </div>
       <FormContainer formContext={formContext} onSuccess={onSubmit}>
         <div className="grid gap-4">
@@ -244,8 +274,22 @@ const MasterItemForm = (props: IMasterItemForm) => {
             component={Paper}
             className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
           >
-            <TextFieldElement name="code" label="Kode" required />
-            <TextFieldElement name="name" label="Nama Produk" required />
+            <TextFieldElement
+              name="code"
+              label="Kode"
+              required
+              InputProps={{
+                disabled: mode === "view",
+              }}
+            />
+            <TextFieldElement
+              name="name"
+              label="Nama Produk"
+              required
+              InputProps={{
+                disabled: mode === "view",
+              }}
+            />
           </Box>
           <Box
             component={Paper}
@@ -255,6 +299,9 @@ const MasterItemForm = (props: IMasterItemForm) => {
               name="itemCategory"
               label="Kategori Produk"
               required
+              autocompleteProps={{
+                disabled: mode === "view",
+              }}
             />
           </Box>
           <Box
@@ -266,6 +313,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
               label="Minimum Stock"
               InputProps={{
                 inputComponent: NumericFormatCustom as never,
+                disabled: mode === "view",
               }}
             />
             <TextFieldElement
@@ -273,6 +321,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
               label="Maximum Stock"
               InputProps={{
                 inputComponent: NumericFormatCustom as never,
+                disabled: mode === "view",
               }}
             />
             <TextFieldElement
@@ -280,6 +329,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
               label="HPP Manual (diisi jika pengaturan manual)"
               InputProps={{
                 inputComponent: NumericFormatCustom as never,
+                disabled: mode === "view",
               }}
             />
             <TextareaAutosizeElement
@@ -287,130 +337,170 @@ const MasterItemForm = (props: IMasterItemForm) => {
               label="Catatan"
               rows={3}
               className="col-start-1"
+              disabled={mode === "view"}
             />
           </Box>
           <Box
             component={Paper}
             className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
           >
-            <SwitchElement name="isActive" label="Aktif" />
+            <SwitchElement
+              name="isActive"
+              label="Aktif"
+              switchProps={{ disabled: mode === "view" }}
+            />
           </Box>
-          <Box component={Paper}>
-            <TableContainer component={Paper} elevation={0} variant="outlined">
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell width="5%" align="right">
-                      No
-                    </TableCell>
-                    <TableCell width="30%">Satuan</TableCell>
-                    <TableCell width="15%" align="right">
-                      Qty
-                    </TableCell>
-                    <TableCell width="15%">Satuan Dasar</TableCell>
-                    <TableCell width="20%">Barcode</TableCell>
-                    <TableCell width="5%" align="center">
-                      <Delete />
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {fieldsUnit.map((row, index) => (
-                    <TableRow
-                      key={row.id}
-                      sx={{
-                        "&:last-child td, &:last-child th": { border: 0 },
-                      }}
-                    >
-                      <TableCell component="th" scope="row" align="right">
-                        {index + 1}
+          <div className="overflow-auto">
+            <Box component={Paper} className="table w-full table-fixed">
+              <TableContainer
+                component={Paper}
+                elevation={0}
+                variant="outlined"
+              >
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell width="5%" align="right">
+                        No
                       </TableCell>
-                      <TableCell align="right">
-                        <AutocompleteUnitOfMeasure
-                          name={`multipleUoms.${index}.unitOfMeasure`}
-                          required
-                          autocompleteProps={{
-                            size: "small",
-                            onChange: (_, data: IDataOption | null) =>
-                              index === 0 &&
-                              setDefaultUnit(data?.label ?? null),
-                          }}
-                          textFieldProps={{
-                            hiddenLabel: true,
-                          }}
-                        />
+                      <TableCell width="30%">Satuan</TableCell>
+                      <TableCell width="15%" align="right">
+                        Qty
                       </TableCell>
-                      <TableCell align="right">
-                        <TextFieldElement
-                          name={`multipleUoms.${index}.conversionQty`}
-                          hiddenLabel
-                          InputProps={{
-                            inputComponent: NumericFormatCustom as never,
-                            disabled: index === 0,
-                          }}
-                          fullWidth
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>{defaultUnit ?? "-"}</TableCell>
-                      <TableCell>
-                        <TextFieldElement
-                          name={`multipleUoms.${index}.barcode`}
-                          hiddenLabel
-                          fullWidth
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        <IconButton
-                          onClick={() => void removeUnit(index)}
-                          color="error"
-                          size="small"
-                          disabled={index === 0}
-                        >
-                          <Close />
-                        </IconButton>
+                      <TableCell width="15%">Satuan Dasar</TableCell>
+                      <TableCell width="20%">Barcode</TableCell>
+                      <TableCell width="5%" align="center">
+                        <Delete />
                       </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    <TableCell colSpan={6}>
-                      <Button
-                        startIcon={<Add />}
-                        onClick={() =>
-                          void appendUnit({
-                            unitOfMeasureId: "",
-                            unitOfMeasure: null,
-                            conversionQty: 0,
-                            barcode: "",
-                          })
-                        }
-                        size="large"
-                        fullWidth
+                  </TableHead>
+                  <TableBody>
+                    {fieldsUnit.map((row, index) => (
+                      <TableRow
+                        key={row.id}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
                       >
-                        Tambah Satuan
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                </TableFooter>
-              </Table>
-            </TableContainer>
-          </Box>
-          <Box className="flex flex-col justify-between md:flex-row">
+                        <TableCell component="th" scope="row" align="right">
+                          {index + 1}
+                        </TableCell>
+                        <TableCell align="right">
+                          <AutocompleteUnitOfMeasure
+                            name={`multipleUoms.${index}.unitOfMeasure`}
+                            required
+                            autocompleteProps={{
+                              size: "small",
+                              disabled: mode === "view",
+                              onChange: (_, data) => {
+                                if (index === 0) {
+                                  setDefaultUnit(
+                                    (data as IDataOption | null)?.label ?? null,
+                                  );
+                                }
+                              },
+                            }}
+                            textFieldProps={{
+                              hiddenLabel: true,
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          <TextFieldElement
+                            name={`multipleUoms.${index}.conversionQty`}
+                            hiddenLabel
+                            InputProps={{
+                              inputComponent: NumericFormatCustom as never,
+                              disabled: index === 0,
+                            }}
+                            fullWidth
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell>{defaultUnit ?? "-"}</TableCell>
+                        <TableCell>
+                          <TextFieldElement
+                            name={`multipleUoms.${index}.barcode`}
+                            hiddenLabel
+                            fullWidth
+                            size="small"
+                            InputProps={{
+                              disabled: index === 0,
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell align="center">
+                          <IconButton
+                            onClick={() => void removeUnit(index)}
+                            color="error"
+                            size="small"
+                            disabled={index === 0}
+                          >
+                            <Close />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                  {mode !== "view" && (
+                    <TableFooter>
+                      <TableRow>
+                        <TableCell colSpan={6}>
+                          <Button
+                            startIcon={<Add />}
+                            onClick={() =>
+                              void appendUnit({
+                                unitOfMeasureId: "",
+                                unitOfMeasure: null,
+                                conversionQty: 0,
+                                barcode: "",
+                              })
+                            }
+                            size="large"
+                            fullWidth
+                          >
+                            Tambah Satuan
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    </TableFooter>
+                  )}
+                </Table>
+              </TableContainer>
+            </Box>
+          </div>
+          {/* <Box className="flex flex-col justify-between md:flex-row">
             <div></div>
             <div>
-              <Button
-                variant="contained"
-                type="submit"
-                disabled={isSubmitting}
-                fullWidth
-              >
-                Save
-              </Button>
+              {mode === "view" ? (
+                <Button
+                  variant="contained"
+                  type="button"
+                  fullWidth
+                  onClick={() =>
+                    router.push(
+                      {
+                        pathname: "/masters/products",
+                        query: { slug: ["f", selectedId] },
+                      },
+                      `/masters/products/f/${selectedId}`,
+                    )
+                  }
+                >
+                  Sunting
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  type="submit"
+                  disabled={isSubmitting}
+                  fullWidth
+                >
+                  Simpan
+                </Button>
+              )}
             </div>
-          </Box>
+          </Box> */}
         </div>
       </FormContainer>
     </>
