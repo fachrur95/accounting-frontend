@@ -26,10 +26,10 @@ export declare interface ITransactionDetail {
   updatedAt: Date;
   updatedBy: string | null;
   transactionId: string;
-  transactionPaymentId: string | null;
-  multipleUomId: string | null;
-  taxId: string | null;
-  chartOfAccountId: string | null;
+  transactionPaymentId?: string | null;
+  multipleUomId?: string | null;
+  taxId?: string | null;
+  chartOfAccountId?: string | null;
   transaction?: ITransaction;
   transactionPayment?: ITransaction | null;
   multipleUom?: IMultipleUom | null;

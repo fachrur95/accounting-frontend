@@ -11,7 +11,7 @@ export declare interface IItem {
   id: string;
   code: string;
   name: string;
-  description: string | null;
+  description?: string | null;
   note?: string | null;
   isActive: boolean;
   minQty: number;

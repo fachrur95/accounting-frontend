@@ -3,7 +3,7 @@ import type { IUnit } from "./unit";
 
 export declare interface IUnitOfMeasure {
   id: string;
-  code: string | null;
+  code?: string | null;
   name: string;
   note?: string | null;
   isActive: boolean;

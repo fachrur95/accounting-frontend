@@ -1,7 +1,6 @@
 import useInfinitePeople from "@/components/hooks/options/masters/useInfinitePeople";
 import type { AutoDefault } from "@/types/options";
 import React from "react";
-import type { GridFilterModel } from "@mui/x-data-grid-pro";
 import { type FieldValues } from "react-hook-form";
 import {
   AutocompleteElement,

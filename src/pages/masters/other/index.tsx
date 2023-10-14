@@ -43,6 +43,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     props: {
       session,
     },
+    redirect: {
+      destination: "/masters/other/terms",
+      permanent: false,
+    },
   };
 };
 

@@ -1,5 +1,5 @@
 import { darkTheme, lightTheme } from "@/styles/theme";
-import { ThemeProvider as MuiProvider } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { SnackbarProvider } from "notistack";
 import { useTheme } from "next-themes";
@@ -50,12 +50,12 @@ export function GlobalContextProvider({ children }: Props) {
   return (
     <>
       <GlobalContext.Provider value={value}>
-        <MuiProvider theme={currentTheme === "dark" ? darkTheme : lightTheme}>
+        <ThemeProvider theme={currentTheme === "dark" ? darkTheme : lightTheme}>
           <SnackbarProvider maxSnack={3} dense autoHideDuration={3000}>
             <CssBaseline enableColorScheme={true} />
             {children}
           </SnackbarProvider>
-        </MuiProvider>
+        </ThemeProvider>
       </GlobalContext.Provider>
     </>
   );

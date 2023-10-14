@@ -14,7 +14,7 @@ export declare interface IPriceBook {
   createdBy: string;
   updatedAt: Date;
   updatedBy: string | null;
-  peopleCategoryId: string | null;
+  peopleCategoryId?: string | null;
   unitId: string;
   unit?: IUnit;
   peopleCategory?: IPeopleCategory | null;

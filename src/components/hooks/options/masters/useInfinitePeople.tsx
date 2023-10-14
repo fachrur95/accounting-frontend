@@ -7,7 +7,6 @@ import Box from "@mui/material/Box";
 import Done from "@mui/icons-material/Done";
 import debounce from "lodash.debounce";
 import type { IPeople } from "@/types/prisma-api/people";
-import type { GridFilterModel } from "@mui/x-data-grid-pro";
 
 const useInfinitePeople = ({
   type,

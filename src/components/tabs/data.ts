@@ -92,13 +92,18 @@ export const otherTabs: IDataTab[] = [
     url: "/masters/other/warehouses",
   }, */
   {
+    id: "term",
+    label: "Termin",
+    url: "/masters/other/terms",
+  },
+  {
     id: "tax",
     label: "Pajak",
     url: "/masters/other/taxes",
   },
   {
-    id: "term",
-    label: "Termin",
-    url: "/masters/other/terms",
+    id: "cash-register",
+    label: "Mesin Kasir",
+    url: "/masters/other/cash-registers",
   },
 ];

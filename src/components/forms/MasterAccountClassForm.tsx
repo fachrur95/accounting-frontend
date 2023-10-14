@@ -6,54 +6,50 @@ import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import {
   FormContainer,
-  SwitchElement,
   TextFieldElement,
-  TextareaAutosizeElement,
+  RadioButtonGroup,
   useForm,
 } from "react-hook-form-mui";
 import Close from "@mui/icons-material/Close";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
-import AutocompletePeopleCategory from "../controls/autocompletes/masters/AutocompletePeopleCategory";
 import { api } from "@/utils/api";
 import Link from "next/link";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import type { FormSlugType } from "@/types/global";
-import type { IPeopleMutation } from "@/types/prisma-api/people";
+import type { IAccountClassMutation } from "@/types/prisma-api/account-class";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 // import type { IItemCategory } from "@/types/prisma-api/item-category";
 
-/* type MasterItemBodyType = IPeopleMutation & {
+/* type MasterItemBodyType = IAccountClassMutation & {
   itemCategory: IDataOption | IItemCategory | null;
   tax: IDataOption | ITax | null;
 }; */
 
-const defaultValues: IPeopleMutation = {
-  peopleCategoryId: "",
+const defaultValues: IAccountClassMutation = {
   code: "",
+  group: "",
   name: "",
-  note: "",
-  isActive: true,
-  peopleCategory: null,
+  type: "AKTIVA",
+  balanceSheetPosition: "POSITIVE",
 };
 
-interface IMasterPeopleForm {
+interface IMasterAccountClassForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
-  forType: "customer" | "supplier" | "employee";
 }
 
-const MasterPeopleForm = (props: IMasterPeopleForm) => {
-  const { slug, showIn, forType } = props;
+const basePath = "/masters/chart-of-accounts/classes";
+
+const MasterAccountClassForm = (props: IMasterAccountClassForm) => {
+  const { slug, showIn } = props;
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const formContext = useForm<IPeopleMutation>({ defaultValues });
-
-  const basePath = `/masters/contacts/${forType}s`;
+  const formContext = useForm<IAccountClassMutation>({ defaultValues });
 
   const {
     setValue,
@@ -63,18 +59,18 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
   } = formContext;
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
-    api.people.findOne.useQuery(
+    api.accountClass.findOne.useQuery(
       { id: selectedId ?? "" },
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
-  const mutationCreate = api.people.create.useMutation({
+  const mutationCreate = api.accountClass.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IPeopleMutation, {
+          void setError(field as keyof IAccountClassMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -83,13 +79,13 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
     },
   });
 
-  const mutationUpdate = api.people.update.useMutation({
+  const mutationUpdate = api.accountClass.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IPeopleMutation, {
+          void setError(field as keyof IAccountClassMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -98,13 +94,11 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
     },
   });
 
-  const onSubmit = (data: IPeopleMutation) => {
-    const dataSave: IPeopleMutation = {
+  const onSubmit = (data: IAccountClassMutation) => {
+    const dataSave: IAccountClassMutation = {
       ...data,
-      note: data.note === "" || data.note === null ? undefined : data.note,
-      peopleCategoryId: data.peopleCategory?.id ?? "",
+      group: data.group === "" || data.group === null ? undefined : data.group,
     };
-    console.log({ dataSave });
     if (selectedId) {
       return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }
@@ -131,22 +125,12 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
-          if (key === "peopleCategory") {
-            const selectedCategory = dataSelected[key]!;
-            if (selectedCategory) {
-              setValue("peopleCategory", {
-                id: selectedCategory.id,
-                label: selectedCategory.name,
-              });
-            }
-            continue;
-          }
           if (
-            key === "peopleCategoryId" ||
             key === "code" ||
+            key === "group" ||
             key === "name" ||
-            key === "note" ||
-            key === "isActive"
+            key === "type" ||
+            key === "balanceSheetPosition"
           ) {
             setValue(key, dataSelected[key]);
           }
@@ -177,7 +161,7 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">Kategori</Typography>
+            <Typography variant="h6">Akun Kelas</Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (
@@ -232,20 +216,12 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
                   disabled: mode === "view",
                 }}
               />
-            </Box>
-            <Box
-              component={Paper}
-              variant="outlined"
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <AutocompletePeopleCategory
-                name="peopleCategory"
-                label="Kategori"
-                required
-                autocompleteProps={{
+              <TextFieldElement
+                name="group"
+                label="Label"
+                InputProps={{
                   disabled: mode === "view",
                 }}
-                type={forType}
               />
             </Box>
             <Box
@@ -253,17 +229,37 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
               variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
-              <TextareaAutosizeElement
-                name="note"
-                label="Catatan"
-                rows={3}
-                className="col-start-1"
-                disabled={mode === "view"}
+              <RadioButtonGroup
+                label="Posisi Akun"
+                name="type"
+                options={[
+                  {
+                    id: "AKTIVA",
+                    label: "Aktiva",
+                  },
+                  {
+                    id: "PASIVA",
+                    label: "Pasiva",
+                  },
+                ]}
+                row
+                required
               />
-              <SwitchElement
-                name="isActive"
-                label="Aktif"
-                switchProps={{ disabled: mode === "view" }}
+              <RadioButtonGroup
+                label="Posisi dalam Neraca"
+                name="balanceSheetPosition"
+                options={[
+                  {
+                    id: "POSITIVE",
+                    label: "POSITIVE",
+                  },
+                  {
+                    id: "NEGATIVE",
+                    label: "NEGATIVE",
+                  },
+                ]}
+                row
+                required
               />
             </Box>
             <Button type="submit" disabled={isSubmitting} className="hidden">
@@ -276,4 +272,4 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
   );
 };
 
-export default MasterPeopleForm;
+export default MasterAccountClassForm;

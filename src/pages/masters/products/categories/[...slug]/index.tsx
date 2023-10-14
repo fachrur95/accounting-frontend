@@ -4,12 +4,12 @@ import type { IJwtDecode } from "@/types/session";
 import { useRouter } from "next/router";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
-import MasterPeopleCategoryForm from "@/components/forms/MasterPeopleCategoryForm";
+import MasterItemCategoryForm from "@/components/forms/MasterItemCategoryForm";
 import type { FormSlugType } from "@/types/global";
 import Head from "next/head";
 import React from "react";
 
-const title = "Kategori Karyawan";
+const title = "Kategori Produk";
 
 const ProductFormSlugPage: MyPage = () => {
   const router = useRouter();
@@ -21,11 +21,7 @@ const ProductFormSlugPage: MyPage = () => {
         <title>{`Gogabook | ${title}`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <MasterPeopleCategoryForm
-        slug={slug as FormSlugType}
-        showIn="page"
-        forType="supplier"
-      />
+      <MasterItemCategoryForm slug={slug as FormSlugType} showIn="page" />
     </>
   );
 };

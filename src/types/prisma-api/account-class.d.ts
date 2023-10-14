@@ -6,7 +6,7 @@ export declare interface IAccountClass {
   id: string;
   type: BalanceSheet;
   code: string;
-  group: string | null;
+  group?: string | null;
   name: string;
   balanceSheetPosition: Vector;
   createdAt: Date;

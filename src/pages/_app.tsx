@@ -21,6 +21,7 @@ import type { IEventDeleteWorker } from "@/types/worker";
 import { WorkerContext } from "@/context/WorkerContext";
 import { useAppStore } from "@/utils/store";
 import { LoadingPage } from "@/components/layouts/LoadingPage";
+import RefreshTokenHandler from "@/components/RefreshTokenHandler";
 
 //Route Events.
 Router.events.on("routeChangeStart", () => NProgress.start());
@@ -34,6 +35,7 @@ const MyApp = ({
   const Layout =
     Layouts[Component?.Layout ?? "Plain"] ?? ((page: unknown) => page);
   const [isClient, setIsClient] = useState<boolean>(false);
+  const [interval, setInterval] = useState<number>(0);
 
   const deleteWorker = useRef<Worker>();
   const { setToast, setDeletingProcess } = useAppStore();
@@ -73,10 +75,14 @@ const MyApp = ({
     <TwProvider enableSystem={true} attribute="class" defaultTheme="system">
       <GlobalContextProvider>
         <WorkerContext.Provider value={{ deleteWorker }}>
-          <SessionProvider session={session as Session}>
+          <SessionProvider
+            session={session as Session}
+            refetchInterval={interval}
+          >
             <ConnectionProvider>
               <Layout>
                 <Component {...pageProps} />
+                <RefreshTokenHandler setInterval={setInterval} />
               </Layout>
             </ConnectionProvider>
           </SessionProvider>

@@ -4,7 +4,7 @@ import type { IUnit } from "./unit";
 
 export declare interface IPeopleCategory {
   id: string;
-  code: string | null;
+  code?: string | null;
   name: string;
   isCustomer: boolean;
   isSupplier: boolean;

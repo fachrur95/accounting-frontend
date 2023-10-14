@@ -14,46 +14,44 @@ import {
 import Close from "@mui/icons-material/Close";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
-import AutocompletePeopleCategory from "../controls/autocompletes/masters/AutocompletePeopleCategory";
+import AutocompleteItemType from "../controls/autocompletes/masters/AutocompleteItemType";
 import { api } from "@/utils/api";
 import Link from "next/link";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import type { FormSlugType } from "@/types/global";
-import type { IPeopleMutation } from "@/types/prisma-api/people";
+import type { IItemCategoryMutation } from "@/types/prisma-api/item-category";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 // import type { IItemCategory } from "@/types/prisma-api/item-category";
 
-/* type MasterItemBodyType = IPeopleMutation & {
+/* type MasterItemBodyType = IItemCategoryMutation & {
   itemCategory: IDataOption | IItemCategory | null;
   tax: IDataOption | ITax | null;
 }; */
 
-const defaultValues: IPeopleMutation = {
-  peopleCategoryId: "",
-  code: "",
+const defaultValues: IItemCategoryMutation = {
+  itemTypeId: "",
   name: "",
   note: "",
   isActive: true,
-  peopleCategory: null,
+  itemType: null,
 };
 
-interface IMasterPeopleForm {
+interface IMasterItemCategoryForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
-  forType: "customer" | "supplier" | "employee";
 }
 
-const MasterPeopleForm = (props: IMasterPeopleForm) => {
-  const { slug, showIn, forType } = props;
+const basePath = `/masters/products/categories`;
+
+const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
+  const { slug, showIn } = props;
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const formContext = useForm<IPeopleMutation>({ defaultValues });
-
-  const basePath = `/masters/contacts/${forType}s`;
+  const formContext = useForm<IItemCategoryMutation>({ defaultValues });
 
   const {
     setValue,
@@ -63,18 +61,18 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
   } = formContext;
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
-    api.people.findOne.useQuery(
+    api.itemCategory.findOne.useQuery(
       { id: selectedId ?? "" },
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
-  const mutationCreate = api.people.create.useMutation({
+  const mutationCreate = api.itemCategory.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IPeopleMutation, {
+          void setError(field as keyof IItemCategoryMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -83,13 +81,13 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
     },
   });
 
-  const mutationUpdate = api.people.update.useMutation({
+  const mutationUpdate = api.itemCategory.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IPeopleMutation, {
+          void setError(field as keyof IItemCategoryMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -98,11 +96,11 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
     },
   });
 
-  const onSubmit = (data: IPeopleMutation) => {
-    const dataSave: IPeopleMutation = {
+  const onSubmit = (data: IItemCategoryMutation) => {
+    const dataSave: IItemCategoryMutation = {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
-      peopleCategoryId: data.peopleCategory?.id ?? "",
+      itemTypeId: data.itemType?.id ?? "",
     };
     console.log({ dataSave });
     if (selectedId) {
@@ -131,10 +129,10 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
-          if (key === "peopleCategory") {
+          if (key === "itemType") {
             const selectedCategory = dataSelected[key]!;
             if (selectedCategory) {
-              setValue("peopleCategory", {
+              setValue("itemType", {
                 id: selectedCategory.id,
                 label: selectedCategory.name,
               });
@@ -142,8 +140,7 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
             continue;
           }
           if (
-            key === "peopleCategoryId" ||
-            key === "code" ||
+            key === "itemTypeId" ||
             key === "name" ||
             key === "note" ||
             key === "isActive"
@@ -217,14 +214,6 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
-                name="code"
-                label="Kode"
-                required
-                InputProps={{
-                  disabled: mode === "view",
-                }}
-              />
-              <TextFieldElement
                 name="name"
                 label="Nama"
                 required
@@ -238,14 +227,13 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
               variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
-              <AutocompletePeopleCategory
-                name="peopleCategory"
-                label="Kategori"
+              <AutocompleteItemType
+                name="itemType"
+                label="Tipe Produk"
                 required
                 autocompleteProps={{
                   disabled: mode === "view",
                 }}
-                type={forType}
               />
             </Box>
             <Box
@@ -276,4 +264,4 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
   );
 };
 
-export default MasterPeopleForm;
+export default MasterItemCategoryForm;

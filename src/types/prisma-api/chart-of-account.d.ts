@@ -8,7 +8,7 @@ import type { IUnit } from "./unit";
 export declare interface IChartOfAccount {
   id: string;
   code: string;
-  group: string | null;
+  group?: string | null;
   name: string;
   isActive: boolean;
   createdAt: Date;

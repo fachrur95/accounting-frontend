@@ -26,6 +26,7 @@ import type {
   GridRenderCellParams,
   GridSelectionModel,
   GridSortModel,
+  GridValueGetterParams,
 } from "@mui/x-data-grid-pro";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
@@ -44,9 +45,9 @@ import type { IPeople } from "@/types/prisma-api/people";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
 
-const sortDefault: GridSortModel = [{ field: "name", sort: "asc" }];
+const sortDefault: GridSortModel = [{ field: "code", sort: "asc" }];
 
-const title = "Kategori Pelanggan";
+const title = "Pelanggan";
 const path: WorkerPathType = "people";
 
 const pathname = "/masters/contacts/customers";
@@ -119,6 +120,15 @@ const CustomersPage: MyPage = () => {
       headerName: "Nama",
       type: "string",
       flex: 1,
+    },
+    {
+      field: "peopleCategory.name",
+      headerName: "Kategori",
+      type: "string",
+      flex: 1,
+      valueGetter: (params: GridValueGetterParams<unknown, IPeople>) => {
+        return params.row.peopleCategory?.name ?? "-";
+      },
     },
     {
       field: "isActive",

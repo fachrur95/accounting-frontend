@@ -1,33 +1,12 @@
 import type { MyPage } from "@/components/layouts/layoutTypes";
 import { getServerAuthSession } from "@/server/auth";
 import type { IJwtDecode } from "@/types/session";
-import { useRouter } from "next/router";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
-import MasterPeopleCategoryForm from "@/components/forms/MasterPeopleCategoryForm";
-import type { FormSlugType } from "@/types/global";
-import Head from "next/head";
 import React from "react";
 
-const title = "Kategori Karyawan";
-
-const ProductFormSlugPage: MyPage = () => {
-  const router = useRouter();
-  const slug = router.query.slug;
-
-  return (
-    <>
-      <Head>
-        <title>{`Gogabook | ${title}`}</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      </Head>
-      <MasterPeopleCategoryForm
-        slug={slug as FormSlugType}
-        showIn="page"
-        forType="supplier"
-      />
-    </>
-  );
+const CashRegistersPage: MyPage = () => {
+  return <div>CashRegistersPage</div>;
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -67,5 +46,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default ProductFormSlugPage;
-ProductFormSlugPage.Layout = "Dashboard";
+export default CashRegistersPage;
+CashRegistersPage.Layout = "Dashboard";

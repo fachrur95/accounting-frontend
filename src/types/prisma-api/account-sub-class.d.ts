@@ -6,7 +6,7 @@ import type { Vector } from "./vector";
 export declare interface IAccountSubClass {
   id: string
   code: string
-  group: string | null
+  group?: string | null
   name: string
   balanceSheetPosition: Vector
   createdAt: Date

@@ -8,52 +8,50 @@ import {
   FormContainer,
   SwitchElement,
   TextFieldElement,
-  TextareaAutosizeElement,
   useForm,
 } from "react-hook-form-mui";
 import Close from "@mui/icons-material/Close";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
-import AutocompletePeopleCategory from "../controls/autocompletes/masters/AutocompletePeopleCategory";
+import AutocompleteAccountSubClass from "../controls/autocompletes/masters/AutocompleteAccountSubClass";
 import { api } from "@/utils/api";
 import Link from "next/link";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import type { FormSlugType } from "@/types/global";
-import type { IPeopleMutation } from "@/types/prisma-api/people";
+import type { IChartOfAccountMutation } from "@/types/prisma-api/chart-of-account";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 // import type { IItemCategory } from "@/types/prisma-api/item-category";
 
-/* type MasterItemBodyType = IPeopleMutation & {
+/* type MasterItemBodyType = IChartOfAccountMutation & {
   itemCategory: IDataOption | IItemCategory | null;
   tax: IDataOption | ITax | null;
 }; */
 
-const defaultValues: IPeopleMutation = {
-  peopleCategoryId: "",
+const defaultValues: IChartOfAccountMutation = {
+  accountSubClassId: "",
   code: "",
+  group: "",
   name: "",
-  note: "",
   isActive: true,
-  peopleCategory: null,
+  accountSubClass: null,
 };
 
-interface IMasterPeopleForm {
+interface IMasterChartOfAccountForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
-  forType: "customer" | "supplier" | "employee";
 }
 
-const MasterPeopleForm = (props: IMasterPeopleForm) => {
-  const { slug, showIn, forType } = props;
+const basePath = `/masters/chart-of-accounts`;
+
+const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
+  const { slug, showIn } = props;
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const formContext = useForm<IPeopleMutation>({ defaultValues });
-
-  const basePath = `/masters/contacts/${forType}s`;
+  const formContext = useForm<IChartOfAccountMutation>({ defaultValues });
 
   const {
     setValue,
@@ -63,18 +61,18 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
   } = formContext;
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
-    api.people.findOne.useQuery(
+    api.chartOfAccount.findOne.useQuery(
       { id: selectedId ?? "" },
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
-  const mutationCreate = api.people.create.useMutation({
+  const mutationCreate = api.chartOfAccount.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IPeopleMutation, {
+          void setError(field as keyof IChartOfAccountMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -83,13 +81,13 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
     },
   });
 
-  const mutationUpdate = api.people.update.useMutation({
+  const mutationUpdate = api.chartOfAccount.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IPeopleMutation, {
+          void setError(field as keyof IChartOfAccountMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -98,11 +96,11 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
     },
   });
 
-  const onSubmit = (data: IPeopleMutation) => {
-    const dataSave: IPeopleMutation = {
+  const onSubmit = (data: IChartOfAccountMutation) => {
+    const dataSave: IChartOfAccountMutation = {
       ...data,
-      note: data.note === "" || data.note === null ? undefined : data.note,
-      peopleCategoryId: data.peopleCategory?.id ?? "",
+      group: data.group === "" || data.group === null ? undefined : data.group,
+      accountSubClassId: data.accountSubClass?.id ?? "",
     };
     console.log({ dataSave });
     if (selectedId) {
@@ -131,10 +129,10 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
-          if (key === "peopleCategory") {
+          if (key === "accountSubClass") {
             const selectedCategory = dataSelected[key]!;
             if (selectedCategory) {
-              setValue("peopleCategory", {
+              setValue("accountSubClass", {
                 id: selectedCategory.id,
                 label: selectedCategory.name,
               });
@@ -142,10 +140,10 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
             continue;
           }
           if (
-            key === "peopleCategoryId" ||
+            key === "accountSubClassId" ||
             key === "code" ||
+            key === "group" ||
             key === "name" ||
-            key === "note" ||
             key === "isActive"
           ) {
             setValue(key, dataSelected[key]);
@@ -177,7 +175,7 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">Kategori</Typography>
+            <Typography variant="h6">Bagan Akun</Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (
@@ -232,20 +230,26 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
                   disabled: mode === "view",
                 }}
               />
+              <TextFieldElement
+                name="group"
+                label="Label"
+                InputProps={{
+                  disabled: mode === "view",
+                }}
+              />
             </Box>
             <Box
               component={Paper}
               variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
-              <AutocompletePeopleCategory
-                name="peopleCategory"
-                label="Kategori"
+              <AutocompleteAccountSubClass
+                name="accountSubClass"
+                label="Akun Sub Kelas"
                 required
                 autocompleteProps={{
                   disabled: mode === "view",
                 }}
-                type={forType}
               />
             </Box>
             <Box
@@ -253,13 +257,6 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
               variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
-              <TextareaAutosizeElement
-                name="note"
-                label="Catatan"
-                rows={3}
-                className="col-start-1"
-                disabled={mode === "view"}
-              />
               <SwitchElement
                 name="isActive"
                 label="Aktif"
@@ -276,4 +273,4 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
   );
 };
 
-export default MasterPeopleForm;
+export default MasterChartOfAccountForm;

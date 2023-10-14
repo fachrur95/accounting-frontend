@@ -24,7 +24,7 @@ const ProductFormSlugPage: MyPage = () => {
       <MasterPeopleCategoryForm
         slug={slug as FormSlugType}
         showIn="page"
-        forType="supplier"
+        forType="employee"
       />
     </>
   );

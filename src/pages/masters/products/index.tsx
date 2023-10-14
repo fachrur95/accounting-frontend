@@ -50,6 +50,8 @@ const sortDefault: GridSortModel = [{ field: "code", sort: "asc" }];
 const title = "Produk";
 const path: WorkerPathType = "item";
 
+const pathname = "/masters/products";
+
 const ProductsPage: MyPage = () => {
   const router = useRouter();
 
@@ -181,10 +183,10 @@ const ProductsPage: MyPage = () => {
                   params &&
                   router.push(
                     {
-                      pathname: "/masters/products",
+                      pathname: pathname,
                       query: { slug: ["v", params] },
                     },
-                    `/masters/products/v/${params}`,
+                    `${pathname}/v/${params}`,
                   ),
               },
               {
@@ -194,10 +196,10 @@ const ProductsPage: MyPage = () => {
                   params &&
                   router.push(
                     {
-                      pathname: "/masters/products",
+                      pathname: pathname,
                       query: { slug: ["f", params] },
                     },
-                    `/masters/products/f/${params}`,
+                    `${pathname}/f/${params}`,
                   ),
               },
               {
@@ -284,10 +286,10 @@ const ProductsPage: MyPage = () => {
               </IconButton>
               <Link
                 href={{
-                  pathname: "/masters/products",
+                  pathname: pathname,
                   query: { slug: ["f"] },
                 }}
-                as="/masters/products/f"
+                as="${pathname}/f"
               >
                 <Button variant="contained" endIcon={<Add />}>
                   Tambah
@@ -312,19 +314,19 @@ const ProductsPage: MyPage = () => {
             onRowDoubleClick={(params) =>
               router.push(
                 {
-                  pathname: "/masters/products",
+                  pathname: pathname,
                   query: { slug: ["v", params.row.id] },
                 },
-                `/masters/products/v/${params.row.id}`,
+                `${pathname}/v/${params.row.id}`,
               )
             }
             /* onRowDoubleClick={(params: GridCellParams<unknown, IItem, unknown>) =>
               router.push(
                 {
-                  pathname: "/masters/products",
+                  pathname: pathname,
                   query: { slug: ["f", params.row.id] },
                 },
-                `/masters/products/f/${params.row.id}`,
+                `${pathname}/f/${params.row.id}`,
               )
             } */
             checkboxSelection
