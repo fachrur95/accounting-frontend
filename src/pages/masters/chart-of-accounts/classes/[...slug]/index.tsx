@@ -18,7 +18,7 @@ const ProductFormSlugPage: MyPage = () => {
   return (
     <>
       <Head>
-        <title>{`Gogabook | ${title}`}</title>
+        <title>{`Bidang Usaha | ${title}`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <MasterAccountClassForm slug={slug as FormSlugType} showIn="page" />

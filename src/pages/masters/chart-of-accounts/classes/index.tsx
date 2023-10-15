@@ -76,7 +76,7 @@ const AccountClassesPage: MyPage = () => {
     isFetching,
   } = api.accountClass.findAll.useInfiniteQuery(
     {
-      limit: 150,
+      limit: 50,
       search,
       filter: filterModel,
       sort: sortModel,
@@ -237,7 +237,7 @@ const AccountClassesPage: MyPage = () => {
   return (
     <>
       <Head>
-        <title>{`Gogabook | ${title}`}</title>
+        <title>{`Bidang Usaha | ${title}`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <Box className="flex flex-col gap-2">

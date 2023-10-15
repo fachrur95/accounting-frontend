@@ -100,7 +100,7 @@ export const chartOfAccountRouter = createTRPCRouter({
     z.object({
       accountSubClassId: z.string(),
       code: z.string(),
-      group: z.string().optional(),
+      group: z.string().nullish(),
       name: z.string(),
       isActive: z.boolean(),
     }),
@@ -127,7 +127,7 @@ export const chartOfAccountRouter = createTRPCRouter({
       id: z.string(),
       accountSubClassId: z.string(),
       code: z.string(),
-      group: z.string().optional(),
+      group: z.string().nullish(),
       name: z.string(),
       isActive: z.boolean(),
     }),

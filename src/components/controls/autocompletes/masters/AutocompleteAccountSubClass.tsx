@@ -16,29 +16,32 @@ const AutocompleteAccountSubClass = <TFieldValues extends FieldValues>(
       boolean | undefined
     >,
     "options"
-  >,
+  > & {
+    accountClassId?: string | null;
+  },
 ): JSX.Element => {
+  const { accountClassId, ...rest } = props;
   const {
     options: optionsItem,
     isFetching: isFetchingItem,
     renderOption: renderOptionItem,
     onSearch: onSearchItem,
-  } = useInfiniteAccountSubClass();
+  } = useInfiniteAccountSubClass({ accountClassId });
 
   return (
     <AutocompleteElement
-      {...props}
+      {...rest}
       options={optionsItem}
       loading={isFetchingItem}
       textFieldProps={{
-        ...props.textFieldProps,
+        ...rest.textFieldProps,
         onChange: onSearchItem,
       }}
       autocompleteProps={{
-        ...props.autocompleteProps,
+        ...rest.autocompleteProps,
         onClose: () => onSearchItem(),
         renderOption: renderOptionItem,
-        disableClearable: props.required,
+        disableClearable: rest.required,
       }}
     />
   );

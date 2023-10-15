@@ -1,6 +1,7 @@
 import SearchInput from "@/components/controls/SearchInput";
 import useNotification from "@/components/hooks/useNotification";
 import type { MyPage } from "@/components/layouts/layoutTypes";
+import { getServerAuthSession } from "@/server/auth";
 import type { PaginationResponse } from "@/types/api-response";
 import type { IInstitute } from "@/types/prisma-api/institute";
 import { api } from "@/utils/api";
@@ -18,6 +19,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
+import { type GetServerSideProps } from "next";
 import { signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -171,6 +173,25 @@ const InstituteCredentialPage: MyPage = () => {
       </Container>
     </React.Fragment>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getServerAuthSession(ctx);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/api/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      session,
+    },
+  };
 };
 
 export default InstituteCredentialPage;

@@ -126,6 +126,7 @@ export const peopleCategoryRouter = createTRPCRouter({
     z.object({
       code: z.string().nullish(),
       name: z.string(),
+      discount: z.number().nullish(),
       isCustomer: z.boolean(),
       isSupplier: z.boolean(),
       isEmployee: z.boolean(),
@@ -155,6 +156,7 @@ export const peopleCategoryRouter = createTRPCRouter({
       id: z.string(),
       code: z.string().nullish(),
       name: z.string(),
+      discount: z.number().nullish(),
       isCustomer: z.boolean(),
       isSupplier: z.boolean(),
       isEmployee: z.boolean(),

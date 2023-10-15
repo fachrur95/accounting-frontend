@@ -16,7 +16,7 @@ import LocalOfferOutlined from "@mui/icons-material/LocalOfferOutlined";
 import MonetizationOnOutlined from "@mui/icons-material/MonetizationOnOutlined";
 import MoreOutlined from "@mui/icons-material/MoreOutlined";
 import PaymentOutlined from "@mui/icons-material/PaymentOutlined";
-import PriceChange from "@mui/icons-material/PriceChange";
+// import PriceChange from "@mui/icons-material/PriceChange";
 import ProductionQuantityLimits from "@mui/icons-material/ProductionQuantityLimits";
 import ReceiptLongOutlined from "@mui/icons-material/ReceiptLongOutlined";
 import SaveAltOutlined from "@mui/icons-material/SaveAltOutlined";
@@ -263,14 +263,14 @@ const data: DataMenuType[] = [
         icon: <LocalOfferOutlined fontSize="small" />,
         children: [],
       },
-      {
+      /* {
         id: "price-book",
         label: "harga jual",
         depth: 1,
         url: "/masters/price-books",
         icon: <PriceChange fontSize="small" />,
         children: [],
-      },
+      }, */
       {
         id: "contact",
         label: "kontak",

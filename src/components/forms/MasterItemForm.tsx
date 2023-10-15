@@ -64,6 +64,7 @@ const defaultValues: IItemMutation = {
   minQty: 0,
   maxQty: 0,
   manualCogs: 0,
+  price: 0,
   note: "",
   isActive: true,
   multipleUoms: [defaultUom],
@@ -300,6 +301,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
               | "minQty"
               | "maxQty"
               | "manualCogs"
+              | "price"
               | "note"
               | "isActive"
             >),
@@ -314,6 +316,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
                 | "minQty"
                 | "maxQty"
                 | "manualCogs"
+                | "price"
                 | "note"
                 | "isActive"
               >
@@ -429,6 +432,28 @@ const MasterItemForm = (props: IMasterItemForm) => {
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
+                name="manualCogs"
+                label="HPP Manual (diisi jika pengaturan manual)"
+                InputProps={{
+                  inputComponent: NumericFormatCustom as never,
+                  disabled: mode === "view",
+                }}
+              />
+              <TextFieldElement
+                name="price"
+                label="Harga Satuan"
+                InputProps={{
+                  inputComponent: NumericFormatCustom as never,
+                  disabled: mode === "view",
+                }}
+              />
+            </Box>
+            <Box
+              component={Paper}
+              variant="outlined"
+              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+            >
+              <TextFieldElement
                 name="minQty"
                 label="Minimum Stock"
                 InputProps={{
@@ -439,14 +464,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
               <TextFieldElement
                 name="maxQty"
                 label="Maximum Stock"
-                InputProps={{
-                  inputComponent: NumericFormatCustom as never,
-                  disabled: mode === "view",
-                }}
-              />
-              <TextFieldElement
-                name="manualCogs"
-                label="HPP Manual (diisi jika pengaturan manual)"
                 InputProps={{
                   inputComponent: NumericFormatCustom as never,
                   disabled: mode === "view",

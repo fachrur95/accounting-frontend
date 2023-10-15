@@ -5,7 +5,7 @@ import type { ITerm } from "./term";
 import type { ITransactionDetail } from "./transaction-detail";
 import type { TransactionType } from "./transaction-type";
 import type { IUnit } from "./unit";
-import type { IWarehouse } from "./warehouse";
+// import type { IWarehouse } from "./warehouse";
 
 export declare interface ITransaction {
   id: string;
@@ -31,8 +31,8 @@ export declare interface ITransaction {
   cashierId?: string | null;
   unitId: string;
   termId: string | null;
-  warehouseId?: string | null;
-  warehouseDestinationId?: string | null;
+  // warehouseId?: string | null;
+  // warehouseDestinationId?: string | null;
   chartOfAccountId?: string | null;
   cashRegisterId?: string | null;
   transactionParentId?: string | null;
@@ -41,8 +41,8 @@ export declare interface ITransaction {
   people?: IPeople | null;
   cashier?: IPeople | null;
   term?: ITerm | null;
-  warehouse?: IWarehouse | null;
-  warehouseDestination?: IWarehouse | null;
+  // // warehouse?: IWarehouse | null;
+  // // warehouseDestination?: IWarehouse | null;
   chartOfAccount?: IChartOfAccount | null;
   cashRegister?: ICashRegister | null;
   transactionParent?: ITransaction | null;

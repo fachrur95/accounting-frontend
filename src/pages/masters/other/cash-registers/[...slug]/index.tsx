@@ -4,12 +4,12 @@ import type { IJwtDecode } from "@/types/session";
 import { useRouter } from "next/router";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
-import MasterTaxForm from "@/components/forms/MasterTaxForm";
+import MasterCashRegisterForm from "@/components/forms/MasterCashRegisterForm";
 import type { FormSlugType } from "@/types/global";
 import Head from "next/head";
 import React from "react";
 
-const title = "Pajak";
+const title = "Mesin Kasir";
 
 const ProductFormSlugPage: MyPage = () => {
   const router = useRouter();
@@ -21,7 +21,7 @@ const ProductFormSlugPage: MyPage = () => {
         <title>{`Bidang Usaha | ${title}`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <MasterTaxForm slug={slug as FormSlugType} showIn="page" />
+      <MasterCashRegisterForm slug={slug as FormSlugType} showIn="page" />
     </>
   );
 };

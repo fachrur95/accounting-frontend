@@ -17,7 +17,7 @@ const ConnectionProvider = ({ children }: ConnectionProviderProps) => {
         enabled: true,
         interval: 5000,
         timeout: 10000,
-        // url: "https://gogabook.com/check-connection",
+        // url: "https://Bidang Usaha.com/check-connection",
       }} */
       render={() => <div>{children}</div>}
       onChange={(status: boolean): void => {

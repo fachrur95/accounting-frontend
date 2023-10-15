@@ -1,3 +1,4 @@
+import type { IDataOption } from "../options";
 import type { IChartOfAccount } from "./chart-of-account";
 import type { ITransaction } from "./transaction";
 import type { IUnit } from "./unit";
@@ -26,4 +27,7 @@ export declare type ICashRegisterMutation = Pick<ICashRegister,
   | "name"
   | "note"
   | "isActive"
->
+> & {
+  depositAccount: IDataOption | IChartOfAccount | null;
+  beginBalanceAccount: IDataOption | IChartOfAccount | null;
+}

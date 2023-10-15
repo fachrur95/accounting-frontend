@@ -80,7 +80,7 @@ const ChartOfAccountsPage: MyPage = () => {
     isFetching,
   } = api.chartOfAccount.findAll.useInfiniteQuery(
     {
-      limit: 150,
+      limit: 50,
       search,
       filter: filterModel,
       sort: sortModel,
@@ -108,17 +108,6 @@ const ChartOfAccountsPage: MyPage = () => {
 
   const columns: GridColDef[] = [
     {
-      field: "accountSubClass.name",
-      headerName: "Akun Sub Kelas",
-      type: "string",
-      flex: 1,
-      valueGetter: (
-        params: GridValueGetterParams<unknown, IChartOfAccount>,
-      ) => {
-        return params.row.accountSubClass?.name ?? "-";
-      },
-    },
-    {
       field: "accountSubClass.accountClass.name",
       headerName: "Akun Kelas",
       type: "string",
@@ -127,6 +116,17 @@ const ChartOfAccountsPage: MyPage = () => {
         params: GridValueGetterParams<unknown, IChartOfAccount>,
       ) => {
         return params.row.accountSubClass?.accountClass?.name ?? "-";
+      },
+    },
+    {
+      field: "accountSubClass.name",
+      headerName: "Akun Sub Kelas",
+      type: "string",
+      flex: 1,
+      valueGetter: (
+        params: GridValueGetterParams<unknown, IChartOfAccount>,
+      ) => {
+        return params.row.accountSubClass?.name ?? "-";
       },
     },
     {
@@ -267,7 +267,7 @@ const ChartOfAccountsPage: MyPage = () => {
   return (
     <>
       <Head>
-        <title>{`Gogabook | ${title}`}</title>
+        <title>{`Bidang Usaha | ${title}`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <Box className="flex flex-col gap-2">

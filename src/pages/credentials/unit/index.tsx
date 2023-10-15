@@ -22,6 +22,10 @@ import Typography from "@mui/material/Typography";
 import Head from "next/head";
 import { useAppStore } from "@/utils/store";
 import SearchInput from "@/components/controls/SearchInput";
+import { type GetServerSideProps } from "next";
+import { getServerAuthSession } from "@/server/auth";
+import jwtDecode from "jwt-decode";
+import type { IJwtDecode } from "@/types/session";
 
 const UnitCredentialPage: MyPage = () => {
   const router = useRouter();
@@ -164,6 +168,35 @@ const UnitCredentialPage: MyPage = () => {
       </Container>
     </React.Fragment>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getServerAuthSession(ctx);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/api/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+  const accessToken = session.accessToken;
+  const tokenData = jwtDecode<IJwtDecode>(accessToken);
+  if (!tokenData.session?.institute) {
+    return {
+      redirect: {
+        destination: "/credentials/institute",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      session,
+    },
+  };
 };
 
 export default UnitCredentialPage;

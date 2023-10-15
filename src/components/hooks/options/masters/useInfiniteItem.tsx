@@ -64,7 +64,7 @@ const useInfiniteItem = () => {
         .map((page) =>
           page.rows.map((row: IItem) => ({
             id: row.id,
-            label: row.name ?? "-",
+            label: `${row.code} - ${row.name}` ?? "-",
           })),
         )
         .flat();

@@ -17,6 +17,7 @@ export declare interface IItem {
   minQty: number;
   maxQty: number;
   manualCogs: number;
+  price: number;
   createdAt: Date;
   createdBy: string;
   updatedAt: Date;
@@ -63,6 +64,7 @@ export declare interface IItemMutation {
   minQty: number;
   maxQty: number;
   manualCogs?: number;
+  price?: number;
   note?: string;
   isActive: boolean;
   multipleUoms: IMultipleUomMutation[];

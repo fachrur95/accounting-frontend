@@ -8,14 +8,18 @@ import Done from "@mui/icons-material/Done";
 import debounce from "lodash.debounce";
 import type { IAccountSubClass } from "@/types/prisma-api/account-sub-class";
 
-const useInfiniteAccountSubClass = () => {
+const useInfiniteAccountSubClass = ({
+  accountClassId,
+}: {
+  accountClassId?: string | null;
+}) => {
   const { ref, inView } = useInView();
   const [search, setSearch] = useState<string>("");
   const [options, setOptions] = useState<IDataOption[]>([]);
   const [countAll, setCountAll] = useState<number>(0);
   const { data, hasNextPage, fetchNextPage, isFetching } =
     api.accountSubClass.findAll.useInfiniteQuery(
-      { limit: 25, search },
+      { limit: 25, search, accountClassId },
       {
         getNextPageParam: (lastPage: PaginationResponse<IAccountSubClass>) =>
           typeof lastPage.currentPage === "number" && options.length < countAll
@@ -64,7 +68,7 @@ const useInfiniteAccountSubClass = () => {
         .map((page) =>
           page.rows.map((row: IAccountSubClass) => ({
             id: row.id,
-            label: row.name ?? "-",
+            label: `${row.code} - ${row.name}` ?? "-",
           })),
         )
         .flat();

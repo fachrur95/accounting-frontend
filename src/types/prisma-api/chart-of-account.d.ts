@@ -1,6 +1,7 @@
 import type { IDataOption } from "../options";
 import type { IAccountSubClass } from "./account-sub-class";
 import type { ICashRegister } from "./cash-register";
+import type { IItemCategory } from "./item-category";
 import type { ITransaction } from "./transaction";
 import type { ITransactionDetail } from "./transaction-detail";
 import type { IUnit } from "./unit";
@@ -21,6 +22,8 @@ export declare interface IChartOfAccount {
   unit: IUnit;
   cashRegisterDeposits?: ICashRegister[];
   cashRegisterBeginBalances?: ICashRegister[];
+  itemCategoryStocks?: IItemCategory[];
+  itemCategoryCogs?: IItemCategory[];
   transactionDetails?: ITransactionDetail[];
   transactions?: ITransaction[];
 }

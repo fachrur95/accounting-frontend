@@ -6,6 +6,7 @@ export declare interface IPeopleCategory {
   id: string;
   code?: string | null;
   name: string;
+  discount?: number | null;
   isCustomer: boolean;
   isSupplier: boolean;
   isEmployee: boolean;
@@ -24,6 +25,7 @@ export declare interface IPeopleCategory {
 export declare type IPeopleCategoryMutation = Pick<IPeopleCategory,
   | "code"
   | "name"
+  | "discount"
   | "isCustomer"
   | "isSupplier"
   | "isEmployee"

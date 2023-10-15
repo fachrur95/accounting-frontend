@@ -14,48 +14,46 @@ import {
 import Close from "@mui/icons-material/Close";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
+import AutocompleteChartOfAccount from "../controls/autocompletes/masters/AutocompleteChartOfAccount";
 import { api } from "@/utils/api";
 import Link from "next/link";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import type { FormSlugType } from "@/types/global";
-import type { IPeopleCategoryMutation } from "@/types/prisma-api/people-category";
+import type { ICashRegisterMutation } from "@/types/prisma-api/cash-register";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
-import NumericFormatCustom from "../controls/NumericFormatCustom";
 // import type { IItemCategory } from "@/types/prisma-api/item-category";
 
-/* type MasterItemBodyType = IPeopleCategoryMutation & {
+/* type MasterItemBodyType = ICashRegisterMutation & {
   itemCategory: IDataOption | IItemCategory | null;
   tax: IDataOption | ITax | null;
 }; */
 
-const defaultValues: IPeopleCategoryMutation = {
-  code: "",
+const defaultValues: ICashRegisterMutation = {
+  depositAccountId: "",
+  beginBalanceAccountId: "",
   name: "",
-  discount: 0,
-  isCustomer: false,
-  isSupplier: false,
-  isEmployee: false,
   note: "",
   isActive: true,
+  depositAccount: null,
+  beginBalanceAccount: null,
 };
 
-interface IMasterPeopleCategoryForm {
+interface IMasterCashRegisterForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
-  forType: "customer" | "supplier" | "employee";
 }
 
-const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
-  const { slug, showIn, forType } = props;
+const basePath = `/masters/other/cash-registers`;
+
+const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
+  const { slug, showIn } = props;
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const formContext = useForm<IPeopleCategoryMutation>({ defaultValues });
-
-  const basePath = `/masters/contacts/${forType}s/categories`;
+  const formContext = useForm<ICashRegisterMutation>({ defaultValues });
 
   const {
     setValue,
@@ -65,18 +63,18 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
   } = formContext;
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
-    api.peopleCategory.findOne.useQuery(
+    api.cashRegister.findOne.useQuery(
       { id: selectedId ?? "" },
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
-  const mutationCreate = api.peopleCategory.create.useMutation({
+  const mutationCreate = api.cashRegister.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IPeopleCategoryMutation, {
+          void setError(field as keyof ICashRegisterMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -85,13 +83,13 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
     },
   });
 
-  const mutationUpdate = api.peopleCategory.update.useMutation({
+  const mutationUpdate = api.cashRegister.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IPeopleCategoryMutation, {
+          void setError(field as keyof ICashRegisterMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -100,19 +98,14 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
     },
   });
 
-  const onSubmit = (data: IPeopleCategoryMutation) => {
-    const dataSave: IPeopleCategoryMutation = {
+  const onSubmit = (data: ICashRegisterMutation) => {
+    const dataSave: ICashRegisterMutation = {
       ...data,
-      discount: data.discount ? data.discount : undefined,
       note: data.note === "" || data.note === null ? undefined : data.note,
-      ...(forType === "customer"
-        ? { isCustomer: true, isSupplier: false, isEmployee: false }
-        : forType === "supplier"
-        ? { isCustomer: false, isSupplier: true, isEmployee: false }
-        : forType === "employee"
-        ? { isCustomer: false, isSupplier: false, isEmployee: true }
-        : {}),
+      depositAccountId: data.depositAccount?.id ?? "",
+      beginBalanceAccountId: data.beginBalanceAccount?.id ?? "",
     };
+    console.log({ dataSave });
     if (selectedId) {
       return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }
@@ -139,13 +132,30 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
+          if (key === "depositAccount") {
+            const selectedCategory = dataSelected[key]!;
+            if (selectedCategory) {
+              setValue("depositAccount", {
+                id: selectedCategory.id,
+                label: selectedCategory.name,
+              });
+            }
+            continue;
+          }
+          if (key === "beginBalanceAccount") {
+            const selectedCategory = dataSelected[key]!;
+            if (selectedCategory) {
+              setValue("beginBalanceAccount", {
+                id: selectedCategory.id,
+                label: selectedCategory.name,
+              });
+            }
+            continue;
+          }
           if (
-            key === "code" ||
+            key === "depositAccountId" ||
+            key === "beginBalanceAccountId" ||
             key === "name" ||
-            key === "discount" ||
-            key === "isCustomer" ||
-            key === "isSupplier" ||
-            key === "isEmployee" ||
             key === "note" ||
             key === "isActive"
           ) {
@@ -178,7 +188,7 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">Kategori</Typography>
+            <Typography variant="h6">Mesin Register</Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (
@@ -218,13 +228,6 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
-                name="code"
-                label="Kode"
-                InputProps={{
-                  disabled: mode === "view",
-                }}
-              />
-              <TextFieldElement
                 name="name"
                 label="Nama"
                 required
@@ -238,36 +241,23 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
               variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
-              <TextFieldElement
-                name="discount"
-                label="Potongan Harga (%)"
-                InputProps={{
-                  inputComponent: NumericFormatCustom as never,
+              <AutocompleteChartOfAccount
+                name="depositAccount"
+                label="Akun Setoran"
+                required
+                autocompleteProps={{
+                  disabled: mode === "view",
+                }}
+              />
+              <AutocompleteChartOfAccount
+                name="beginBalanceAccount"
+                label="Akun Saldo Awal"
+                required
+                autocompleteProps={{
                   disabled: mode === "view",
                 }}
               />
             </Box>
-            {/* <Box
-              component={Paper}
-              variant="outlined"
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <SwitchElement
-                name="isCustomer"
-                label="Pelanggan"
-                switchProps={{ disabled: mode === "view" }}
-              />
-              <SwitchElement
-                name="isSupplier"
-                label="Pemasok"
-                switchProps={{ disabled: mode === "view" }}
-              />
-              <SwitchElement
-                name="isEmployee"
-                label="Karyawan"
-                switchProps={{ disabled: mode === "view" }}
-              />
-            </Box> */}
             <Box
               component={Paper}
               variant="outlined"
@@ -296,4 +286,4 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
   );
 };
 
-export default MasterPeopleCategoryForm;
+export default MasterCashRegisterForm;

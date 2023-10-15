@@ -64,7 +64,7 @@ const useInfiniteAccountClass = () => {
         .map((page) =>
           page.rows.map((row: IAccountClass) => ({
             id: row.id,
-            label: row.name ?? "-",
+            label: `${row.code} - ${row.name}` ?? "-",
           })),
         )
         .flat();

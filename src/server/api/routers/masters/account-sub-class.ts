@@ -43,9 +43,10 @@ export const accountSubClassRouter = createTRPCRouter({
           sort: z.enum(["asc", "desc"]).nullish().default("asc"),
         })
       ).nullish(),
+      accountClassId: z.string().nullish(),
     }),
   ).query(async ({ ctx, input }) => {
-    const { limit, cursor, search, filter, sort } = input;
+    const { limit, cursor, search, filter, sort, accountClassId } = input;
 
     let url = `${GLOBAL_URL}?page=${cursor ?? 0}&limit=${limit}`;
 
@@ -59,6 +60,10 @@ export const accountSubClassRouter = createTRPCRouter({
 
     if (sort) {
       url += convertSortToURL(sort as GridSortModel)
+    }
+
+    if (accountClassId) {
+      url += `&accountClassId=${accountClassId}`;
     }
 
     const result = await axios.get<PaginationResponse<IAccountSubClass>>(

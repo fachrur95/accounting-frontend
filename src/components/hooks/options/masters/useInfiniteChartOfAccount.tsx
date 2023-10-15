@@ -64,7 +64,7 @@ const useInfiniteChartOfAccount = () => {
         .map((page) =>
           page.rows.map((row: IChartOfAccount) => ({
             id: row.id,
-            label: row.name ?? "-",
+            label: `${row.code} - ${row.name}` ?? "-",
           })),
         )
         .flat();

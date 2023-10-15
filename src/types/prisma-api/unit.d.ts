@@ -19,7 +19,7 @@ import type { ITerm } from "./term";
 import type { ITransaction } from "./transaction";
 import type { IUnitOfMeasure } from "./unit-of-measure";
 import type { IUserUnit } from "./user-unit";
-import type { IWarehouse } from "./warehouse";
+// import type { IWarehouse } from "./warehouse";
 
 export declare interface IUnit {
   id: string;
@@ -31,7 +31,7 @@ export declare interface IUnit {
   instituteId: string;
   institute?: IInstitute;
   generalSetting?: IGeneralSetting | null;
-  warehouses?: IWarehouse[];
+  // // warehouses?: IWarehouse[];
   chartOfAccounts?: IChartOfAccount[];
   peopleCategories?: IPeopleCategory[];
   itemTypes?: IItemType[];
@@ -53,7 +53,4 @@ export declare interface IUnit {
   financialClosings?: IFinancialClosing[];
 }
 
-export declare type IUnitMutation = Pick<IUnit,
-  | "instituteId"
-  | "name"
->
+export declare type IUnitMutation = Pick<IUnit, "name">

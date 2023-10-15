@@ -15,6 +15,7 @@ import Close from "@mui/icons-material/Close";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
 import AutocompleteItemType from "../controls/autocompletes/masters/AutocompleteItemType";
+import AutocompleteChartOfAccount from "../controls/autocompletes/masters/AutocompleteChartOfAccount";
 import { api } from "@/utils/api";
 import Link from "next/link";
 import Backdrop from "@mui/material/Backdrop";
@@ -33,6 +34,8 @@ import { useRouter } from "next/router";
 
 const defaultValues: IItemCategoryMutation = {
   itemTypeId: "",
+  stockAccountId: "",
+  cogsAccountId: "",
   name: "",
   note: "",
   isActive: true,
@@ -101,6 +104,8 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
       itemTypeId: data.itemType?.id ?? "",
+      stockAccountId: data.stockAccount?.id ?? undefined,
+      cogsAccountId: data.cogsAccount?.id ?? undefined,
     };
     console.log({ dataSave });
     if (selectedId) {
@@ -130,17 +135,39 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
           if (key === "itemType") {
-            const selectedCategory = dataSelected[key]!;
-            if (selectedCategory) {
+            const selectedType = dataSelected[key]!;
+            if (selectedType) {
               setValue("itemType", {
-                id: selectedCategory.id,
-                label: selectedCategory.name,
+                id: selectedType.id,
+                label: selectedType.name,
+              });
+            }
+            continue;
+          }
+          if (key === "stockAccount") {
+            const selectedAccount = dataSelected[key]!;
+            if (selectedAccount) {
+              setValue("stockAccount", {
+                id: selectedAccount.id,
+                label: selectedAccount.name,
+              });
+            }
+            continue;
+          }
+          if (key === "cogsAccount") {
+            const selectedAccount = dataSelected[key]!;
+            if (selectedAccount) {
+              setValue("cogsAccount", {
+                id: selectedAccount.id,
+                label: selectedAccount.name,
               });
             }
             continue;
           }
           if (
             key === "itemTypeId" ||
+            key === "stockAccountId" ||
+            key === "cogsAccountId" ||
             key === "name" ||
             key === "note" ||
             key === "isActive"
@@ -231,6 +258,20 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
                 name="itemType"
                 label="Tipe Produk"
                 required
+                autocompleteProps={{
+                  disabled: mode === "view",
+                }}
+              />
+              <AutocompleteChartOfAccount
+                name="stockAccount"
+                label="Akun Modal/Stock (optional)"
+                autocompleteProps={{
+                  disabled: mode === "view",
+                }}
+              />
+              <AutocompleteChartOfAccount
+                name="cogsAccount"
+                label="Akun HPP (optional)"
                 autocompleteProps={{
                   disabled: mode === "view",
                 }}

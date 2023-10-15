@@ -11,7 +11,7 @@ export const useAppStore = create<StoreState>()(persist((...params) => ({
   ...appUnPersistSlice(...params),
   // ...createCheckoutSlice(...params),
 }), {
-  name: "gogabook-app",
+  name: "Bidang Usaha-app",
   partialize: (state) => ({
     openMenu: state.openMenu,
   })

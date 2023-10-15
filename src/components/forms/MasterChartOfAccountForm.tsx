@@ -9,10 +9,12 @@ import {
   SwitchElement,
   TextFieldElement,
   useForm,
+  useWatch,
 } from "react-hook-form-mui";
 import Close from "@mui/icons-material/Close";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
+import AutocompleteAccountClass from "../controls/autocompletes/masters/AutocompleteAccountClass";
 import AutocompleteAccountSubClass from "../controls/autocompletes/masters/AutocompleteAccountSubClass";
 import { api } from "@/utils/api";
 import Link from "next/link";
@@ -23,6 +25,8 @@ import type { IChartOfAccountMutation } from "@/types/prisma-api/chart-of-accoun
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
+import type { IDataOption } from "@/types/options";
+import type { IAccountClass } from "@/types/prisma-api/account-class";
 // import type { IItemCategory } from "@/types/prisma-api/item-category";
 
 /* type MasterItemBodyType = IChartOfAccountMutation & {
@@ -30,13 +34,19 @@ import { useRouter } from "next/router";
   tax: IDataOption | ITax | null;
 }; */
 
-const defaultValues: IChartOfAccountMutation = {
+interface IChartOfAccountMutationWithAccountClass
+  extends IChartOfAccountMutation {
+  accountClass?: IDataOption | IAccountClass | null;
+}
+
+const defaultValues: IChartOfAccountMutationWithAccountClass = {
   accountSubClassId: "",
   code: "",
   group: "",
   name: "",
   isActive: true,
   accountSubClass: null,
+  accountClass: null,
 };
 
 interface IMasterChartOfAccountForm {
@@ -51,9 +61,12 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const formContext = useForm<IChartOfAccountMutation>({ defaultValues });
+  const formContext = useForm<IChartOfAccountMutationWithAccountClass>({
+    defaultValues,
+  });
 
   const {
+    control,
     setValue,
     formState: { isSubmitting },
     handleSubmit,
@@ -72,10 +85,13 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IChartOfAccountMutation, {
-            type: "custom",
-            message: errors[field]?.join(", "),
-          });
+          void setError(
+            field as keyof IChartOfAccountMutationWithAccountClass,
+            {
+              type: "custom",
+              message: errors[field]?.join(", "),
+            },
+          );
         }
       }
     },
@@ -87,17 +103,24 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IChartOfAccountMutation, {
-            type: "custom",
-            message: errors[field]?.join(", "),
-          });
+          void setError(
+            field as keyof IChartOfAccountMutationWithAccountClass,
+            {
+              type: "custom",
+              message: errors[field]?.join(", "),
+            },
+          );
         }
       }
     },
   });
 
-  const onSubmit = (data: IChartOfAccountMutation) => {
-    const dataSave: IChartOfAccountMutation = {
+  const selectedAccountClass = useWatch({ control, name: "accountClass" });
+
+  console.log({ selectedAccountClass });
+
+  const onSubmit = (data: IChartOfAccountMutationWithAccountClass) => {
+    const dataSave: IChartOfAccountMutationWithAccountClass = {
       ...data,
       group: data.group === "" || data.group === null ? undefined : data.group,
       accountSubClassId: data.accountSubClass?.id ?? "",
@@ -136,6 +159,12 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
                 id: selectedCategory.id,
                 label: selectedCategory.name,
               });
+              if (selectedCategory.accountClass) {
+                setValue("accountClass", {
+                  id: selectedCategory.accountClass.id,
+                  label: selectedCategory.accountClass.name,
+                });
+              }
             }
             continue;
           }
@@ -214,6 +243,29 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
               variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
+              <AutocompleteAccountClass
+                name="accountClass"
+                label="Akun Kelas"
+                required
+                autocompleteProps={{
+                  disabled: mode === "view",
+                }}
+              />
+              <AutocompleteAccountSubClass
+                name="accountSubClass"
+                label="Akun Sub Kelas"
+                required
+                autocompleteProps={{
+                  disabled: mode === "view",
+                }}
+                accountClassId={selectedAccountClass?.id ?? undefined}
+              />
+            </Box>
+            <Box
+              component={Paper}
+              variant="outlined"
+              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+            >
               <TextFieldElement
                 name="code"
                 label="Kode"
@@ -234,20 +286,6 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
                 name="group"
                 label="Label"
                 InputProps={{
-                  disabled: mode === "view",
-                }}
-              />
-            </Box>
-            <Box
-              component={Paper}
-              variant="outlined"
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <AutocompleteAccountSubClass
-                name="accountSubClass"
-                label="Akun Sub Kelas"
-                required
-                autocompleteProps={{
                   disabled: mode === "view",
                 }}
               />
