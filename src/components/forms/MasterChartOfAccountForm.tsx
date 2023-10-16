@@ -117,15 +117,12 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
 
   const selectedAccountClass = useWatch({ control, name: "accountClass" });
 
-  console.log({ selectedAccountClass });
-
   const onSubmit = (data: IChartOfAccountMutationWithAccountClass) => {
     const dataSave: IChartOfAccountMutationWithAccountClass = {
       ...data,
       group: data.group === "" || data.group === null ? undefined : data.group,
       accountSubClassId: data.accountSubClass?.id ?? "",
     };
-    console.log({ dataSave });
     if (selectedId) {
       return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }

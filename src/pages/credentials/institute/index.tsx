@@ -81,7 +81,6 @@ const InstituteCredentialPage: MyPage = () => {
       return;
     } */
 
-    console.log({ id });
     await mutation.mutateAsync(
       { id },
       {

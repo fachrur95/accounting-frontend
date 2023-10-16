@@ -160,7 +160,6 @@ export const itemRouter = createTRPCRouter({
     }),
   ).mutation(async ({ ctx, input }) => {
     const { id, ...data } = input;
-    console.log({ data });
     try {
       const result = await axios.patch<IItem>(
         `${GLOBAL_URL}/${id}`,

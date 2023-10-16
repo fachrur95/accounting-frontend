@@ -80,7 +80,6 @@ export const unitCredentialsRouter = createTRPCRouter({
       id: z.string(),
     }),
   ).query(async ({ ctx, input }) => {
-    console.log({ url: `${env.BACKEND_URL}/v1/units/${input.id}` })
     const result = await axios.get<IUnit>(
       `${env.BACKEND_URL}/v1/units/${input.id}`,
       {

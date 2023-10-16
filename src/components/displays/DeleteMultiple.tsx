@@ -20,7 +20,6 @@ const DeleteMultiple = ({
   handleRefresh?: () => void;
 }) => {
   // const { data } = useSession();
-  // console.log()
   const [open, setOpen] = useState<boolean>(false);
   const { deleteWorker } = useContext(WorkerContext);
   const { toast, setToast, isDeleting, setIsDeleting } = useAppStore();

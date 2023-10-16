@@ -107,7 +107,6 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
       stockAccountId: data.stockAccount?.id ?? undefined,
       cogsAccountId: data.cogsAccount?.id ?? undefined,
     };
-    console.log({ dataSave });
     if (selectedId) {
       return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }

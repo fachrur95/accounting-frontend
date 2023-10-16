@@ -102,7 +102,6 @@ const MasterAccountSubClassForm = (props: IMasterAccountSubClassForm) => {
       group: data.group === "" || data.group === null ? undefined : data.group,
       accountClassId: data.accountClass?.id ?? "",
     };
-    console.log({ dataSave });
     if (selectedId) {
       return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }

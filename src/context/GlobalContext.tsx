@@ -41,7 +41,6 @@ export function GlobalContextProvider({ children }: Props) {
 
   useEffect(() => {
     const curTheme = theme === "system" ? systemTheme : theme;
-    // console.log({ curTheme });
     setCurrentTheme(curTheme);
   }, [theme, systemTheme]);
 

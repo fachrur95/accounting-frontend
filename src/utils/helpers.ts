@@ -131,7 +131,6 @@ export const convertToArabicText = (conventionalNumber: string): string => {
 }
 
 export const convertOperator = ({ items }: { items: GridFilterItem[] }) => {
-  // console.log({ data })
   return items.map((el) => {
     if (
       el.operatorValue === "equals" ||

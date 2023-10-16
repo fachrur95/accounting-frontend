@@ -104,7 +104,6 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
       note: data.note === "" || data.note === null ? undefined : data.note,
       peopleCategoryId: data.peopleCategory?.id ?? "",
     };
-    console.log({ dataSave });
     if (selectedId) {
       return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }

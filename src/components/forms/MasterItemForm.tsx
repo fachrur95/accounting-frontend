@@ -214,7 +214,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
             : unit.barcode,
       })),
     };
-    // console.log({ dataSave });
     if (selectedId) {
       return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }

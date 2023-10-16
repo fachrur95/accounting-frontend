@@ -108,7 +108,6 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
       depositAccountId: data.depositAccount?.id ?? "",
       beginBalanceAccountId: data.beginBalanceAccount?.id ?? "",
     };
-    console.log({ dataSave });
     if (selectedId) {
       return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }

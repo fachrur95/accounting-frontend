@@ -85,8 +85,6 @@ async function refreshAccessToken(tokenObject: User) {
       refreshToken: newTokens.refresh.token ?? tokenObject.refreshToken, // Fall back to old refresh token
     }
   } catch (error) {
-    console.log(error)
-
     return {
       ...tokenObject,
       error: "RefreshAccessTokenError",
@@ -125,7 +123,6 @@ export const authOptions: NextAuthOptions = {
       if (trigger === "update") {
         return { ...token, accessToken: session?.accessToken, refreshToken: session?.refreshToken }
       }
-      // console.log({ accessToken: token.accessToken, refreshToken: token.refreshToken });
       if (token.accessToken) {
         const tokenData = jwtDecode<IJwtDecode>(token.accessToken as string);
         if (Date.now() > tokenData.exp * 1000) {

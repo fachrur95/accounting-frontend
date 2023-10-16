@@ -74,13 +74,11 @@ const UnitCredentialPage: MyPage = () => {
   };
 
   const handleSetUnit = async (id: string) => {
-    console.log({ id });
     await mutation.mutateAsync(
       { id },
       {
         onError: (err) => console.log(err),
         onSuccess: async (data) => {
-          // console.log(data);
           if (!data) {
             return void setOpenNotification("Error to set business");
           }
