@@ -44,7 +44,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       session,
     },
     redirect: {
-      destination: "/masters/other/terms",
+      destination: "/masters/other/cash-registers",
       permanent: false,
     },
   };

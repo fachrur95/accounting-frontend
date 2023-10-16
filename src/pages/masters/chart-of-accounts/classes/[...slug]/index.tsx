@@ -9,7 +9,7 @@ import type { FormSlugType } from "@/types/global";
 import Head from "next/head";
 import React from "react";
 
-const title = "Akun Kelas";
+const title = "Akun Utama";
 
 const ProductFormSlugPage: MyPage = () => {
   const router = useRouter();

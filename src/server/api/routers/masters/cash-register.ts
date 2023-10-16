@@ -98,6 +98,7 @@ export const cashRegisterRouter = createTRPCRouter({
   }),
   create: protectedProcedure.input(
     z.object({
+      mainAccountId: z.string(),
       depositAccountId: z.string(),
       beginBalanceAccountId: z.string(),
       name: z.string(),
@@ -125,6 +126,7 @@ export const cashRegisterRouter = createTRPCRouter({
   update: protectedProcedure.input(
     z.object({
       id: z.string(),
+      mainAccountId: z.string(),
       depositAccountId: z.string(),
       beginBalanceAccountId: z.string(),
       name: z.string(),

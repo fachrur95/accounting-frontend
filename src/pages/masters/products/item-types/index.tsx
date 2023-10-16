@@ -154,7 +154,7 @@ const ItemTypesPage: MyPage = () => {
                   params &&
                   router.push(
                     {
-                      pathname: pathname,
+                      pathname,
                       query: { slug: ["v", params] },
                     },
                     `${pathname}/v/${params}`,
@@ -167,7 +167,7 @@ const ItemTypesPage: MyPage = () => {
                   params &&
                   router.push(
                     {
-                      pathname: pathname,
+                      pathname,
                       query: { slug: ["f", params] },
                     },
                     `${pathname}/f/${params}`,
@@ -257,7 +257,7 @@ const ItemTypesPage: MyPage = () => {
               </IconButton>
               <Link
                 href={{
-                  pathname: pathname,
+                  pathname,
                   query: { slug: ["f"] },
                 }}
                 as={`${pathname}/f`}
@@ -285,7 +285,7 @@ const ItemTypesPage: MyPage = () => {
             onRowDoubleClick={(params) =>
               router.push(
                 {
-                  pathname: pathname,
+                  pathname,
                   query: { slug: ["v", params.row.id] },
                 },
                 `${pathname}/v/${params.row.id}`,
@@ -294,7 +294,7 @@ const ItemTypesPage: MyPage = () => {
             /* onRowDoubleClick={(params: GridCellParams<unknown, IItem, unknown>) =>
               router.push(
                 {
-                  pathname: pathname,
+                  pathname,
                   query: { slug: ["f", params.row.id] },
                 },
                 `${pathname}/f/${params.row.id}`,

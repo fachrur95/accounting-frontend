@@ -12,9 +12,11 @@ export declare interface ICashRegister {
   createdBy: string;
   updatedAt: Date;
   updatedBy: string | null;
+  mainAccountId: string;
   depositAccountId: string;
   beginBalanceAccountId: string;
   unitId: string;
+  mainAccount?: IChartOfAccount;
   depositAccount?: IChartOfAccount;
   beginBalanceAccount?: IChartOfAccount;
   unit?: IUnit;
@@ -22,12 +24,14 @@ export declare interface ICashRegister {
 }
 
 export declare type ICashRegisterMutation = Pick<ICashRegister,
+  | "mainAccountId"
   | "depositAccountId"
   | "beginBalanceAccountId"
   | "name"
   | "note"
   | "isActive"
 > & {
+  mainAccount: IDataOption | IChartOfAccount | null;
   depositAccount: IDataOption | IChartOfAccount | null;
   beginBalanceAccount: IDataOption | IChartOfAccount | null;
 }

@@ -32,11 +32,13 @@ import { useRouter } from "next/router";
 }; */
 
 const defaultValues: ICashRegisterMutation = {
+  mainAccountId: "",
   depositAccountId: "",
   beginBalanceAccountId: "",
   name: "",
   note: "",
   isActive: true,
+  mainAccount: null,
   depositAccount: null,
   beginBalanceAccount: null,
 };
@@ -102,6 +104,7 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
     const dataSave: ICashRegisterMutation = {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
+      mainAccountId: data.mainAccount?.id ?? "",
       depositAccountId: data.depositAccount?.id ?? "",
       beginBalanceAccountId: data.beginBalanceAccount?.id ?? "",
     };
@@ -132,6 +135,16 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
+          if (key === "mainAccount") {
+            const selectedCategory = dataSelected[key]!;
+            if (selectedCategory) {
+              setValue("mainAccount", {
+                id: selectedCategory.id,
+                label: selectedCategory.name,
+              });
+            }
+            continue;
+          }
           if (key === "depositAccount") {
             const selectedCategory = dataSelected[key]!;
             if (selectedCategory) {
@@ -153,6 +166,7 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
             continue;
           }
           if (
+            key === "mainAccountId" ||
             key === "depositAccountId" ||
             key === "beginBalanceAccountId" ||
             key === "name" ||
@@ -241,6 +255,14 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
               variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
+              <AutocompleteChartOfAccount
+                name="mainAccount"
+                label="Akun Utama"
+                required
+                autocompleteProps={{
+                  disabled: mode === "view",
+                }}
+              />
               <AutocompleteChartOfAccount
                 name="depositAccount"
                 label="Akun Setoran"

@@ -3,7 +3,7 @@ import CallMadeOutlined from "@mui/icons-material/CallMadeOutlined";
 import CallReceivedOutlined from "@mui/icons-material/CallReceivedOutlined";
 import CircleOutlined from "@mui/icons-material/CircleOutlined";
 import ContactsOutlined from "@mui/icons-material/ContactsOutlined";
-import Diversity2 from "@mui/icons-material/Diversity2";
+// import Diversity2 from "@mui/icons-material/Diversity2";
 import Diversity3 from "@mui/icons-material/Diversity3";
 import FormatListNumberedOutlined from "@mui/icons-material/FormatListNumberedOutlined";
 import GroupAddOutlined from "@mui/icons-material/GroupAddOutlined";
@@ -294,14 +294,14 @@ const data: DataMenuType[] = [
             icon: <Diversity3 fontSize="small" />,
             children: [],
           },
-          {
+          /* {
             id: "employee",
             label: "karyawan",
             depth: 2,
             url: "/masters/contacts/employees",
             icon: <Diversity2 fontSize="small" />,
             children: [],
-          },
+          }, */
         ],
       },
       {

@@ -7,7 +7,7 @@ import { env } from "@/env.mjs";
 import { z } from "zod";
 import type { ITokenData } from "@/types/token";
 import type { IUnit } from "@/types/prisma-api/unit";
-import type { PaginationResponse } from "@/types/api-response";
+import type { ApiCatchError, PaginationResponse } from "@/types/api-response";
 
 export const defaultUndefinedResult: PaginationResponse<IUnit> = {
   rows: [],
@@ -74,5 +74,93 @@ export const unitCredentialsRouter = createTRPCRouter({
     });
 
     return result;
+  }),
+  findOne: protectedProcedure.input(
+    z.object({
+      id: z.string(),
+    }),
+  ).query(async ({ ctx, input }) => {
+    console.log({ url: `${env.BACKEND_URL}/v1/units/${input.id}` })
+    const result = await axios.get<IUnit>(
+      `${env.BACKEND_URL}/v1/units/${input.id}`,
+      {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+      }
+    ).then((response) => {
+      return response.data;
+    }).catch((err) => {
+      console.log(err)
+      return null;
+    });
+
+    return result;
+  }),
+  create: protectedProcedure.input(
+    z.object({
+      name: z.string(),
+    }),
+  ).mutation(async ({ ctx, input }) => {
+    try {
+      const result = await axios.post<IUnit>(
+        `${env.BACKEND_URL}/v1/units`,
+        input,
+        {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+        }
+      ).then((response) => {
+        return response.data;
+      });
+
+      return result;
+    } catch (error) {
+      throw new Error((error as ApiCatchError).message ?? "An error occurred");
+    }
+  }),
+  update: protectedProcedure.input(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+    }),
+  ).mutation(async ({ ctx, input }) => {
+    const { id, ...data } = input
+    try {
+      const result = await axios.patch<IUnit>(
+        `${env.BACKEND_URL}/v1/units/${id}`,
+        data,
+        {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+        }
+      ).then((response) => {
+        return response.data;
+      });
+
+      return result;
+    } catch (error) {
+      throw new Error((error as ApiCatchError).message ?? "An error occurred");
+    }
+  }),
+  destroy: protectedProcedure.input(
+    z.object({
+      id: z.string(),
+    }),
+  ).mutation(async ({ ctx, input }) => {
+    try {
+      const result = await axios.delete<IUnit>(
+        `${env.BACKEND_URL}/v1/units/${input.id}`,
+        {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+        }
+      ).then((response) => {
+        return response.data;
+      });
+
+      return result;
+    } catch (error) {
+      throw new Error((error as ApiCatchError).message ?? "An error occurred");
+    }
   }),
 });

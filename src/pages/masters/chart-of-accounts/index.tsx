@@ -109,7 +109,7 @@ const ChartOfAccountsPage: MyPage = () => {
   const columns: GridColDef[] = [
     {
       field: "accountSubClass.accountClass.name",
-      headerName: "Akun Kelas",
+      headerName: "Akun Utama",
       type: "string",
       flex: 1,
       valueGetter: (
@@ -120,7 +120,7 @@ const ChartOfAccountsPage: MyPage = () => {
     },
     {
       field: "accountSubClass.name",
-      headerName: "Akun Sub Kelas",
+      headerName: "Sub Akun",
       type: "string",
       flex: 1,
       valueGetter: (
@@ -189,7 +189,7 @@ const ChartOfAccountsPage: MyPage = () => {
                   params &&
                   router.push(
                     {
-                      pathname: pathname,
+                      pathname,
                       query: { slug: ["v", params] },
                     },
                     `${pathname}/v/${params}`,
@@ -202,7 +202,7 @@ const ChartOfAccountsPage: MyPage = () => {
                   params &&
                   router.push(
                     {
-                      pathname: pathname,
+                      pathname,
                       query: { slug: ["f", params] },
                     },
                     `${pathname}/f/${params}`,
@@ -292,7 +292,7 @@ const ChartOfAccountsPage: MyPage = () => {
               </IconButton>
               <Link
                 href={{
-                  pathname: pathname,
+                  pathname,
                   query: { slug: ["f"] },
                 }}
                 as={`${pathname}/f`}
@@ -320,7 +320,7 @@ const ChartOfAccountsPage: MyPage = () => {
             onRowDoubleClick={(params) =>
               router.push(
                 {
-                  pathname: pathname,
+                  pathname,
                   query: { slug: ["v", params.row.id] },
                 },
                 `${pathname}/v/${params.row.id}`,
@@ -329,7 +329,7 @@ const ChartOfAccountsPage: MyPage = () => {
             /* onRowDoubleClick={(params: GridCellParams<unknown, IItem, unknown>) =>
               router.push(
                 {
-                  pathname: pathname,
+                  pathname,
                   query: { slug: ["f", params.row.id] },
                 },
                 `${pathname}/f/${params.row.id}`,

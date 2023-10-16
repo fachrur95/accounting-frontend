@@ -44,7 +44,7 @@ import type { WorkerPathType } from "@/types/worker";
 
 const sortDefault: GridSortModel = [{ field: "code", sort: "asc" }];
 
-const title = "Akun Sub Kelas";
+const title = "Sub Akun";
 const path: WorkerPathType = "account-sub-class";
 
 const pathname = "/masters/chart-of-accounts/sub-classes";
@@ -106,7 +106,7 @@ const AccountSubClassesPage: MyPage = () => {
   const columns: GridColDef[] = [
     {
       field: "accountClass.name",
-      headerName: "Akun Kelas",
+      headerName: "Akun Utama",
       type: "string",
       flex: 1,
       valueGetter: (
@@ -159,7 +159,7 @@ const AccountSubClassesPage: MyPage = () => {
                   params &&
                   router.push(
                     {
-                      pathname: pathname,
+                      pathname,
                       query: { slug: ["v", params] },
                     },
                     `${pathname}/v/${params}`,
@@ -172,7 +172,7 @@ const AccountSubClassesPage: MyPage = () => {
                   params &&
                   router.push(
                     {
-                      pathname: pathname,
+                      pathname,
                       query: { slug: ["f", params] },
                     },
                     `${pathname}/f/${params}`,
@@ -262,7 +262,7 @@ const AccountSubClassesPage: MyPage = () => {
               </IconButton>
               <Link
                 href={{
-                  pathname: pathname,
+                  pathname,
                   query: { slug: ["f"] },
                 }}
                 as={`${pathname}/f`}
@@ -290,7 +290,7 @@ const AccountSubClassesPage: MyPage = () => {
             onRowDoubleClick={(params) =>
               router.push(
                 {
-                  pathname: pathname,
+                  pathname,
                   query: { slug: ["v", params.row.id] },
                 },
                 `${pathname}/v/${params.row.id}`,
@@ -299,7 +299,7 @@ const AccountSubClassesPage: MyPage = () => {
             /* onRowDoubleClick={(params: GridCellParams<unknown, IItem, unknown>) =>
               router.push(
                 {
-                  pathname: pathname,
+                  pathname,
                   query: { slug: ["f", params.row.id] },
                 },
                 `${pathname}/f/${params.row.id}`,

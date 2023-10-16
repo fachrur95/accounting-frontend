@@ -26,6 +26,16 @@ import { type GetServerSideProps } from "next";
 import { getServerAuthSession } from "@/server/auth";
 import jwtDecode from "jwt-decode";
 import type { IJwtDecode } from "@/types/session";
+import ModalTransition from "@/components/dialogs/ModalTransition";
+import type { FormSlugType } from "@/types/global";
+import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
+import Edit from "@mui/icons-material/Edit";
+import IconButton from "@mui/material/IconButton";
+import Link from "next/link";
+import Add from "@mui/icons-material/Add";
+import UnitForm from "@/components/forms/UnitForm";
+
+const pathname = "/credentials/unit";
 
 const UnitCredentialPage: MyPage = () => {
   const router = useRouter();
@@ -34,9 +44,10 @@ const UnitCredentialPage: MyPage = () => {
   const { data: session, update: updateSession } = useSession();
   const [rows, setRows] = useState<IUnit[]>([]);
   const [countAll, setCountAll] = useState<number>(0);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const { setOpenNotification } = useNotification();
 
-  const { data, fetchNextPage, hasNextPage } =
+  const { data, fetchNextPage, hasNextPage, refetch } =
     api.unitCredentials.getAll.useInfiniteQuery(
       { limit: 10, search },
       {
@@ -48,6 +59,19 @@ const UnitCredentialPage: MyPage = () => {
     );
 
   const mutation = api.unitCredentials.set.useMutation();
+
+  const mutationDelete = api.unitCredentials.destroy.useMutation({
+    onSuccess: () => {
+      void refetch();
+    },
+  });
+
+  const handleDelete = (): void => {
+    if (!selectedId) return;
+
+    mutationDelete.mutate({ id: selectedId });
+    setSelectedId(null);
+  };
 
   const handleSetUnit = async (id: string) => {
     console.log({ id });
@@ -97,6 +121,10 @@ const UnitCredentialPage: MyPage = () => {
     }
   }, [data]);
 
+  useEffect(() => {
+    void refetch();
+  }, [router.query.slug, refetch]);
+
   return (
     <React.Fragment>
       <Head>
@@ -133,6 +161,23 @@ const UnitCredentialPage: MyPage = () => {
           <div>
             <SearchInput />
           </div>
+          <Link
+            href={{
+              pathname,
+              query: { slug: ["f"] },
+            }}
+            as={`${pathname}/f`}
+          >
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<Add />}
+              // onClick={() => setOpenAddNew(true)}
+              // onClick={() => void handleUpdateSession()}
+            >
+              Tambah
+            </Button>
+          </Link>
         </Box>
         <TableContainer
           component={Paper}
@@ -144,6 +189,9 @@ const UnitCredentialPage: MyPage = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Unit</TableCell>
+                <TableCell align="center" width="10%">
+                  Opsi
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -160,11 +208,50 @@ const UnitCredentialPage: MyPage = () => {
                       <div className="invisible" ref={ref}></div>
                     )}
                   </TableCell>
+                  <TableCell align="center">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={(event) => {
+                        event.stopPropagation();
+
+                        void router.push(
+                          {
+                            pathname,
+                            query: { slug: ["f", row.id] },
+                          },
+                          `${pathname}/f/${row.id}`,
+                        );
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+        {router.query.slug && (
+          <ModalTransition
+            open
+            handleClose={router.back}
+            maxWidth="sm"
+            fullWidth
+            scroll="paper"
+          >
+            <UnitForm slug={router.query.slug as FormSlugType} showIn="popup" />
+          </ModalTransition>
+        )}
+        {typeof selectedId === "string" && (
+          <ConfirmationDialog
+            open={typeof selectedId === "string"}
+            title="Konfirmasi Hapus"
+            message="Apakah Anda yakin ingin menghapus ini?"
+            onClose={() => setSelectedId(null)}
+            onSubmit={handleDelete}
+          />
+        )}
       </Container>
     </React.Fragment>
   );

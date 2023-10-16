@@ -161,7 +161,7 @@ const MasterAccountClassForm = (props: IMasterAccountClassForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">Akun Kelas</Typography>
+            <Typography variant="h6">Akun Utama</Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (

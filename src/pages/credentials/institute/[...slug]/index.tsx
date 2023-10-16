@@ -4,12 +4,12 @@ import type { IJwtDecode } from "@/types/session";
 import { useRouter } from "next/router";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
-import MasterAccountSubClassForm from "@/components/forms/MasterAccountSubClassForm";
+import InstituteForm from "@/components/forms/InstituteForm";
 import type { FormSlugType } from "@/types/global";
 import Head from "next/head";
 import React from "react";
 
-const title = "Sub Akun";
+const title = "Lembaga";
 
 const ProductFormSlugPage: MyPage = () => {
   const router = useRouter();
@@ -21,7 +21,7 @@ const ProductFormSlugPage: MyPage = () => {
         <title>{`Bidang Usaha | ${title}`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <MasterAccountSubClassForm slug={slug as FormSlugType} showIn="page" />
+      <InstituteForm slug={slug as FormSlugType} showIn="page" />
     </>
   );
 };
@@ -64,4 +64,4 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 };
 
 export default ProductFormSlugPage;
-ProductFormSlugPage.Layout = "Dashboard";
+ProductFormSlugPage.Layout = "Plain";

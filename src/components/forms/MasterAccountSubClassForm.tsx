@@ -175,7 +175,7 @@ const MasterAccountSubClassForm = (props: IMasterAccountSubClassForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">Akun Sub Kelas</Typography>
+            <Typography variant="h6">Sub Akun</Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (
@@ -245,7 +245,7 @@ const MasterAccountSubClassForm = (props: IMasterAccountSubClassForm) => {
             >
               <AutocompleteAccountClass
                 name="accountClass"
-                label="Akun Kelas"
+                label="Akun Utama"
                 required
                 autocompleteProps={{
                   disabled: mode === "view",

@@ -1,12 +1,17 @@
 import SearchInput from "@/components/controls/SearchInput";
+import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
+import ModalTransition from "@/components/dialogs/ModalTransition";
+import InstituteForm from "@/components/forms/InstituteForm";
 import useNotification from "@/components/hooks/useNotification";
 import type { MyPage } from "@/components/layouts/layoutTypes";
 import { getServerAuthSession } from "@/server/auth";
 import type { PaginationResponse } from "@/types/api-response";
+import type { FormSlugType } from "@/types/global";
 import type { IInstitute } from "@/types/prisma-api/institute";
 import { api } from "@/utils/api";
 import { useAppStore } from "@/utils/store";
 import Add from "@mui/icons-material/Add";
+import Edit from "@mui/icons-material/Edit";
 import ArrowBackIos from "@mui/icons-material/ArrowBackIos";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -18,13 +23,17 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { type GetServerSideProps } from "next";
 import { signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { useInView } from "react-intersection-observer";
+
+const pathname = "/credentials/institute";
 
 const InstituteCredentialPage: MyPage = () => {
   const router = useRouter();
@@ -33,9 +42,10 @@ const InstituteCredentialPage: MyPage = () => {
   const { data: session, update: updateSession } = useSession();
   const [rows, setRows] = useState<IInstitute[]>([]);
   const [countAll, setCountAll] = useState<number>(0);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const { setOpenNotification } = useNotification();
 
-  const { data, fetchNextPage, hasNextPage } =
+  const { data, fetchNextPage, hasNextPage, refetch } =
     api.instituteCredentials.getAll.useInfiniteQuery(
       { limit: 10, search },
       {
@@ -48,7 +58,29 @@ const InstituteCredentialPage: MyPage = () => {
 
   const mutation = api.instituteCredentials.set.useMutation();
 
-  const handleSetInstitute = async (id: string) => {
+  const mutationDelete = api.instituteCredentials.destroy.useMutation({
+    onSuccess: () => {
+      void refetch();
+    },
+  });
+
+  const handleDelete = (): void => {
+    if (!selectedId) return;
+
+    mutationDelete.mutate({ id: selectedId });
+    setSelectedId(null);
+  };
+
+  const handleSetInstitute = async (event: React.MouseEvent, id: string) => {
+    event.stopPropagation();
+    /* console.log({
+      typeof: typeof (event.target as HTMLElement).classList,
+      check: (event.target as HTMLElement).classList,
+    });
+    if ((event.target as HTMLElement).classList.contains("MuiSvgIcon-root")) {
+      return;
+    } */
+
     console.log({ id });
     await mutation.mutateAsync(
       { id },
@@ -96,6 +128,10 @@ const InstituteCredentialPage: MyPage = () => {
     }
   }, [data]);
 
+  useEffect(() => {
+    void refetch();
+  }, [router.query.slug, refetch]);
+
   return (
     <React.Fragment>
       <Head>
@@ -129,15 +165,23 @@ const InstituteCredentialPage: MyPage = () => {
           <div>
             <SearchInput />
           </div>
-          <Button
-            variant="contained"
-            color="success"
-            startIcon={<Add />}
-            // onClick={() => setOpenAddNew(true)}
-            // onClick={() => void handleUpdateSession()}
+          <Link
+            href={{
+              pathname,
+              query: { slug: ["f"] },
+            }}
+            as={`${pathname}/f`}
           >
-            Add New
-          </Button>
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<Add />}
+              // onClick={() => setOpenAddNew(true)}
+              // onClick={() => void handleUpdateSession()}
+            >
+              Tambah
+            </Button>
+          </Link>
         </Box>
         <TableContainer
           component={Paper}
@@ -149,6 +193,9 @@ const InstituteCredentialPage: MyPage = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Lembaga</TableCell>
+                <TableCell align="center" width="10%">
+                  Opsi
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -156,7 +203,7 @@ const InstituteCredentialPage: MyPage = () => {
                 <TableRow
                   hover
                   key={index}
-                  onClick={() => void handleSetInstitute(row.id)}
+                  onClick={(event) => void handleSetInstitute(event, row.id)}
                   className="cursor-pointer"
                 >
                   <TableCell component="th" scope="row">
@@ -165,11 +212,53 @@ const InstituteCredentialPage: MyPage = () => {
                       <div className="invisible" ref={ref}></div>
                     )}
                   </TableCell>
+                  <TableCell align="center">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={(event) => {
+                        event.stopPropagation();
+
+                        void router.push(
+                          {
+                            pathname,
+                            query: { slug: ["f", row.id] },
+                          },
+                          `${pathname}/f/${row.id}`,
+                        );
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+        {router.query.slug && (
+          <ModalTransition
+            open
+            handleClose={router.back}
+            maxWidth="sm"
+            fullWidth
+            scroll="paper"
+          >
+            <InstituteForm
+              slug={router.query.slug as FormSlugType}
+              showIn="popup"
+            />
+          </ModalTransition>
+        )}
+        {typeof selectedId === "string" && (
+          <ConfirmationDialog
+            open={typeof selectedId === "string"}
+            title="Konfirmasi Hapus"
+            message="Apakah Anda yakin ingin menghapus ini?"
+            onClose={() => setSelectedId(null)}
+            onSubmit={handleDelete}
+          />
+        )}
       </Container>
     </React.Fragment>
   );
