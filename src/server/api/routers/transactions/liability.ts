@@ -20,7 +20,7 @@ export const defaultUndefinedResult: PaginationResponse<ITransaction> = {
   totalPages: 0,
 }
 
-const GLOBAL_URL = `${env.BACKEND_URL}/v1/transactions/sell`;
+const GLOBAL_URL = `${env.BACKEND_URL}/v1/transactions`;
 
 export const salesRouter = createTRPCRouter({
   findAll: protectedProcedure.input(

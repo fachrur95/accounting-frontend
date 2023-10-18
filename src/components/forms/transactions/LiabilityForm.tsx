@@ -1,33 +1,10 @@
-import useNotification from "@/components/hooks/useNotification";
-import type { FormSlugType } from "@/types/global";
-import type { IDataOption } from "@/types/options";
-import type { IItemMutation } from "@/types/prisma-api/item";
-import type { ITax } from "@/types/prisma-api/tax";
-import { api } from "@/utils/api";
-import Add from "@mui/icons-material/Add";
-import Close from "@mui/icons-material/Close";
-import Delete from "@mui/icons-material/Delete";
-import Edit from "@mui/icons-material/Edit";
-import Save from "@mui/icons-material/Save";
-import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
 import TableFooter from "@mui/material/TableFooter";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FormContainer,
   SwitchElement,
@@ -36,54 +13,66 @@ import {
   useFieldArray,
   useForm,
 } from "react-hook-form-mui";
-import NumericFormatCustom from "../controls/NumericFormatCustom";
-import AutocompleteItemCategory from "../controls/autocompletes/masters/AutocompleteItemCategory";
-import AutocompleteUnitOfMeasure from "../controls/autocompletes/masters/AutocompleteUnitOfMeasure";
+import Close from "@mui/icons-material/Close";
+import Add from "@mui/icons-material/Add";
+import Delete from "@mui/icons-material/Delete";
+import Edit from "@mui/icons-material/Edit";
+import Save from "@mui/icons-material/Save";
+import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
+import NumericFormatCustom from "../../controls/NumericFormatCustom";
+import { api } from "@/utils/api";
+import Link from "next/link";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import type { FormSlugType } from "@/types/global";
+import type { ILiabilityMutation } from "@/types/prisma-api/transaction";
+import type { IPeople } from "@/types/prisma-api/people";
+import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
+import type { IDataOption } from "@/types/options";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import { useRouter } from "next/router";
+import useNotification from "@/components/hooks/useNotification";
 // import type { IItemCategory } from "@/types/prisma-api/item-category";
 
-/* type MasterItemBodyType = IItemMutation & {
+/* type MasterItemBodyType = ILiabilityMutation & {
   itemCategory: IDataOption | IItemCategory | null;
-  tax: IDataOption | ITax | null;
+  tax: IDataOption | IPeople | null;
 }; */
 
-const defaultUom = {
-  unitOfMeasureId: "",
-  conversionQty: 1,
-  barcode: "",
-  unitOfMeasure: null,
-};
-
-const defaultValues: IItemMutation = {
-  itemCategory: null,
-  tax: null,
-  itemCategoryId: "",
-  taxId: "",
-  code: "",
-  name: "",
-  description: "",
-  minQty: 0,
-  maxQty: 0,
-  manualCogs: 0,
-  price: 0,
+const defaultValues: ILiabilityMutation = {
+  transactionNumber: null,
+  chartOfAccountId: null,
+  chartOfAccount: "",
+  peopleId: "",
+  people: "",
+  entryDate: new Date(),
   note: "",
-  isActive: true,
-  multipleUoms: [defaultUom],
-  files: [],
+  transactionDetails: [],
 };
 
-interface IMasterItemForm {
+interface ILiabilityForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
+  type: "revenue" | "expense";
 }
 
-const MasterItemForm = (props: IMasterItemForm) => {
-  const { slug, showIn } = props;
+const LiabilityForm = (props: ILiabilityForm) => {
+  const { slug, showIn, type } = props;
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [defaultUnit, setDefaultUnit] = useState<string | null>(null);
-  const formContext = useForm<IItemMutation>({ defaultValues });
+  const formContext = useForm<ILiabilityMutation>({ defaultValues });
   const { setOpenNotification } = useNotification();
+
+  const basePath = `/cash-and-bank/${type}s`;
 
   const {
     control,
@@ -95,35 +84,35 @@ const MasterItemForm = (props: IMasterItemForm) => {
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "multipleUoms",
+    name: "transactionDetails",
   });
 
-  // const test = useWatch(control, "multipleUoms[0].unitOfMeasure.name");
+  // const test = useWatch(control, "transactionDetails[0].chartOfAccount.name");
 
   /* console.log({
     test,
-    getValues: getValues(`multipleUoms[0]?.unitOfMeasure?.name`),
-    watch: watch(`multipleUoms[0]?.unitOfMeasure?.name`),
+    getValues: getValues(`transactionDetails[0]?.chartOfAccount?.name`),
+    watch: watch(`transactionDetails[0]?.chartOfAccount?.name`),
   }); */
 
-  // const defaultUnit = watch("multipleUoms");
+  // const defaultUnit = watch("transactionDetails");
   // const selectedCategory = watch("itemCategory");
   // const currentVariantCategory = watch("variantCategories");
   // const currentVariants = watch("variants");
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
-    api.item.findOne.useQuery(
+    api.globalTransaction.findOne.useQuery(
       { id: selectedId ?? "" },
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
-  const mutationCreate = api.item.create.useMutation({
-    onSuccess: () => void router.push("/masters/products"),
+  const mutationCreate = api.globalTransaction.create.useMutation({
+    onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IItemMutation, {
+          void setError(field as keyof ILiabilityMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -132,13 +121,13 @@ const MasterItemForm = (props: IMasterItemForm) => {
     },
   });
 
-  const mutationUpdate = api.item.update.useMutation({
-    onSuccess: () => void router.push("/masters/products"),
+  const mutationUpdate = api.globalTransaction.update.useMutation({
+    onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IItemMutation, {
+          void setError(field as keyof ILiabilityMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -147,67 +136,18 @@ const MasterItemForm = (props: IMasterItemForm) => {
     },
   });
 
-  const onSubmit = (data: IItemMutation) => {
-    // const check = data.multipleUoms.some((unit) => unit.unitOfMeasure === null)
-    let baseUnit: string | null = null;
-    let unitTemp: string | null | undefined = null;
-    let conversionQtyTemp = 1;
-    for (const [index, unit] of data.multipleUoms.entries()) {
-      if (unit.conversionQty === 1 && index === 0) {
-        if (!unit.unitOfMeasure) {
-          return setOpenNotification("Silahkan pilih satuan dasar!", {
-            variant: "error",
-          });
-        }
-        baseUnit = unit.unitOfMeasure.id;
-        continue;
-      }
-      if (
-        unit.unitOfMeasure?.id === baseUnit ||
-        unit.unitOfMeasure?.id === unitTemp
-      ) {
-        return setOpenNotification(
-          "Tidak boleh memilih satuan dasar yg sama lebih dari 1!",
-          {
-            variant: "error",
-          },
-        );
-      }
-      if (unit.conversionQty <= 1) {
-        return setOpenNotification(
-          "Nilai konversi selain satuan dasar harus bernilai > 1!",
-          {
-            variant: "error",
-          },
-        );
-      }
-      if (unit.conversionQty === conversionQtyTemp) {
-        return setOpenNotification(
-          "Nilai konversi tidak boleh bernilai sama satu dengan yg lain!",
-          {
-            variant: "error",
-          },
-        );
-      }
-      unitTemp = unit.unitOfMeasure?.id;
-      conversionQtyTemp = unit.conversionQty;
-    }
-    const dataSave: IItemMutation = {
+  const onSubmit = (data: ILiabilityMutation) => {
+    const dataSave: ILiabilityMutation = {
       ...data,
-      description:
-        data.description === "" || data.description === null
-          ? undefined
-          : data.description,
       note: data.note === "" || data.note === null ? undefined : data.note,
-      itemCategoryId: data.itemCategory?.id ?? "",
-      taxId: data.tax?.id ?? undefined,
-      multipleUoms: data.multipleUoms.map((unit) => ({
-        ...unit,
-        unitOfMeasureId: unit.unitOfMeasure?.id ?? "",
-        barcode:
-          unit.barcode === "" || unit.barcode === null
-            ? undefined
-            : unit.barcode,
+      chartOfAccountId: data.chartOfAccount?.id ?? "",
+      peopleId: data.people?.id ?? undefined,
+      transactionDetails: data.transactionDetails.map((detail) => ({
+        ...detail,
+        chartOfAccountId: detail.chartOfAccount?.id ?? "",
+        taxId: detail.tax?.id ?? undefined,
+        note:
+          detail.note === "" || detail.note === null ? undefined : detail.note,
       })),
     };
     if (selectedId) {
@@ -236,46 +176,49 @@ const MasterItemForm = (props: IMasterItemForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
-          if (key === "itemCategory") {
-            const selectedCategory = dataSelected[key]!;
-            if (selectedCategory) {
-              setValue("itemCategory", {
-                id: selectedCategory.id,
-                label: selectedCategory.name,
+          if (key === "chartOfAccount") {
+            const selectedAccount = dataSelected[key]!;
+            if (selectedAccount) {
+              setValue("chartOfAccount", {
+                id: selectedAccount.id,
+                label: selectedAccount.name,
               });
             }
             continue;
           }
-          if (key === "tax") {
-            const selectedTax = dataSelected[key] as ITax | null;
-            if (selectedTax) {
-              setValue("tax", {
-                id: selectedTax.id,
-                label: selectedTax.name,
+          if (key === "people") {
+            const selectedPeople = dataSelected[key] as IPeople | null;
+            if (selectedPeople) {
+              setValue("people", {
+                id: selectedPeople.id,
+                label: selectedPeople.name,
               });
             }
             continue;
           }
-          if (key === "multipleUoms") {
-            const multipleUnit = dataSelected[key]!;
+          if (key === "transactionDetails") {
+            const transactionDetail = dataSelected[key]!;
 
-            if (multipleUnit.length > 0) {
-              const dataUnit = multipleUnit.map((unit) => {
-                const selectedUnit = {
-                  id: unit.unitOfMeasure?.id ?? "",
-                  label: unit.unitOfMeasure?.name ?? "",
+            if (transactionDetail.length > 0) {
+              const dataDetail = transactionDetail.map((row) => {
+                const selectedAccount = {
+                  id: row.chartOfAccount?.id ?? "",
+                  label: row.chartOfAccount?.name ?? "",
                 };
-                if (unit.conversionQty === 1) {
-                  setDefaultUnit(unit.unitOfMeasure?.name ?? "");
-                }
+                const selectedTax = {
+                  id: row.tax?.id ?? "",
+                  label: row.tax?.name ?? "",
+                };
                 return {
-                  id: unit.id,
-                  unitOfMeasure: selectedUnit,
-                  conversionQty: unit.conversionQty,
-                  barcode: unit.barcode,
+                  id: row.id,
+                  chartOfAccount: selectedAccount,
+                  tax: selectedAccount,
+                  priceInput: row.priceInput,
+                  discountInput: row.discountInput,
+                  note: row.note,
                 };
               });
-              setValue("multipleUoms", dataUnit);
+              setValue("transactionDetails", dataDetail);
             }
 
             continue;
@@ -283,37 +226,25 @@ const MasterItemForm = (props: IMasterItemForm) => {
           if (key === "files") {
             continue;
           }
-          // "itemCategory" | "multipleUoms" | "tax" | "files" | "id"
+          // "itemCategory" | "transactionDetails" | "tax" | "files" | "id"
 
           setValue(
             key as keyof (keyof Pick<
-              IItemMutation,
-              | "itemCategoryId"
-              | "taxId"
-              | "code"
-              | "name"
-              | "description"
-              | "minQty"
-              | "maxQty"
-              | "manualCogs"
-              | "price"
+              ILiabilityMutation,
+              | "transactionNumber"
+              | "chartOfAccountId"
+              | "peopleId"
+              | "entryDate"
               | "note"
-              | "isActive"
             >),
             dataSelected[
               key as keyof Pick<
-                IItemMutation,
-                | "itemCategoryId"
-                | "taxId"
-                | "code"
-                | "name"
-                | "description"
-                | "minQty"
-                | "maxQty"
-                | "manualCogs"
-                | "price"
+                ILiabilityMutation,
+                | "transactionNumber"
+                | "chartOfAccountId"
+                | "peopleId"
+                | "entryDate"
                 | "note"
-                | "isActive"
               >
             ],
           );
@@ -339,7 +270,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
           }`}
         >
           <div className="mb-2 flex items-center gap-2">
-            <Link href="/masters/products">
+            <Link href={basePath}>
               <IconButton color="error">
                 <Close />
               </IconButton>
@@ -354,7 +285,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
                 size="large"
                 fullWidth
                 startIcon={<Edit />}
-                onClick={() => router.push(`/masters/products/f/${selectedId}`)}
+                onClick={() => router.push(`${basePath}/f/${selectedId}`)}
               >
                 Sunting
               </Button>
@@ -384,103 +315,28 @@ const MasterItemForm = (props: IMasterItemForm) => {
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
-                name="code"
-                label="Kode"
+                name="transactionNumber"
+                label="No. Transaksi"
                 required
                 InputProps={{
                   disabled: mode === "view",
                 }}
               />
-              <TextFieldElement
-                name="name"
-                label="Nama Produk"
-                required
-                InputProps={{
-                  disabled: mode === "view",
-                }}
-              />
-            </Box>
-            <Box
-              component={Paper}
-              variant="outlined"
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <TextareaAutosizeElement
-                name="description"
-                label="Deskripsi"
-                rows={3}
-                className="col-start-1"
-                disabled={mode === "view"}
-              />
-              <AutocompleteItemCategory
-                name="itemCategory"
-                label="Kategori Produk"
+              <AutocompleteChartOfAccount
+                name="chartOfAccount"
+                label="Akun"
                 required
                 autocompleteProps={{
                   disabled: mode === "view",
                 }}
               />
-            </Box>
-            <Box
-              component={Paper}
-              variant="outlined"
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <TextFieldElement
-                name="manualCogs"
-                label="HPP Manual (diisi jika pengaturan manual)"
-                InputProps={{
-                  inputComponent: NumericFormatCustom as never,
+              <AutocompletePeople
+                name="people"
+                label="Customer"
+                autocompleteProps={{
                   disabled: mode === "view",
                 }}
-              />
-              <TextFieldElement
-                name="price"
-                label="Harga Satuan"
-                InputProps={{
-                  inputComponent: NumericFormatCustom as never,
-                  disabled: mode === "view",
-                }}
-              />
-            </Box>
-            <Box
-              component={Paper}
-              variant="outlined"
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <TextFieldElement
-                name="minQty"
-                label="Minimum Stock"
-                InputProps={{
-                  inputComponent: NumericFormatCustom as never,
-                  disabled: mode === "view",
-                }}
-              />
-              <TextFieldElement
-                name="maxQty"
-                label="Maximum Stock"
-                InputProps={{
-                  inputComponent: NumericFormatCustom as never,
-                  disabled: mode === "view",
-                }}
-              />
-              <TextareaAutosizeElement
-                name="note"
-                label="Catatan"
-                rows={3}
-                className="col-start-1"
-                disabled={mode === "view"}
-              />
-            </Box>
-            <Box
-              component={Paper}
-              variant="outlined"
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <SwitchElement
-                name="isActive"
-                label="Aktif"
-                switchProps={{ disabled: mode === "view" }}
+                type="customer"
               />
             </Box>
             <div className="overflow-auto">
@@ -496,12 +352,11 @@ const MasterItemForm = (props: IMasterItemForm) => {
                         <TableCell width="5%" align="right">
                           No
                         </TableCell>
-                        <TableCell width="30%">Satuan</TableCell>
-                        <TableCell width="15%" align="right">
-                          Qty
+                        <TableCell width="50%">Sumber Akun</TableCell>
+                        <TableCell width="25%" align="right">
+                          Nilai
                         </TableCell>
-                        <TableCell width="15%">Satuan Dasar</TableCell>
-                        <TableCell width="20%">Barcode</TableCell>
+                        <TableCell width="15%">Catatan</TableCell>
                         <TableCell width="5%" align="center">
                           <Delete />
                         </TableCell>
@@ -519,8 +374,8 @@ const MasterItemForm = (props: IMasterItemForm) => {
                             {index + 1}
                           </TableCell>
                           <TableCell align="right">
-                            <AutocompleteUnitOfMeasure
-                              name={`multipleUoms.${index}.unitOfMeasure`}
+                            <AutocompleteChartOfAccount
+                              name={`transactionDetails.${index}.chartOfAccount`}
                               required
                               autocompleteProps={{
                                 size: "small",
@@ -541,20 +396,18 @@ const MasterItemForm = (props: IMasterItemForm) => {
                           </TableCell>
                           <TableCell align="right">
                             <TextFieldElement
-                              name={`multipleUoms.${index}.conversionQty`}
+                              name={`transactionDetails.${index}.priceInput`}
                               hiddenLabel
                               InputProps={{
                                 inputComponent: NumericFormatCustom as never,
-                                disabled: index === 0,
                               }}
                               fullWidth
                               size="small"
                             />
                           </TableCell>
-                          <TableCell>{defaultUnit ?? "-"}</TableCell>
                           <TableCell>
                             <TextFieldElement
-                              name={`multipleUoms.${index}.barcode`}
+                              name={`transactionDetails.${index}.note`}
                               hiddenLabel
                               fullWidth
                               size="small"
@@ -565,7 +418,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
                               onClick={() => void remove(index)}
                               color="error"
                               size="small"
-                              disabled={index === 0}
                             >
                               <Close />
                             </IconButton>
@@ -581,16 +433,16 @@ const MasterItemForm = (props: IMasterItemForm) => {
                               startIcon={<Add />}
                               onClick={() =>
                                 void append({
-                                  unitOfMeasureId: "",
-                                  unitOfMeasure: null,
-                                  conversionQty: 0,
-                                  barcode: "",
+                                  chartOfAccountId: "",
+                                  chartOfAccount: null,
+                                  priceInput: 0,
+                                  note: "",
                                 })
                               }
                               size="large"
                               fullWidth
                             >
-                              Tambah Satuan
+                              Tambah
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -600,6 +452,19 @@ const MasterItemForm = (props: IMasterItemForm) => {
                 </TableContainer>
               </Box>
             </div>
+            <Box
+              component={Paper}
+              variant="outlined"
+              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+            >
+              <TextareaAutosizeElement
+                name="note"
+                label="Catatan"
+                rows={3}
+                className="col-start-1"
+                disabled={mode === "view"}
+              />
+            </Box>
             <Button type="submit" disabled={isSubmitting} className="hidden">
               Simpan
             </Button>
@@ -614,10 +479,10 @@ const MasterItemForm = (props: IMasterItemForm) => {
                   onClick={() =>
                     router.push(
                       {
-                        pathname: "/masters/products",
+                        pathname: basePath,
                         query: { slug: ["f", selectedId] },
                       },
-                      `/masters/products/f/${selectedId}`,
+                      `${basePath}/f/${selectedId}`,
                     )
                   }
                 >
@@ -642,4 +507,4 @@ const MasterItemForm = (props: IMasterItemForm) => {
   );
 };
 
-export default MasterItemForm;
+export default LiabilityForm;

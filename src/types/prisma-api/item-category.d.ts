@@ -14,8 +14,10 @@ export declare interface IItemCategory {
   updatedAt: Date;
   updatedBy: string | null;
   itemTypeId: string;
+  salesAccountId: string;
   unitId: string;
   itemType?: IItemType;
+  salesAccount?: IChartOfAccount;
   stockAccountId?: string | null;
   stockAccount?: IChartOfAccount | null;
   cogsAccountId?: string | null;
@@ -26,6 +28,7 @@ export declare interface IItemCategory {
 
 export declare type IItemCategoryMutation = Pick<IItemCategory,
   | "itemTypeId"
+  | "salesAccountId"
   | "stockAccountId"
   | "cogsAccountId"
   | "name"
@@ -33,6 +36,7 @@ export declare type IItemCategoryMutation = Pick<IItemCategory,
   | "isActive"
 > & {
   itemType: IDataOption | IItemType | null;
+  salesAccount: IDataOption | IChartOfAccount | null;
   stockAccount?: IDataOption | IChartOfAccount | null;
   cogsAccount?: IDataOption | IChartOfAccount | null;
 }

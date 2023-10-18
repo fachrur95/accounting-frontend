@@ -20,9 +20,9 @@ export const defaultUndefinedResult: PaginationResponse<ITransaction> = {
   totalPages: 0,
 }
 
-const GLOBAL_URL = `${env.BACKEND_URL}/v1/transactions/sell`;
+const GLOBAL_URL = `${env.BACKEND_URL}/v1/transactions`;
 
-export const salesRouter = createTRPCRouter({
+export const globalTransactionRouter = createTRPCRouter({
   findAll: protectedProcedure.input(
     z.object({
       limit: z.number(),
@@ -44,11 +44,39 @@ export const salesRouter = createTRPCRouter({
           sort: z.enum(["asc", "desc"]).nullish().default("asc"),
         })
       ).nullish(),
+      transactionType: z.enum([
+        "SALE_QUOTATION",
+        "SALE_ORDER",
+        "SALE_INVOICE",
+        "SALE_RETURN",
+        "PURCHASE_QUOTATION",
+        "PURCHASE_ORDER",
+        "PURCHASE_INVOICE",
+        "PURCHASE_RETURN",
+        "RECEIVEABLE_PAYMENT",
+        "DEBT_PAYMENT",
+        "EXPENSE",
+        "REVENUE",
+        "TRANSFER_FUND",
+        "TRANSFER_ITEM_SEND",
+        "TRANSFER_ITEM_RECEIVE",
+        "STOCK_OPNAME",
+        "JOURNAL_ENTRY",
+        "BEGINNING_BALANCE_STOCK",
+        "BEGINNING_BALANCE_DEBT",
+        "BEGINNING_BALANCE_RECEIVABLE",
+        "OPEN_REGISTER",
+        "CLOSE_REGISTER",
+      ]).nullish(),
     }),
   ).query(async ({ ctx, input }) => {
-    const { limit, cursor, search, filter, sort } = input;
+    const { limit, cursor, search, filter, sort, transactionType } = input;
 
     let url = `${GLOBAL_URL}?page=${cursor ?? 0}&limit=${limit}`;
+
+    if (transactionType) {
+      url += `&transactionType=${transactionType}`;
+    }
 
     if (search && search !== "") {
       url += `&search=${search}`;
@@ -77,74 +105,34 @@ export const salesRouter = createTRPCRouter({
 
     return result;
   }),
-  create: protectedProcedure.input(
-    z.object({
-      code: z.string(),
-      description: z.string().nullish(),
-      itemCategoryId: z.string(),
-      taxId: z.string().nullish(),
-      name: z.string(),
-      manualCogs: z.number(),
-      price: z.number(),
-      maxQty: z.number(),
-      minQty: z.number(),
-      note: z.string().nullish(),
-      isActive: z.boolean(),
-      multipleUoms: z.array(
-        z.object({
-          unitOfMeasureId: z.string(),
-          conversionQty: z.number(),
-          barcode: z.string().nullish(),
-        })
-      ).min(1),
-    }),
-  ).mutation(async ({ ctx, input }) => {
-    try {
-      const result = await axios.post<ITransaction>(
-        `${GLOBAL_URL}`,
-        input,
-        {
-          withCredentials: true,
-          headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
-        }
-      ).then((response) => {
-        return response.data;
-      });
-
-      return result;
-    } catch (error) {
-      throw new Error((error as ApiCatchError).message ?? "An error occurred");
-    }
-  }),
-  update: protectedProcedure.input(
+  findOne: protectedProcedure.input(
     z.object({
       id: z.string(),
-      code: z.string(),
-      description: z.string().nullish(),
-      itemCategoryId: z.string(),
-      taxId: z.string().nullish(),
-      name: z.string(),
-      manualCogs: z.number(),
-      price: z.number(),
-      maxQty: z.number(),
-      minQty: z.number(),
-      note: z.string().nullish(),
-      isActive: z.boolean(),
-      multipleUoms: z.array(
-        z.object({
-          id: z.string().nullish(),
-          unitOfMeasureId: z.string(),
-          conversionQty: z.number(),
-          barcode: z.string().nullish(),
-        })
-      ).min(1),
+    }),
+  ).query(async ({ ctx, input }) => {
+    const result = await axios.get<ITransaction>(
+      `${GLOBAL_URL}/${input.id}`,
+      {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+      }
+    ).then((response) => {
+      return response.data;
+    }).catch((err) => {
+      console.log(err)
+      return null;
+    });
+
+    return result;
+  }),
+  destroy: protectedProcedure.input(
+    z.object({
+      id: z.string(),
     }),
   ).mutation(async ({ ctx, input }) => {
-    const { id, ...data } = input;
     try {
-      const result = await axios.patch<ITransaction>(
-        `${GLOBAL_URL}/${id}`,
-        data,
+      const result = await axios.delete<ITransaction>(
+        `${GLOBAL_URL}/${input.id}`,
         {
           withCredentials: true,
           headers: { Authorization: `Bearer ${ctx.session.accessToken}` },

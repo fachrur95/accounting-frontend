@@ -34,12 +34,16 @@ import { useRouter } from "next/router";
 
 const defaultValues: IItemCategoryMutation = {
   itemTypeId: "",
+  salesAccountId: "",
   stockAccountId: "",
   cogsAccountId: "",
   name: "",
   note: "",
   isActive: true,
   itemType: null,
+  salesAccount: null,
+  stockAccount: null,
+  cogsAccount: null,
 };
 
 interface IMasterItemCategoryForm {
@@ -104,6 +108,7 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
       itemTypeId: data.itemType?.id ?? "",
+      salesAccountId: data.salesAccount?.id ?? "",
       stockAccountId: data.stockAccount?.id ?? undefined,
       cogsAccountId: data.cogsAccount?.id ?? undefined,
     };
@@ -143,6 +148,16 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
             }
             continue;
           }
+          if (key === "salesAccount") {
+            const selectedAccount = dataSelected[key]!;
+            if (selectedAccount) {
+              setValue("salesAccount", {
+                id: selectedAccount.id,
+                label: selectedAccount.name,
+              });
+            }
+            continue;
+          }
           if (key === "stockAccount") {
             const selectedAccount = dataSelected[key]!;
             if (selectedAccount) {
@@ -165,6 +180,7 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
           }
           if (
             key === "itemTypeId" ||
+            key === "salesAccountId" ||
             key === "stockAccountId" ||
             key === "cogsAccountId" ||
             key === "name" ||
@@ -256,6 +272,14 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
               <AutocompleteItemType
                 name="itemType"
                 label="Tipe Produk"
+                required
+                autocompleteProps={{
+                  disabled: mode === "view",
+                }}
+              />
+              <AutocompleteChartOfAccount
+                name="salesAccount"
+                label="Akun Penjualan"
                 required
                 autocompleteProps={{
                   disabled: mode === "view",

@@ -99,6 +99,7 @@ export const itemCategoryRouter = createTRPCRouter({
   create: protectedProcedure.input(
     z.object({
       itemTypeId: z.string(),
+      salesAccountId: z.string(),
       stockAccountId: z.string().nullish(),
       cogsAccountId: z.string().nullish(),
       name: z.string(),
@@ -127,6 +128,7 @@ export const itemCategoryRouter = createTRPCRouter({
     z.object({
       id: z.string(),
       itemTypeId: z.string(),
+      salesAccountId: z.string(),
       stockAccountId: z.string().nullish(),
       cogsAccountId: z.string().nullish(),
       name: z.string(),
