@@ -106,7 +106,13 @@ const LiabilityForm = (props: ILiabilityForm) => {
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
-  const mutationCreate = api.globalTransaction.create.useMutation({
+  const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
+    transactionType: "REVENUE",
+  });
+
+  // console.log({ dataNumber });
+
+  const mutationCreate = api.liability.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
@@ -121,7 +127,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
     },
   });
 
-  const mutationUpdate = api.globalTransaction.update.useMutation({
+  const mutationUpdate = api.liability.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       const errors = error.data?.zodError?.fieldErrors;
@@ -212,7 +218,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
                 return {
                   id: row.id,
                   chartOfAccount: selectedAccount,
-                  tax: selectedAccount,
+                  tax: selectedTax,
                   priceInput: row.priceInput,
                   discountInput: row.discountInput,
                   note: row.note,

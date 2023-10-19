@@ -6,6 +6,7 @@ import type { ITerm } from "./term";
 import type { ITransactionDetail } from "./transaction-detail";
 import type { TransactionType } from "./transaction-type";
 import type { IUnit } from "./unit";
+import type { ITax } from "./tax";
 import type { IMultipleUom } from "./multiple-uom";
 // import type { IWarehouse } from "./warehouse";
 

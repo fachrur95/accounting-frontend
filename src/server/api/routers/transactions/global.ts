@@ -11,6 +11,31 @@ import { convertFilterToURL, convertSortToURL } from "@/utils/helpers";
 import type { GridFilterModel, GridSortModel } from "@mui/x-data-grid-pro";
 import type { ITransaction } from "@/types/prisma-api/transaction";
 
+const transactionType = z.enum([
+  "SALE_QUOTATION",
+  "SALE_ORDER",
+  "SALE_INVOICE",
+  "SALE_RETURN",
+  "PURCHASE_QUOTATION",
+  "PURCHASE_ORDER",
+  "PURCHASE_INVOICE",
+  "PURCHASE_RETURN",
+  "RECEIVEABLE_PAYMENT",
+  "DEBT_PAYMENT",
+  "EXPENSE",
+  "REVENUE",
+  "TRANSFER_FUND",
+  "TRANSFER_ITEM_SEND",
+  "TRANSFER_ITEM_RECEIVE",
+  "STOCK_OPNAME",
+  "JOURNAL_ENTRY",
+  "BEGINNING_BALANCE_STOCK",
+  "BEGINNING_BALANCE_DEBT",
+  "BEGINNING_BALANCE_RECEIVABLE",
+  "OPEN_REGISTER",
+  "CLOSE_REGISTER",
+]);
+
 export const defaultUndefinedResult: PaginationResponse<ITransaction> = {
   rows: [],
   countRows: 0,
@@ -23,6 +48,26 @@ export const defaultUndefinedResult: PaginationResponse<ITransaction> = {
 const GLOBAL_URL = `${env.BACKEND_URL}/v1/transactions`;
 
 export const globalTransactionRouter = createTRPCRouter({
+  generateNumber: protectedProcedure.input(
+    z.object({
+      transactionType,
+    }),
+  ).query(async ({ ctx, input }) => {
+    const result = await axios.get<{ transactionNumber: string }>(
+      `${GLOBAL_URL}/generate-number/${input.transactionType}`,
+      {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+      }
+    ).then((response) => {
+      return response.data;
+    }).catch((err) => {
+      console.log(err)
+      return null;
+    });
+
+    return result;
+  }),
   findAll: protectedProcedure.input(
     z.object({
       limit: z.number(),
@@ -44,30 +89,7 @@ export const globalTransactionRouter = createTRPCRouter({
           sort: z.enum(["asc", "desc"]).nullish().default("asc"),
         })
       ).nullish(),
-      transactionType: z.enum([
-        "SALE_QUOTATION",
-        "SALE_ORDER",
-        "SALE_INVOICE",
-        "SALE_RETURN",
-        "PURCHASE_QUOTATION",
-        "PURCHASE_ORDER",
-        "PURCHASE_INVOICE",
-        "PURCHASE_RETURN",
-        "RECEIVEABLE_PAYMENT",
-        "DEBT_PAYMENT",
-        "EXPENSE",
-        "REVENUE",
-        "TRANSFER_FUND",
-        "TRANSFER_ITEM_SEND",
-        "TRANSFER_ITEM_RECEIVE",
-        "STOCK_OPNAME",
-        "JOURNAL_ENTRY",
-        "BEGINNING_BALANCE_STOCK",
-        "BEGINNING_BALANCE_DEBT",
-        "BEGINNING_BALANCE_RECEIVABLE",
-        "OPEN_REGISTER",
-        "CLOSE_REGISTER",
-      ]).nullish(),
+      transactionType: transactionType.nullish(),
     }),
   ).query(async ({ ctx, input }) => {
     const { limit, cursor, search, filter, sort, transactionType } = input;

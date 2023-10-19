@@ -18,6 +18,7 @@ import { termRouter } from "./routers/masters/term";
 import { unitOfMeasureRouter } from "./routers/masters/unit-of-measure";
 import { warehouseRouter } from "./routers/masters/warehouse";
 import { globalTransactionRouter } from "./routers/transactions/global";
+import { liabilityRouter } from "./routers/transactions/liability";
 
 /**
  * This is the primary router for your server.
@@ -44,6 +45,7 @@ export const appRouter = createTRPCRouter({
   unitOfMeasure: unitOfMeasureRouter,
   warehouse: warehouseRouter,
   globalTransaction: globalTransactionRouter,
+  liability: liabilityRouter,
 });
 
 // export type definition of API

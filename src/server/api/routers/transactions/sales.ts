@@ -6,77 +6,12 @@ import {
 import axios from "axios";
 import { env } from "@/env.mjs";
 import { z } from "zod";
-import type { ApiCatchError, PaginationResponse } from "@/types/api-response";
-import { convertFilterToURL, convertSortToURL } from "@/utils/helpers";
-import type { GridFilterModel, GridSortModel } from "@mui/x-data-grid-pro";
+import type { ApiCatchError } from "@/types/api-response";
 import type { ITransaction } from "@/types/prisma-api/transaction";
-
-export const defaultUndefinedResult: PaginationResponse<ITransaction> = {
-  rows: [],
-  countRows: 0,
-  countAll: 0,
-  currentPage: 0,
-  nextPage: false,
-  totalPages: 0,
-}
 
 const GLOBAL_URL = `${env.BACKEND_URL}/v1/transactions/sell`;
 
 export const salesRouter = createTRPCRouter({
-  findAll: protectedProcedure.input(
-    z.object({
-      limit: z.number(),
-      cursor: z.union([z.string(), z.number()]).nullish(),
-      search: z.string().nullish(),
-      filter: z.object({
-        linkOperator: z.enum(["and", "or"]).optional(),
-        items: z.array(
-          z.object({
-            columnField: z.string(),
-            operatorValue: z.string().optional(),
-            value: z.any(),
-          })
-        )
-      }).nullish(),
-      sort: z.array(
-        z.object({
-          field: z.string(),
-          sort: z.enum(["asc", "desc"]).nullish().default("asc"),
-        })
-      ).nullish(),
-    }),
-  ).query(async ({ ctx, input }) => {
-    const { limit, cursor, search, filter, sort } = input;
-
-    let url = `${GLOBAL_URL}?page=${cursor ?? 0}&limit=${limit}`;
-
-    if (search && search !== "") {
-      url += `&search=${search}`;
-    }
-
-    if (filter) {
-      url += convertFilterToURL(filter as GridFilterModel)
-    }
-
-    if (sort) {
-      url += convertSortToURL(sort as GridSortModel)
-    }
-
-    const result = await axios.get<PaginationResponse<ITransaction>>(
-      url,
-      {
-        withCredentials: true,
-        headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
-      }
-    ).then((response) => {
-      return response.data;
-    }).catch((err) => {
-      console.log(err)
-      return defaultUndefinedResult;
-    });
-
-    return result;
-  }),
   create: protectedProcedure.input(
     z.object({
       code: z.string(),
