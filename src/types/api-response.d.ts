@@ -9,4 +9,9 @@ export declare interface PaginationResponse<T> {
 
 export declare interface ApiCatchError {
   message?: string;
+  response?: {
+    data?: {
+      message?: string;
+    }
+  }
 }

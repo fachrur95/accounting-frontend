@@ -130,7 +130,7 @@ export const peopleRouter = createTRPCRouter({
 
       return result;
     } catch (error) {
-      throw new Error((error as ApiCatchError).message ?? "An error occurred");
+      throw new Error((error as ApiCatchError).response?.data?.message ?? (error as ApiCatchError).message ?? "An error occurred");
     }
   }),
   update: protectedProcedure.input(
@@ -158,7 +158,7 @@ export const peopleRouter = createTRPCRouter({
 
       return result;
     } catch (error) {
-      throw new Error((error as ApiCatchError).message ?? "An error occurred");
+      throw new Error((error as ApiCatchError).response?.data?.message ?? (error as ApiCatchError).message ?? "An error occurred");
     }
   }),
   destroy: protectedProcedure.input(
@@ -179,7 +179,7 @@ export const peopleRouter = createTRPCRouter({
 
       return result;
     } catch (error) {
-      throw new Error((error as ApiCatchError).message ?? "An error occurred");
+      throw new Error((error as ApiCatchError).response?.data?.message ?? (error as ApiCatchError).message ?? "An error occurred");
     }
   }),
 });

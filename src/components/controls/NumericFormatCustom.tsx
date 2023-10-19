@@ -5,6 +5,7 @@ import type { NumericFormatProps } from "react-number-format/types/types";
 interface CustomProps {
   onChange?: (event: { target: { name: string; value: number } }) => void;
   name: string;
+  allowNegative?: boolean;
 }
 
 const NumericFormatCustom = forwardRef<NumericFormatProps, CustomProps>(
@@ -29,11 +30,10 @@ const NumericFormatCustom = forwardRef<NumericFormatProps, CustomProps>(
         decimalSeparator=","
         thousandSeparator="."
         allowLeadingZeros={false}
-        allowNegative={false}
         style={{ textAlign: "right" }}
       />
     );
-  }
+  },
 );
 
 NumericFormatCustom.displayName = "NumericFormatCustom";

@@ -22,12 +22,7 @@ import type { IAccountClassMutation } from "@/types/prisma-api/account-class";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
-// import type { IItemCategory } from "@/types/prisma-api/item-category";
-
-/* type MasterItemBodyType = IAccountClassMutation & {
-  itemCategory: IDataOption | IItemCategory | null;
-  tax: IDataOption | ITax | null;
-}; */
+import useNotification from "@/components/hooks/useNotification";
 
 const defaultValues: IAccountClassMutation = {
   code: "",
@@ -50,6 +45,7 @@ const MasterAccountClassForm = (props: IMasterAccountClassForm) => {
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const formContext = useForm<IAccountClassMutation>({ defaultValues });
+  const { setOpenNotification } = useNotification();
 
   const {
     setValue,
@@ -67,6 +63,9 @@ const MasterAccountClassForm = (props: IMasterAccountClassForm) => {
   const mutationCreate = api.accountClass.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
@@ -82,6 +81,9 @@ const MasterAccountClassForm = (props: IMasterAccountClassForm) => {
   const mutationUpdate = api.accountClass.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {

@@ -24,6 +24,7 @@ import SettingsApplicationsOutlined from "@mui/icons-material/SettingsApplicatio
 import ShoppingCartOutlined from "@mui/icons-material/ShoppingCartOutlined";
 import StorageOutlined from "@mui/icons-material/StorageOutlined";
 import StorefrontOutlined from "@mui/icons-material/StorefrontOutlined";
+import EditNote from "@mui/icons-material/EditNote";
 
 export type DataMenuType = {
   id: string;
@@ -235,7 +236,7 @@ const data: DataMenuType[] = [
         label: "journal entry",
         depth: 1,
         url: "/other-transactions/journal-entries",
-        icon: <CircleOutlined fontSize="small" />,
+        icon: <EditNote fontSize="small" />,
         children: [],
       },
       {

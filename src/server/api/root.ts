@@ -19,6 +19,8 @@ import { unitOfMeasureRouter } from "./routers/masters/unit-of-measure";
 import { warehouseRouter } from "./routers/masters/warehouse";
 import { globalTransactionRouter } from "./routers/transactions/global";
 import { liabilityRouter } from "./routers/transactions/liability";
+import { journalEntryRouter } from "./routers/transactions/journal-entry";
+import { logActivityRouter } from "./routers/log-activity";
 
 /**
  * This is the primary router for your server.
@@ -46,6 +48,8 @@ export const appRouter = createTRPCRouter({
   warehouse: warehouseRouter,
   globalTransaction: globalTransactionRouter,
   liability: liabilityRouter,
+  journalEntry: journalEntryRouter,
+  logActivity: logActivityRouter,
 });
 
 // export type definition of API

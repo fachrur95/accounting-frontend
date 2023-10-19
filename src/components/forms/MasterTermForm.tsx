@@ -24,12 +24,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import NumericFormatCustom from "../controls/NumericFormatCustom";
-// import type { IItemCategory } from "@/types/prisma-api/item-category";
-
-/* type MasterItemBodyType = ITermMutation & {
-  itemCategory: IDataOption | IItemCategory | null;
-  tax: IDataOption | ITermMutation | null;
-}; */
+import useNotification from "@/components/hooks/useNotification";
 
 const defaultValues: ITermMutation = {
   name: "",
@@ -51,6 +46,7 @@ const MasterTermForm = (props: IMasterTermForm) => {
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const formContext = useForm<ITermMutation>({ defaultValues });
+  const { setOpenNotification } = useNotification();
 
   const {
     setValue,
@@ -68,6 +64,9 @@ const MasterTermForm = (props: IMasterTermForm) => {
   const mutationCreate = api.term.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
@@ -83,6 +82,9 @@ const MasterTermForm = (props: IMasterTermForm) => {
   const mutationUpdate = api.term.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {

@@ -264,7 +264,7 @@ const ProductsPage: MyPage = () => {
         <title>{`Bidang Usaha | ${title}`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <Box className="flex flex-col gap-2">
+      <Box className="flex flex-col gap-2 overflow-auto">
         <NavTabs data={productTabs} />
         <Box
           component={Paper}

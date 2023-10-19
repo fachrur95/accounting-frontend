@@ -39,12 +39,6 @@ import {
 import NumericFormatCustom from "../controls/NumericFormatCustom";
 import AutocompleteItemCategory from "../controls/autocompletes/masters/AutocompleteItemCategory";
 import AutocompleteUnitOfMeasure from "../controls/autocompletes/masters/AutocompleteUnitOfMeasure";
-// import type { IItemCategory } from "@/types/prisma-api/item-category";
-
-/* type MasterItemBodyType = IItemMutation & {
-  itemCategory: IDataOption | IItemCategory | null;
-  tax: IDataOption | ITax | null;
-}; */
 
 const defaultUom = {
   unitOfMeasureId: "",
@@ -120,6 +114,9 @@ const MasterItemForm = (props: IMasterItemForm) => {
   const mutationCreate = api.item.create.useMutation({
     onSuccess: () => void router.push("/masters/products"),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
@@ -135,6 +132,9 @@ const MasterItemForm = (props: IMasterItemForm) => {
   const mutationUpdate = api.item.update.useMutation({
     onSuccess: () => void router.push("/masters/products"),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {

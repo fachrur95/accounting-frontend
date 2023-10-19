@@ -17,12 +17,7 @@ import type { IInstituteMutation } from "@/types/prisma-api/institute";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
-// import type { IItemCategory } from "@/types/prisma-api/item-category";
-
-/* type MasterItemBodyType = IInstituteMutation & {
-  itemCategory: IDataOption | IItemCategory | null;
-  tax: IDataOption | ITax | null;
-}; */
+import useNotification from "@/components/hooks/useNotification";
 
 const defaultValues: IInstituteMutation = {
   name: "",
@@ -41,6 +36,7 @@ const InstituteForm = (props: IInstituteForm) => {
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const formContext = useForm<IInstituteMutation>({ defaultValues });
+  const { setOpenNotification } = useNotification();
 
   const {
     setValue,
@@ -58,6 +54,9 @@ const InstituteForm = (props: IInstituteForm) => {
   const mutationCreate = api.instituteCredentials.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
@@ -73,6 +72,9 @@ const InstituteForm = (props: IInstituteForm) => {
   const mutationUpdate = api.instituteCredentials.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {

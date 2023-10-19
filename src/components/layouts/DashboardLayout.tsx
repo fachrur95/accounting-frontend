@@ -59,27 +59,63 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-const DashboardLayout = (props: PropsWithChildren) => {
+type DashboardProps = PropsWithChildren & {
+  window?: () => Window;
+};
+
+const DashboardLayout = (props: DashboardProps) => {
+  const { window } = props;
   const [open, setOpen] = useState(false);
 
   const handleDrawerOpen = () => {
     setOpen(!open);
   };
 
+  const drawer = (
+    <>
+      <DrawerHeader>
+        <IconButton onClick={handleDrawerOpen}>
+          {open === false ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+        </IconButton>
+      </DrawerHeader>
+      <Divider />
+      <div className="flex h-full flex-col justify-between">
+        <SidebarMenu openDrawer={open} />
+        <ThemeChanger />
+      </div>
+    </>
+  );
+
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
+
   return (
     <Box sx={{ display: "flex" }}>
       <DashboardHeader handleClick={handleDrawerOpen} />
-      <Drawer variant="permanent" open={open}>
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerOpen}>
-            {open === false ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <div className="flex h-full flex-col justify-between">
-          <SidebarMenu openDrawer={open} />
-          <ThemeChanger />
-        </div>
+      <MuiDrawer
+        container={container}
+        variant="temporary"
+        open={open}
+        onClose={handleDrawerOpen}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        sx={{
+          display: { xs: "block", sm: "none" },
+          // "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+        }}
+      >
+        {drawer}
+      </MuiDrawer>
+      <Drawer
+        variant="permanent"
+        open={open}
+        sx={{
+          display: { xs: "none", sm: "block" },
+          // "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+        }}
+      >
+        {drawer}
       </Drawer>
       <Box
         component="main"

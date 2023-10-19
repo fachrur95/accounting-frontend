@@ -11,13 +11,13 @@ import {
   TextareaAutosizeElement,
   useFieldArray,
   useForm,
+  useWatch,
 } from "react-hook-form-mui";
 import Close from "@mui/icons-material/Close";
 import Add from "@mui/icons-material/Add";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
-import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
 import NumericFormatCustom from "../../controls/NumericFormatCustom";
 import { api } from "@/utils/api";
 import Link from "next/link";
@@ -30,40 +30,41 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import type { FormSlugType } from "@/types/global";
-import type { ILiabilityMutation } from "@/types/prisma-api/transaction";
-import type { IPeople } from "@/types/prisma-api/people";
+import type { IJournalEntryMutation } from "@/types/prisma-api/transaction";
 import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
+import { formatCurrency } from "@/utils/helpers";
 import useNotification from "@/components/hooks/useNotification";
 
-const defaultValues: ILiabilityMutation = {
+const defaultValues: IJournalEntryMutation = {
   transactionNumber: "",
-  chartOfAccountId: null,
-  chartOfAccount: null,
-  peopleId: "",
-  people: null,
   entryDate: new Date(),
   note: "",
   transactionDetails: [],
 };
 
-interface ILiabilityForm {
+interface IJournalEntryForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
-  type: "revenue" | "expense";
 }
 
-const LiabilityForm = (props: ILiabilityForm) => {
-  const { slug, showIn, type } = props;
+type TTotalDebitCredit = { debit: number; credit: number };
+
+const basePath = `/other-transactions/journal-entries`;
+
+const JournalEntryForm = (props: IJournalEntryForm) => {
+  const { slug, showIn } = props;
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const formContext = useForm<ILiabilityMutation>({ defaultValues });
+  const [total, setTotal] = useState<TTotalDebitCredit>({
+    debit: 0,
+    credit: 0,
+  });
+  const formContext = useForm<IJournalEntryMutation>({ defaultValues });
   const { setOpenNotification } = useNotification();
-
-  const basePath = `/cash-and-bank/${type}s`;
 
   const {
     control,
@@ -78,7 +79,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
     name: "transactionDetails",
   });
 
-  // const test = useWatch(control, "transactionDetails[0].chartOfAccount.name");
+  const transactionDetails = useWatch({ control, name: "transactionDetails" });
 
   /* console.log({
     test,
@@ -98,12 +99,12 @@ const LiabilityForm = (props: ILiabilityForm) => {
     );
 
   const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
-    transactionType: type === "revenue" ? "REVENUE" : "EXPENSE",
+    transactionType: "JOURNAL_ENTRY",
   });
 
   // console.log({ dataNumber });
 
-  const mutationCreate = api.liability.create.useMutation({
+  const mutationCreate = api.journalEntry.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       if (error.message) {
@@ -112,7 +113,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof ILiabilityMutation, {
+          void setError(field as keyof IJournalEntryMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -121,7 +122,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
     },
   });
 
-  const mutationUpdate = api.liability.update.useMutation({
+  const mutationUpdate = api.journalEntry.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       if (error.message) {
@@ -130,7 +131,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof ILiabilityMutation, {
+          void setError(field as keyof IJournalEntryMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -139,20 +140,16 @@ const LiabilityForm = (props: ILiabilityForm) => {
     },
   });
 
-  const onSubmit = (data: ILiabilityMutation) => {
-    const dataSave: ILiabilityMutation = {
+  const onSubmit = (data: IJournalEntryMutation) => {
+    const dataSave: IJournalEntryMutation = {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
-      chartOfAccountId: data.chartOfAccount?.id ?? "",
-      peopleId: data.people?.id ?? undefined,
       transactionDetails: data.transactionDetails.map((detail) => ({
         ...detail,
         chartOfAccountId: detail.chartOfAccount?.id ?? "",
-        taxId: detail.tax?.id ?? undefined,
         note:
           detail.note === "" || detail.note === null ? undefined : detail.note,
       })),
-      type,
     };
     console.log({ dataSave });
     if (selectedId) {
@@ -184,29 +181,23 @@ const LiabilityForm = (props: ILiabilityForm) => {
   }, [dataNumber, mode, setValue]);
 
   useEffect(() => {
+    if (transactionDetails) {
+      const sumTotal = transactionDetails.reduce<TTotalDebitCredit>(
+        (obj, detail) => {
+          obj.debit += detail.debit;
+          obj.credit += detail.credit;
+          return obj;
+        },
+        { debit: 0, credit: 0 },
+      );
+      setTotal(sumTotal);
+    }
+  }, [transactionDetails]);
+
+  useEffect(() => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
-          if (key === "chartOfAccount") {
-            const selectedAccount = dataSelected[key]!;
-            if (selectedAccount) {
-              setValue("chartOfAccount", {
-                id: selectedAccount.id,
-                label: selectedAccount.name,
-              });
-            }
-            continue;
-          }
-          if (key === "people") {
-            const selectedPeople = dataSelected[key] as IPeople | null;
-            if (selectedPeople) {
-              setValue("people", {
-                id: selectedPeople.id,
-                label: selectedPeople.name,
-              });
-            }
-            continue;
-          }
           if (key === "transactionDetails") {
             const transactionDetail = dataSelected[key]!;
 
@@ -216,19 +207,11 @@ const LiabilityForm = (props: ILiabilityForm) => {
                   id: row.chartOfAccount?.id ?? "",
                   label: row.chartOfAccount?.name ?? "",
                 };
-                let selectedTax = null;
-                if (row.tax) {
-                  selectedTax = {
-                    id: row.tax.id ?? "",
-                    label: row.tax.name ?? "",
-                  };
-                }
                 return {
                   id: row.id,
                   chartOfAccount: selectedAccount,
-                  tax: selectedTax,
-                  priceInput: row.priceInput,
-                  discountInput: row.discountInput,
+                  debit: row.vector === "POSITIVE" ? row.priceInput : 0,
+                  credit: row.vector === "NEGATIVE" ? row.priceInput : 0,
                   note: row.note,
                 };
               });
@@ -244,21 +227,13 @@ const LiabilityForm = (props: ILiabilityForm) => {
 
           setValue(
             key as keyof (keyof Pick<
-              ILiabilityMutation,
-              | "transactionNumber"
-              | "chartOfAccountId"
-              | "peopleId"
-              | "entryDate"
-              | "note"
+              IJournalEntryMutation,
+              "transactionNumber" | "entryDate" | "note"
             >),
             dataSelected[
               key as keyof Pick<
-                ILiabilityMutation,
-                | "transactionNumber"
-                | "chartOfAccountId"
-                | "peopleId"
-                | "entryDate"
-                | "note"
+                IJournalEntryMutation,
+                "transactionNumber" | "entryDate" | "note"
               >
             ],
           );
@@ -289,9 +264,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">
-              {type === "revenue" ? "Pendapatan" : "Pengeluaran"}
-            </Typography>
+            <Typography variant="h6">Jurnal Umum</Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (
@@ -338,22 +311,6 @@ const LiabilityForm = (props: ILiabilityForm) => {
                   disabled: mode === "view",
                 }}
               />
-              <AutocompleteChartOfAccount
-                name="chartOfAccount"
-                label="Akun"
-                required
-                autocompleteProps={{
-                  disabled: mode === "view",
-                }}
-              />
-              <AutocompletePeople
-                name="people"
-                label="Customer"
-                autocompleteProps={{
-                  disabled: mode === "view",
-                }}
-                type="customer"
-              />
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
@@ -368,11 +325,14 @@ const LiabilityForm = (props: ILiabilityForm) => {
                         <TableCell width="5%" align="right">
                           No
                         </TableCell>
-                        <TableCell width="50%">Sumber Akun</TableCell>
-                        <TableCell width="25%" align="right">
-                          Nilai
+                        <TableCell width="40%">Akun</TableCell>
+                        <TableCell width="20%" align="right">
+                          Debit
                         </TableCell>
-                        <TableCell width="15%">Catatan</TableCell>
+                        <TableCell width="20%" align="right">
+                          Kredit
+                        </TableCell>
+                        <TableCell width="10%">Catatan</TableCell>
                         <TableCell width="5%" align="center">
                           <Delete />
                         </TableCell>
@@ -412,10 +372,37 @@ const LiabilityForm = (props: ILiabilityForm) => {
                           </TableCell>
                           <TableCell align="right">
                             <TextFieldElement
-                              name={`transactionDetails.${index}.priceInput`}
+                              name={`transactionDetails.${index}.debit`}
                               hiddenLabel
                               InputProps={{
                                 inputComponent: NumericFormatCustom as never,
+                                onBlur: (event) => {
+                                  if (event.target.value > 0) {
+                                    setValue(
+                                      `transactionDetails.${index}.credit`,
+                                      0,
+                                    );
+                                  }
+                                },
+                              }}
+                              fullWidth
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <TextFieldElement
+                              name={`transactionDetails.${index}.credit`}
+                              hiddenLabel
+                              InputProps={{
+                                inputComponent: NumericFormatCustom as never,
+                                onBlur: (event) => {
+                                  if (event.target.value > 0) {
+                                    setValue(
+                                      `transactionDetails.${index}.debit`,
+                                      0,
+                                    );
+                                  }
+                                },
                               }}
                               fullWidth
                               size="small"
@@ -441,8 +428,8 @@ const LiabilityForm = (props: ILiabilityForm) => {
                         </TableRow>
                       ))}
                     </TableBody>
-                    {mode !== "view" && (
-                      <TableFooter>
+                    <TableFooter>
+                      {mode !== "view" && (
                         <TableRow>
                           <TableCell colSpan={6}>
                             <Button
@@ -451,7 +438,8 @@ const LiabilityForm = (props: ILiabilityForm) => {
                                 void append({
                                   chartOfAccountId: "",
                                   chartOfAccount: null,
-                                  priceInput: 0,
+                                  debit: 0,
+                                  credit: 0,
                                   note: "",
                                 })
                               }
@@ -462,8 +450,19 @@ const LiabilityForm = (props: ILiabilityForm) => {
                             </Button>
                           </TableCell>
                         </TableRow>
-                      </TableFooter>
-                    )}
+                      )}
+                      <TableRow>
+                        <TableCell colSpan={2}>Total</TableCell>
+                        <TableCell align="right">
+                          {formatCurrency(total.debit)}
+                        </TableCell>
+                        <TableCell align="right">
+                          {formatCurrency(total.credit)}
+                        </TableCell>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                      </TableRow>
+                    </TableFooter>
                   </Table>
                 </TableContainer>
               </Box>
@@ -523,4 +522,4 @@ const LiabilityForm = (props: ILiabilityForm) => {
   );
 };
 
-export default LiabilityForm;
+export default JournalEntryForm;

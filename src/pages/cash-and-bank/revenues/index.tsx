@@ -40,7 +40,7 @@ import type { ITransaction } from "@/types/prisma-api/transaction";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
 
-const sortDefault: GridSortModel = [{ field: "code", sort: "asc" }];
+const sortDefault: GridSortModel = [{ field: "entryDate", sort: "desc" }];
 
 const title = "Pendapatan Lain-Lain";
 const path: WorkerPathType = "transaction";
@@ -117,6 +117,12 @@ const RevenuesPage: MyPage = () => {
       valueGetter: (params: GridValueGetterParams<unknown, ITransaction>) => {
         return params.row.chartOfAccount?.name ?? "-";
       },
+    },
+    {
+      field: "entryDate",
+      headerName: "Tanggal",
+      type: "date",
+      flex: 1,
     },
     {
       field: "total",
@@ -316,6 +322,7 @@ const RevenuesPage: MyPage = () => {
               <LiabilityForm
                 slug={router.query.slug as FormSlugType}
                 showIn="popup"
+                type="revenue"
               />
             </ModalTransition>
           )}

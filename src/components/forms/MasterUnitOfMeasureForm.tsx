@@ -23,12 +23,7 @@ import type { IUnitOfMeasureMutation } from "@/types/prisma-api/unit-of-measure"
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
-// import type { IItemCategory } from "@/types/prisma-api/item-category";
-
-/* type MasterItemBodyType = IUnitOfMeasureMutation & {
-  itemCategory: IDataOption | IItemCategory | null;
-  tax: IDataOption | ITax | null;
-}; */
+import useNotification from "@/components/hooks/useNotification";
 
 const defaultValues: IUnitOfMeasureMutation = {
   code: "",
@@ -50,6 +45,7 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const formContext = useForm<IUnitOfMeasureMutation>({ defaultValues });
+  const { setOpenNotification } = useNotification();
 
   const {
     setValue,
@@ -67,6 +63,9 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
   const mutationCreate = api.unitOfMeasure.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
@@ -82,6 +81,9 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
   const mutationUpdate = api.unitOfMeasure.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {

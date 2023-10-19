@@ -24,12 +24,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import NumericFormatCustom from "../controls/NumericFormatCustom";
-// import type { IItemCategory } from "@/types/prisma-api/item-category";
-
-/* type MasterItemBodyType = IPeopleCategoryMutation & {
-  itemCategory: IDataOption | IItemCategory | null;
-  tax: IDataOption | ITax | null;
-}; */
+import useNotification from "@/components/hooks/useNotification";
 
 const defaultValues: IPeopleCategoryMutation = {
   code: "",
@@ -54,6 +49,7 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const formContext = useForm<IPeopleCategoryMutation>({ defaultValues });
+  const { setOpenNotification } = useNotification();
 
   const basePath = `/masters/contacts/${forType}s/categories`;
 
@@ -73,6 +69,9 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
   const mutationCreate = api.peopleCategory.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
@@ -88,6 +87,9 @@ const MasterPeopleCategoryForm = (props: IMasterPeopleCategoryForm) => {
   const mutationUpdate = api.peopleCategory.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {

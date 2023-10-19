@@ -23,12 +23,7 @@ import type { IItemTypeMutation } from "@/types/prisma-api/item-type";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
-// import type { IItemCategory } from "@/types/prisma-api/item-category";
-
-/* type MasterItemBodyType = IItemTypeMutation & {
-  itemCategory: IDataOption | IItemCategory | null;
-  tax: IDataOption | ITax | null;
-}; */
+import useNotification from "@/components/hooks/useNotification";
 
 const defaultValues: IItemTypeMutation = {
   name: "",
@@ -54,6 +49,7 @@ const MasterItemTypeForm = (props: IMasterItemTypeForm) => {
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const formContext = useForm<IItemTypeMutation>({ defaultValues });
+  const { setOpenNotification } = useNotification();
 
   const {
     setValue,
@@ -71,6 +67,9 @@ const MasterItemTypeForm = (props: IMasterItemTypeForm) => {
   const mutationCreate = api.itemType.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
@@ -86,6 +85,9 @@ const MasterItemTypeForm = (props: IMasterItemTypeForm) => {
   const mutationUpdate = api.itemType.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {

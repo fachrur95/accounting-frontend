@@ -27,12 +27,7 @@ import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import type { IDataOption } from "@/types/options";
 import type { IAccountClass } from "@/types/prisma-api/account-class";
-// import type { IItemCategory } from "@/types/prisma-api/item-category";
-
-/* type MasterItemBodyType = IChartOfAccountMutation & {
-  itemCategory: IDataOption | IItemCategory | null;
-  tax: IDataOption | ITax | null;
-}; */
+import useNotification from "@/components/hooks/useNotification";
 
 interface IChartOfAccountMutationWithAccountClass
   extends IChartOfAccountMutation {
@@ -64,6 +59,7 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
   const formContext = useForm<IChartOfAccountMutationWithAccountClass>({
     defaultValues,
   });
+  const { setOpenNotification } = useNotification();
 
   const {
     control,
@@ -82,6 +78,9 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
   const mutationCreate = api.chartOfAccount.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
@@ -100,6 +99,9 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
   const mutationUpdate = api.chartOfAccount.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {

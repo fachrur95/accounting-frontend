@@ -24,12 +24,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import NumericFormatCustom from "../controls/NumericFormatCustom";
-// import type { IItemCategory } from "@/types/prisma-api/item-category";
-
-/* type MasterItemBodyType = ITaxMutation & {
-  itemCategory: IDataOption | IItemCategory | null;
-  tax: IDataOption | ITaxMutation | null;
-}; */
+import useNotification from "@/components/hooks/useNotification";
 
 const defaultValues: ITaxMutation = {
   name: "",
@@ -51,6 +46,7 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const formContext = useForm<ITaxMutation>({ defaultValues });
+  const { setOpenNotification } = useNotification();
 
   const {
     setValue,
@@ -68,6 +64,9 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
   const mutationCreate = api.tax.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
@@ -83,6 +82,9 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
   const mutationUpdate = api.tax.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
+      if (error.message) {
+        setOpenNotification(error.message, { variant: "error" });
+      }
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {

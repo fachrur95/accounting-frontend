@@ -47,7 +47,6 @@ const NavTabs = ({ data }: INavTabs) => {
         variant="scrollable"
         scrollButtons="auto"
         textColor="inherit"
-        indicatorColor="secondary"
         value={pathName}
       >
         {data.map((tab) => (

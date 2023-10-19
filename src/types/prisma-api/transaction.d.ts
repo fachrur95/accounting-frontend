@@ -138,7 +138,7 @@ export declare interface ILiabilityMutation {
   transactionNumber: string;
   chartOfAccountId?: string | null;
   chartOfAccount?: IDataOption | IChartOfAccount | null;
-  peopleId: string;
+  peopleId?: string | null;
   people: IDataOption | IPeople | null;
   entryDate: Date;
   note?: string;

@@ -21,6 +21,8 @@ import React from "react";
 import type { DataGridProProps } from "@mui/x-data-grid-pro";
 import Box from "@mui/material/Box";
 import SearchInput from "@/components/controls/SearchInput";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 LicenseInfo.setLicenseKey(env.NEXT_PUBLIC_LICENSE_MUIGRID ?? "");
 
@@ -100,14 +102,19 @@ function CustomNoRowsOverlay() {
 // const MemoizedColumnHeaders = React.memo(GridColumnHeaders);
 
 const CustomToolbar = () => {
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
-    <Box className="flex flex-row items-start justify-between gap-2 p-3">
-      <GridToolbarContainer>
-        <GridToolbarDensitySelector />
-        <GridToolbarColumnsButton />
-        <GridToolbarExport />
-        <GridToolbarFilterButton />
-      </GridToolbarContainer>
+    <Box className="flex flex-col items-start justify-center gap-2 p-3 md:flex-row md:justify-between">
+      {!mobile && (
+        <GridToolbarContainer>
+          <GridToolbarDensitySelector />
+          <GridToolbarColumnsButton />
+          <GridToolbarExport />
+          <GridToolbarFilterButton />
+        </GridToolbarContainer>
+      )}
       <Box>
         <SearchInput />
       </Box>
