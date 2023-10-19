@@ -15,6 +15,7 @@ export const journalEntryRouter = createTRPCRouter({
   create: protectedProcedure.input(
     z.object({
       transactionNumber: z.string(),
+      entryDate: z.date().nullish(),
       note: z.string().nullish(),
       transactionDetails: z.array(
         z.object({
@@ -47,6 +48,7 @@ export const journalEntryRouter = createTRPCRouter({
     z.object({
       id: z.string(),
       transactionNumber: z.string(),
+      entryDate: z.date().nullish(),
       note: z.string().nullish(),
       transactionDetails: z.array(
         z.object({

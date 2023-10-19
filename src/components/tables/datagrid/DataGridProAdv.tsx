@@ -103,11 +103,11 @@ function CustomNoRowsOverlay() {
 
 const CustomToolbar = () => {
   const theme = useTheme();
-  const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <Box className="flex flex-col items-start justify-center gap-2 p-3 md:flex-row md:justify-between">
-      {!mobile && (
+    <Box className="flex flex-col items-center justify-center gap-2 p-3 md:flex-row md:justify-between">
+      {!isMobile && (
         <GridToolbarContainer>
           <GridToolbarDensitySelector />
           <GridToolbarColumnsButton />
@@ -115,7 +115,7 @@ const CustomToolbar = () => {
           <GridToolbarFilterButton />
         </GridToolbarContainer>
       )}
-      <Box>
+      <Box className="w-full md:w-60">
         <SearchInput />
       </Box>
     </Box>

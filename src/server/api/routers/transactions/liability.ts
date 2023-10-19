@@ -17,7 +17,7 @@ export const liabilityRouter = createTRPCRouter({
       transactionNumber: z.string(),
       chartOfAccountId: z.string(),
       peopleId: z.string().nullish(),
-      // entryDate: z.date().nullish(),
+      entryDate: z.date().nullish(),
       note: z.string().nullish(),
       transactionDetails: z.array(
         z.object({
@@ -54,7 +54,7 @@ export const liabilityRouter = createTRPCRouter({
       transactionNumber: z.string(),
       chartOfAccountId: z.string(),
       peopleId: z.string().nullish(),
-      // entryDate: z.date().nullish(),
+      entryDate: z.date().nullish(),
       note: z.string().nullish(),
       transactionDetails: z.array(
         z.object({

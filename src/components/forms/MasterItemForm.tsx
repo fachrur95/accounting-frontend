@@ -603,38 +603,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
             <Button type="submit" disabled={isSubmitting} className="hidden">
               Simpan
             </Button>
-            {/* <Box className="flex flex-col justify-between md:flex-row">
-            <div></div>
-            <div>
-              {mode === "view" ? (
-                <Button
-                  variant="contained"
-                  type="button"
-                  fullWidth
-                  onClick={() =>
-                    router.push(
-                      {
-                        pathname: "/masters/products",
-                        query: { slug: ["f", selectedId] },
-                      },
-                      `/masters/products/f/${selectedId}`,
-                    )
-                  }
-                >
-                  Sunting
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  type="submit"
-                  disabled={isSubmitting}
-                  fullWidth
-                >
-                  Simpan
-                </Button>
-              )}
-            </div>
-          </Box> */}
           </div>
         </FormContainer>
       </DialogContent>

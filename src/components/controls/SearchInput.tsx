@@ -62,7 +62,7 @@ const SearchInput = () => {
       </SearchIconWrapper>
       <StyledInputBase
         onChange={debouncedSearch}
-        placeholder="Search…"
+        placeholder="Cari disini…"
         inputProps={{
           "aria-label": "search",
         }}

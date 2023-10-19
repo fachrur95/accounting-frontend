@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import DatePicker from "@/components/controls/DatePicker";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import TableFooter from "@mui/material/TableFooter";
@@ -38,13 +39,6 @@ import { useRouter } from "next/router";
 import { formatCurrency } from "@/utils/helpers";
 import useNotification from "@/components/hooks/useNotification";
 
-const defaultValues: IJournalEntryMutation = {
-  transactionNumber: "",
-  entryDate: new Date(),
-  note: "",
-  transactionDetails: [],
-};
-
 interface IJournalEntryForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
@@ -57,6 +51,13 @@ const basePath = `/other-transactions/journal-entries`;
 const JournalEntryForm = (props: IJournalEntryForm) => {
   const { slug, showIn } = props;
   const router = useRouter();
+
+  const defaultValues: IJournalEntryMutation = {
+    transactionNumber: "",
+    entryDate: new Date(),
+    note: "",
+    transactionDetails: [],
+  };
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [total, setTotal] = useState<TTotalDebitCredit>({
@@ -198,6 +199,12 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
+          if (key === "entryDate") {
+            const entryDate = dataSelected[key]!;
+            if (entryDate) {
+              setValue("entryDate", new Date(entryDate));
+            }
+          }
           if (key === "transactionDetails") {
             const transactionDetail = dataSelected[key]!;
 
@@ -228,12 +235,12 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
           setValue(
             key as keyof (keyof Pick<
               IJournalEntryMutation,
-              "transactionNumber" | "entryDate" | "note"
+              "transactionNumber" | "note"
             >),
             dataSelected[
               key as keyof Pick<
                 IJournalEntryMutation,
-                "transactionNumber" | "entryDate" | "note"
+                "transactionNumber" | "note"
               >
             ],
           );
@@ -311,6 +318,7 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
                   disabled: mode === "view",
                 }}
               />
+              <DatePicker label="Tanggal" name="entryDate" required />
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
@@ -452,12 +460,18 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
                         </TableRow>
                       )}
                       <TableRow>
-                        <TableCell colSpan={2}>Total</TableCell>
-                        <TableCell align="right">
-                          {formatCurrency(total.debit)}
+                        <TableCell colSpan={2}>
+                          <Typography variant="body1">Total</Typography>
                         </TableCell>
                         <TableCell align="right">
-                          {formatCurrency(total.credit)}
+                          <Typography variant="body1">
+                            {formatCurrency(total.debit)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography variant="body1">
+                            {formatCurrency(total.credit)}
+                          </Typography>
                         </TableCell>
                         <TableCell></TableCell>
                         <TableCell></TableCell>
@@ -483,38 +497,6 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
             <Button type="submit" disabled={isSubmitting} className="hidden">
               Simpan
             </Button>
-            {/* <Box className="flex flex-col justify-between md:flex-row">
-            <div></div>
-            <div>
-              {mode === "view" ? (
-                <Button
-                  variant="contained"
-                  type="button"
-                  fullWidth
-                  onClick={() =>
-                    router.push(
-                      {
-                        pathname: basePath,
-                        query: { slug: ["f", selectedId] },
-                      },
-                      `${basePath}/f/${selectedId}`,
-                    )
-                  }
-                >
-                  Sunting
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  type="submit"
-                  disabled={isSubmitting}
-                  fullWidth
-                >
-                  Simpan
-                </Button>
-              )}
-            </div>
-          </Box> */}
           </div>
         </FormContainer>
       </DialogContent>

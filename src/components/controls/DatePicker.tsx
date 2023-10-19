@@ -1,4 +1,7 @@
 import { MobileDatePickerElement } from "react-hook-form-mui";
+import { DatePickerElement } from "react-hook-form-mui";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import DateFnsProvider from "./DateFnsProvider";
 
 const DatePicker = (props: {
@@ -10,13 +13,25 @@ const DatePicker = (props: {
   maxDate?: Date;
 }): JSX.Element => {
   const { size, ...rest } = props;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   return (
     <DateFnsProvider>
-      <MobileDatePickerElement
-        inputProps={{ size: size ?? "medium" }}
-        closeOnSelect
-        {...rest}
-      />
+      {isMobile ? (
+        <MobileDatePickerElement
+          inputProps={{ size: size ?? "medium" }}
+          closeOnSelect
+          format="dd MMMM yyyy"
+          {...rest}
+        />
+      ) : (
+        <DatePickerElement
+          inputProps={{ size: size ?? "medium" }}
+          closeOnSelect
+          format="dd MMMM yyyy"
+          {...rest}
+        />
+      )}
     </DateFnsProvider>
   );
 };

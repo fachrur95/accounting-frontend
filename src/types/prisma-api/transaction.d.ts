@@ -103,7 +103,7 @@ export declare interface ISalesMutation {
   people: IDataOption | IPeople | null;
   termId?: string;
   term?: IDataOption | ITerm | null;
-  entryDate: Date;
+  entryDate?: Date;
   paymentInput: number;
   note?: string;
   transactionDetails: ISalesPurchaseUomMutation[];
@@ -117,7 +117,7 @@ export declare interface IPurchaseMutation {
   term?: IDataOption | ITerm | null;
   chartOfAccountId?: string | null;
   chartOfAccount?: IDataOption | IChartOfAccount | null;
-  entryDate: Date;
+  entryDate?: Date;
   paymentInput: number;
   note?: string;
   transactionDetails: ISalesPurchaseUomMutation[];
@@ -129,7 +129,7 @@ export declare interface IPaymentMutation {
   chartOfAccount?: IDataOption | IChartOfAccount | null;
   peopleId: string;
   people: IDataOption | IPeople | null;
-  entryDate: Date;
+  entryDate?: Date;
   note?: string;
   transactionDetails: IPaymentDetailMutation[];
 }
@@ -140,7 +140,7 @@ export declare interface ILiabilityMutation {
   chartOfAccount?: IDataOption | IChartOfAccount | null;
   peopleId?: string | null;
   people: IDataOption | IPeople | null;
-  entryDate: Date;
+  entryDate?: Date;
   note?: string;
   transactionDetails: ILiabilityDetailMutation[];
 }
@@ -149,14 +149,14 @@ export declare interface ITransferFundMutation {
   transactionNumber: string;
   chartOfAccountId?: string | null;
   chartOfAccount?: IDataOption | IChartOfAccount | null;
-  entryDate: Date;
+  entryDate?: Date;
   note?: string;
   transactionDetails: IPaymentDetailMutation[];
 }
 
 export declare interface IJournalEntryMutation {
   transactionNumber: string;
-  entryDate: Date;
+  entryDate?: Date;
   note?: string;
   transactionDetails: IJournalEntryDetailMutation[];
 }

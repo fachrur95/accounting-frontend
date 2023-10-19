@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
+import DatePicker from "@/components/controls/DatePicker";
 import TableFooter from "@mui/material/TableFooter";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
@@ -38,17 +39,6 @@ import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
 
-const defaultValues: ILiabilityMutation = {
-  transactionNumber: "",
-  chartOfAccountId: null,
-  chartOfAccount: null,
-  peopleId: "",
-  people: null,
-  entryDate: new Date(),
-  note: "",
-  transactionDetails: [],
-};
-
 interface ILiabilityForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
@@ -58,6 +48,17 @@ interface ILiabilityForm {
 const LiabilityForm = (props: ILiabilityForm) => {
   const { slug, showIn, type } = props;
   const router = useRouter();
+
+  const defaultValues: ILiabilityMutation = {
+    transactionNumber: "",
+    chartOfAccountId: null,
+    chartOfAccount: null,
+    peopleId: "",
+    people: null,
+    entryDate: new Date(),
+    note: "",
+    transactionDetails: [],
+  };
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const formContext = useForm<ILiabilityMutation>({ defaultValues });
@@ -187,6 +188,12 @@ const LiabilityForm = (props: ILiabilityForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
+          if (key === "entryDate") {
+            const entryDate = dataSelected[key]!;
+            if (entryDate) {
+              setValue("entryDate", new Date(entryDate));
+            }
+          }
           if (key === "chartOfAccount") {
             const selectedAccount = dataSelected[key]!;
             if (selectedAccount) {
@@ -245,20 +252,12 @@ const LiabilityForm = (props: ILiabilityForm) => {
           setValue(
             key as keyof (keyof Pick<
               ILiabilityMutation,
-              | "transactionNumber"
-              | "chartOfAccountId"
-              | "peopleId"
-              | "entryDate"
-              | "note"
+              "transactionNumber" | "chartOfAccountId" | "peopleId" | "note"
             >),
             dataSelected[
               key as keyof Pick<
                 ILiabilityMutation,
-                | "transactionNumber"
-                | "chartOfAccountId"
-                | "peopleId"
-                | "entryDate"
-                | "note"
+                "transactionNumber" | "chartOfAccountId" | "peopleId" | "note"
               >
             ],
           );
@@ -346,13 +345,16 @@ const LiabilityForm = (props: ILiabilityForm) => {
                   disabled: mode === "view",
                 }}
               />
+              <DatePicker label="Tanggal" name="entryDate" required />
               <AutocompletePeople
                 name="people"
-                label="Customer"
+                label={`${
+                  type === "revenue" ? "Pelanggan" : "Pemasok"
+                } (opsional)`}
                 autocompleteProps={{
                   disabled: mode === "view",
                 }}
-                type="customer"
+                type={type === "revenue" ? "customer" : "supplier"}
               />
             </Box>
             <div className="overflow-auto">
@@ -484,38 +486,6 @@ const LiabilityForm = (props: ILiabilityForm) => {
             <Button type="submit" disabled={isSubmitting} className="hidden">
               Simpan
             </Button>
-            {/* <Box className="flex flex-col justify-between md:flex-row">
-            <div></div>
-            <div>
-              {mode === "view" ? (
-                <Button
-                  variant="contained"
-                  type="button"
-                  fullWidth
-                  onClick={() =>
-                    router.push(
-                      {
-                        pathname: basePath,
-                        query: { slug: ["f", selectedId] },
-                      },
-                      `${basePath}/f/${selectedId}`,
-                    )
-                  }
-                >
-                  Sunting
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  type="submit"
-                  disabled={isSubmitting}
-                  fullWidth
-                >
-                  Simpan
-                </Button>
-              )}
-            </div>
-          </Box> */}
           </div>
         </FormContainer>
       </DialogContent>

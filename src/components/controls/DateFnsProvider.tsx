@@ -1,10 +1,10 @@
+import { type MuiPickersAdapter } from "@mui/x-date-pickers";
 import {
   LocalizationProvider,
   type LocalizationProviderProps,
-  type MuiPickersAdapter,
-} from "@mui/x-date-pickers";
+} from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-// import ar from "date-fns/locale/ar-SA";
+import idFormat from "date-fns/locale/id";
 
 export type DateFnsProviderProps<TDate> = Omit<
   LocalizationProviderProps<TDate, unknown>,
@@ -21,7 +21,7 @@ export default function DateFnsProvider({
   return (
     <LocalizationProvider
       dateAdapter={dateAdapter ?? AdapterDateFns}
-      // adapterLocale={ar}
+      adapterLocale={idFormat}
       {...localizationProps}
     >
       {children}
