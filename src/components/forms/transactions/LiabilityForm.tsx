@@ -143,6 +143,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
   const onSubmit = (data: ILiabilityMutation) => {
     const dataSave: ILiabilityMutation = {
       ...data,
+      entryDate: new Date(data.entryDate),
       note: data.note === "" || data.note === null ? undefined : data.note,
       chartOfAccountId: data.chartOfAccount?.id ?? "",
       peopleId: data.people?.id ?? undefined,

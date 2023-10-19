@@ -144,6 +144,7 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
   const onSubmit = (data: IJournalEntryMutation) => {
     const dataSave: IJournalEntryMutation = {
       ...data,
+      entryDate: new Date(data.entryDate),
       note: data.note === "" || data.note === null ? undefined : data.note,
       transactionDetails: data.transactionDetails.map((detail) => ({
         ...detail,
