@@ -20,6 +20,8 @@ export const purchaseRouter = createTRPCRouter({
       chartOfAccountId: z.string().nullish(),
       termId: z.string().nullish(),
       paymentInput: z.number(),
+      specialDiscount: z.number(),
+      discountGroupInput: z.number(),
       note: z.string().nullish(),
       transactionDetails: z.array(
         z.object({
@@ -60,6 +62,8 @@ export const purchaseRouter = createTRPCRouter({
       chartOfAccountId: z.string().nullish(),
       termId: z.string().nullish(),
       paymentInput: z.number(),
+      specialDiscount: z.number(),
+      discountGroupInput: z.number(),
       note: z.string().nullish(),
       transactionDetails: z.array(
         z.object({

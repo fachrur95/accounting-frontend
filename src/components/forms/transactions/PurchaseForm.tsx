@@ -173,6 +173,8 @@ const PurchaseForm = (props: IPurchaseForm) => {
   const onSubmit = (data: IPurchaseMutation) => {
     const dataSave: IPurchaseMutation = {
       ...data,
+      specialDiscount: data.specialDiscount ?? 0,
+      discountGroupInput: data.discountGroupInput ?? 0,
       note: data.note === "" || data.note === null ? undefined : data.note,
       chartOfAccountId: data.chartOfAccount?.id ?? undefined,
       termId: data.term?.id ?? undefined,
