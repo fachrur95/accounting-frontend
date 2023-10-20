@@ -108,6 +108,8 @@ export declare interface ISalesMutation {
   term?: IDataOption | ITerm | null;
   // entryDate?: Date;
   paymentInput: number;
+  specialDiscount?: number;
+  discountGroupInput?: number;
   note?: string;
   transactionDetails: ISalesPurchaseDetailMutation[];
 }
@@ -122,6 +124,8 @@ export declare interface IPurchaseMutation {
   chartOfAccount?: IDataOption | IChartOfAccount | null;
   // entryDate?: Date;
   paymentInput: number;
+  specialDiscount?: number;
+  discountGroupInput?: number;
   note?: string;
   transactionDetails: ISalesPurchaseDetailMutation[];
 }

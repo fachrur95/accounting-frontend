@@ -64,7 +64,7 @@ const useInfiniteUnitOfMeasure = () => {
         .map((page) =>
           page.rows.map((row: IUnitOfMeasure) => ({
             id: row.id,
-            label: row.name ?? "-",
+            label: row.code ?? row.name ?? "-",
           })),
         )
         .flat();

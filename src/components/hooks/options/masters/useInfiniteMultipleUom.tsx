@@ -65,7 +65,7 @@ const useInfiniteMultipleUom = ({ itemId }: { itemId: string }) => {
           page.rows.map((row: IMultipleUom) => {
             return {
               id: row.id,
-              label: row.unitOfMeasure?.name ?? "-",
+              label: row.unitOfMeasure?.code ?? row.unitOfMeasure?.name ?? "-",
               conversionQty: row.conversionQty ?? 0,
             };
           }),

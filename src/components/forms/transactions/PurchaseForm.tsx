@@ -51,9 +51,12 @@ interface IPurchaseForm {
 
 type TotalType = {
   subTotal: number;
+  total: number;
+  totalDiscountDetail: number;
   totalDiscount: number;
   totalTax: number;
   grandTotal: number;
+  balance: number;
 };
 
 const basePath = `/purchase`;
@@ -67,6 +70,8 @@ const defaultValues: IPurchaseMutation = {
   chartOfAccountId: "",
   chartOfAccount: null,
   paymentInput: 0,
+  specialDiscount: 0,
+  discountGroupInput: 0,
   note: "",
   transactionDetails: [],
 };
@@ -78,9 +83,12 @@ const PurchaseForm = (props: IPurchaseForm) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [total, setTotal] = useState<TotalType>({
     subTotal: 0,
+    total: 0,
+    totalDiscountDetail: 0,
     totalDiscount: 0,
     totalTax: 0,
     grandTotal: 0,
+    balance: 0,
   });
   const formContext = useForm<IPurchaseMutation>({ defaultValues });
   const { setOpenNotification } = useNotification();
@@ -102,17 +110,17 @@ const PurchaseForm = (props: IPurchaseForm) => {
     control,
     name: "transactionDetails",
   });
-
-  /* console.log({
-    test,
-    getValues: getValues(`transactionDetails[0]?.chartOfAccount?.name`),
-    watch: watch(`transactionDetails[0]?.chartOfAccount?.name`),
-  }); */
-
-  // const defaultUnit = watch("transactionDetails");
-  // const selectedCategory = watch("itemCategory");
-  // const currentVariantCategory = watch("variantCategories");
-  // const currentVariants = watch("variants");
+  const paymentInput: number = useWatch({ control, name: "paymentInput" });
+  const specialDiscount: number =
+    useWatch({
+      control,
+      name: "specialDiscount",
+    }) ?? 0;
+  const discountGroupInput: number =
+    useWatch({
+      control,
+      name: "discountGroupInput",
+    }) ?? 0;
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.globalTransaction.findOne.useQuery(
@@ -210,27 +218,32 @@ const PurchaseForm = (props: IPurchaseForm) => {
 
   useEffect(() => {
     if (transactionDetails) {
-      const sumTotal = transactionDetails.reduce<TotalType>(
+      const sumTotal = transactionDetails.reduce<
+        Omit<TotalType, "grandTotal", "balance", "totalDiscount">
+      >(
         (obj, detail) => {
-          const subTotal =
-            detail.qtyInput *
-            (detail.multipleUom?.conversionQty ?? 0) *
-            detail.priceInput;
-          const subTotalAfterDisc =
-            detail.qtyInput *
-            (detail.multipleUom?.conversionQty ?? 0) *
-            (detail.priceInput - detail.discountInput);
+          const qty =
+            detail.qtyInput * (detail.multipleUom?.conversionQty ?? 0);
+          const subTotal = qty * detail.priceInput;
+          const total = qty * (detail.priceInput - detail.discountInput);
+          const totalDiscountDetail = qty * detail.discountInput;
 
           obj.subTotal += subTotal;
-          obj.totalDiscount += detail.discountInput;
-          obj.grandTotal += subTotalAfterDisc;
+          obj.totalDiscountDetail += totalDiscountDetail;
+          obj.total += total;
           return obj;
         },
-        { subTotal: 0, totalDiscount: 0, totalTax: 0, grandTotal: 0 },
+        { subTotal: 0, totalDiscountDetail: 0, totalTax: 0, total: 0 },
       );
-      setTotal(sumTotal);
+      const total = sumTotal.total;
+      const specialDiscountValue = (specialDiscount / 100) * total;
+      const additionalDiscount = discountGroupInput + specialDiscountValue;
+      const grandTotal = total - additionalDiscount;
+      const balance = grandTotal - paymentInput;
+      const totalDiscount = sumTotal.totalDiscountDetail + additionalDiscount;
+      setTotal({ ...sumTotal, totalDiscount, grandTotal, balance });
     }
-  }, [transactionDetails]);
+  }, [transactionDetails, paymentInput, specialDiscount, discountGroupInput]);
 
   useEffect(() => {
     if (dataSelected) {
@@ -283,6 +296,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
                   selectedUnit = {
                     id: row.multipleUom.id,
                     label: row.multipleUom.unitOfMeasure?.name ?? "",
+                    conversionQty: row.conversionQty ?? 0,
                   };
                 }
                 if (row.tax) {
@@ -418,7 +432,10 @@ const PurchaseForm = (props: IPurchaseForm) => {
                   elevation={0}
                   variant="outlined"
                 >
-                  <Table size="small">
+                  <Table
+                    size="small"
+                    sx={{ "& .MuiTableCell-root": { px: "6px" } }}
+                  >
                     <TableHead>
                       <TableRow>
                         <TableCell width="3%" align="right">
@@ -441,9 +458,11 @@ const PurchaseForm = (props: IPurchaseForm) => {
                           Total
                         </TableCell>
                         <TableCell width="10%">Catatan</TableCell>
-                        <TableCell width="3%" align="center">
-                          <Delete />
-                        </TableCell>
+                        {mode !== "view" && (
+                          <TableCell width="3%" align="center">
+                            <Delete />
+                          </TableCell>
+                        )}
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -495,6 +514,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
                               hiddenLabel
                               InputProps={{
                                 inputComponent: NumericFormatCustom as never,
+                                disabled: mode === "view",
                               }}
                               fullWidth
                               size="small"
@@ -528,6 +548,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
                               hiddenLabel
                               InputProps={{
                                 inputComponent: NumericFormatCustom as never,
+                                disabled: mode === "view",
                               }}
                               fullWidth
                               size="small"
@@ -539,6 +560,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
                               hiddenLabel
                               InputProps={{
                                 inputComponent: NumericFormatCustom as never,
+                                disabled: mode === "view",
                               }}
                               fullWidth
                               size="small"
@@ -558,19 +580,24 @@ const PurchaseForm = (props: IPurchaseForm) => {
                             <TextFieldElement
                               name={`transactionDetails.${index}.note`}
                               hiddenLabel
+                              InputProps={{
+                                disabled: mode === "view",
+                              }}
                               fullWidth
                               size="small"
                             />
                           </TableCell>
-                          <TableCell align="center">
-                            <IconButton
-                              onClick={() => void remove(index)}
-                              color="error"
-                              size="small"
-                            >
-                              <Close />
-                            </IconButton>
-                          </TableCell>
+                          {mode !== "view" && (
+                            <TableCell align="center">
+                              <IconButton
+                                onClick={() => void remove(index)}
+                                color="error"
+                                size="small"
+                              >
+                                <Close />
+                              </IconButton>
+                            </TableCell>
+                          )}
                         </TableRow>
                       ))}
                     </TableBody>
@@ -620,25 +647,71 @@ const PurchaseForm = (props: IPurchaseForm) => {
                 className="col-start-1"
                 disabled={mode === "view"}
               />
-              <Box className="grid w-full grid-cols-2 md:col-start-3">
-                {/* <Box className="grid w-full grid-cols-1 md:grid-cols-2"> */}
-                <Typography variant="body1">Sub Total</Typography>
-                <Typography variant="body1" align="right">
-                  {formatNumber(total.subTotal)}
+              <Box className="grid w-full grid-cols-2 items-center justify-center md:col-start-3">
+                {total.subTotal !== total.total && (
+                  <>
+                    <Typography variant="subtitle2">Sub Total</Typography>
+                    <Typography variant="subtitle2" align="right">
+                      {formatNumber(total.subTotal)}
+                    </Typography>
+                  </>
+                )}
+                {total.totalDiscountDetail > 0 && (
+                  <>
+                    <Typography variant="subtitle2">
+                      Total Diskon Baris
+                    </Typography>
+                    <Typography variant="subtitle2" align="right">
+                      {formatNumber(total.totalDiscountDetail)}
+                    </Typography>
+                  </>
+                )}
+                <Typography variant="subtitle2">Total</Typography>
+                <Typography variant="subtitle2" align="right">
+                  {formatNumber(total.total)}
                 </Typography>
-                {/* </Box> */}
-                {/* <Box className="grid w-full grid-cols-1 md:grid-cols-2"> */}
-                <Typography variant="body1">Total Diskon</Typography>
-                <Typography variant="body1" align="right">
-                  {formatNumber(total.totalDiscount)}
-                </Typography>
-                {/* </Box> */}
-                {/* <Box className="grid w-full grid-cols-1 md:grid-cols-2"> */}
-                <Typography variant="body1">Total</Typography>
-                <Typography variant="body1" align="right">
+                <Typography variant="subtitle2">Diskon Tambahan</Typography>
+                <TextFieldElement
+                  name="discountGroupInput"
+                  hiddenLabel
+                  InputProps={{
+                    inputComponent: NumericFormatCustom as never,
+                    disabled: mode === "view",
+                  }}
+                  fullWidth
+                  size="small"
+                />
+                {total.totalDiscount > 0 && (
+                  <>
+                    <Typography variant="subtitle2">Total Diskon</Typography>
+                    <Typography variant="subtitle2" align="right">
+                      {formatNumber(total.totalDiscount)}
+                    </Typography>
+                  </>
+                )}
+                <Typography variant="subtitle2">Total Akhir</Typography>
+                <Typography variant="subtitle2" align="right">
                   {formatNumber(total.grandTotal)}
                 </Typography>
-                {/* </Box> */}
+                <Typography variant="subtitle2">Bayar</Typography>
+                <TextFieldElement
+                  name="paymentInput"
+                  hiddenLabel
+                  InputProps={{
+                    inputComponent: NumericFormatCustom as never,
+                    disabled: mode === "view",
+                  }}
+                  fullWidth
+                  size="small"
+                />
+                <Typography variant="subtitle2">
+                  {total.balance <= 0 ? "Kembalian" : "Kurang"}
+                </Typography>
+                <Typography variant="subtitle2" align="right">
+                  {formatNumber(
+                    total.balance ? total.balance * -1 : total.balance,
+                  )}
+                </Typography>
               </Box>
             </Box>
             <Button type="submit" disabled={isSubmitting} className="hidden">

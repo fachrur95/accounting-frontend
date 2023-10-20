@@ -441,7 +441,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
               />
               <TextFieldElement
                 name="price"
-                label="Harga Satuan"
+                label="Harga Jual Satuan"
                 InputProps={{
                   inputComponent: NumericFormatCustom as never,
                   disabled: mode === "view",

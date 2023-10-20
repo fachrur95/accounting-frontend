@@ -6,7 +6,7 @@ import { type ThemeOptions } from "@mui/material/styles/createTheme";
 
 const themeConfig: Omit<ThemeOptions, "palette"> = {
   shape: {
-    borderRadius: 8
+    borderRadius: 10
   },
 }
 
