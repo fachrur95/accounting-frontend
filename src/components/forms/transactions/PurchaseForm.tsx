@@ -221,7 +221,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
   useEffect(() => {
     if (transactionDetails) {
       const sumTotal = transactionDetails.reduce<
-        Omit<TotalType, "grandTotal", "balance", "totalDiscount">
+        Omit<TotalType, "grandTotal" | "balance" | "totalDiscount">
       >(
         (obj, detail) => {
           const qty =
