@@ -11,7 +11,7 @@ import {
   TextareaAutosizeElement,
   useFieldArray,
   useForm,
-  // useWatch,
+  useWatch,
 } from "react-hook-form-mui";
 import Close from "@mui/icons-material/Close";
 import Add from "@mui/icons-material/Add";
@@ -76,19 +76,18 @@ const PurchaseForm = (props: IPurchaseForm) => {
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  /* const [total, setTotal] = useState<TotalType>({
+  const [total, setTotal] = useState<TotalType>({
     subTotal: 0,
     totalDiscount: 0,
     totalTax: 0,
     grandTotal: 0,
-  }); */
+  });
   const formContext = useForm<IPurchaseMutation>({ defaultValues });
   const { setOpenNotification } = useNotification();
 
   const {
     control,
     setValue,
-    watch,
     formState: { isSubmitting },
     handleSubmit,
     setError,
@@ -99,9 +98,10 @@ const PurchaseForm = (props: IPurchaseForm) => {
     name: "transactionDetails",
   });
 
-  // const transactionDetails = useWatch({ control, name: "transactionDetails" });
-  const transactionDetails: ISalesPurchaseDetailMutation[] =
-    watch("transactionDetails");
+  const transactionDetails: ISalesPurchaseDetailMutation[] = useWatch({
+    control,
+    name: "transactionDetails",
+  });
 
   /* console.log({
     test,
@@ -208,19 +208,29 @@ const PurchaseForm = (props: IPurchaseForm) => {
     }
   }, [dataNumber, mode, setValue]);
 
-  /* useEffect(() => {
+  useEffect(() => {
     if (transactionDetails) {
       const sumTotal = transactionDetails.reduce<TotalType>(
         (obj, detail) => {
-          obj.debit += detail.debit;
-          obj.credit += detail.credit;
+          const subTotal =
+            detail.qtyInput *
+            (detail.multipleUom?.conversionQty ?? 0) *
+            detail.priceInput;
+          const subTotalAfterDisc =
+            detail.qtyInput *
+            (detail.multipleUom?.conversionQty ?? 0) *
+            (detail.priceInput - detail.discountInput);
+
+          obj.subTotal += subTotal;
+          obj.totalDiscount += detail.discountInput;
+          obj.grandTotal += subTotalAfterDisc;
           return obj;
         },
-        { debit: 0, credit: 0 },
+        { subTotal: 0, totalDiscount: 0, totalTax: 0, grandTotal: 0 },
       );
       setTotal(sumTotal);
     }
-  }, [transactionDetails]); */
+  }, [transactionDetails]);
 
   useEffect(() => {
     if (dataSelected) {
@@ -610,6 +620,26 @@ const PurchaseForm = (props: IPurchaseForm) => {
                 className="col-start-1"
                 disabled={mode === "view"}
               />
+              <Box className="grid w-full grid-cols-2 md:col-start-3">
+                {/* <Box className="grid w-full grid-cols-1 md:grid-cols-2"> */}
+                <Typography variant="body1">Sub Total</Typography>
+                <Typography variant="body1" align="right">
+                  {formatNumber(total.subTotal)}
+                </Typography>
+                {/* </Box> */}
+                {/* <Box className="grid w-full grid-cols-1 md:grid-cols-2"> */}
+                <Typography variant="body1">Total Diskon</Typography>
+                <Typography variant="body1" align="right">
+                  {formatNumber(total.totalDiscount)}
+                </Typography>
+                {/* </Box> */}
+                {/* <Box className="grid w-full grid-cols-1 md:grid-cols-2"> */}
+                <Typography variant="body1">Total</Typography>
+                <Typography variant="body1" align="right">
+                  {formatNumber(total.grandTotal)}
+                </Typography>
+                {/* </Box> */}
+              </Box>
             </Box>
             <Button type="submit" disabled={isSubmitting} className="hidden">
               Simpan
