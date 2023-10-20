@@ -233,18 +233,9 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
           }
           // "itemCategory" | "transactionDetails" | "tax" | "files" | "id"
 
-          setValue(
-            key as keyof (keyof Pick<
-              IJournalEntryMutation,
-              "transactionNumber" | "note"
-            >),
-            dataSelected[
-              key as keyof Pick<
-                IJournalEntryMutation,
-                "transactionNumber" | "note"
-              >
-            ],
-          );
+          if (key === "transactionNumber" || key === "note") {
+            setValue(key, dataSelected[key]);
+          }
         }
       }
     }
@@ -386,7 +377,7 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
                               InputProps={{
                                 inputComponent: NumericFormatCustom as never,
                                 onBlur: (event) => {
-                                  if (event.target.value > 0) {
+                                  if (parseFloat(event.target.value) > 0) {
                                     setValue(
                                       `transactionDetails.${index}.credit`,
                                       0,
@@ -405,7 +396,7 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
                               InputProps={{
                                 inputComponent: NumericFormatCustom as never,
                                 onBlur: (event) => {
-                                  if (event.target.value > 0) {
+                                  if (parseFloat(event.target.value) > 0) {
                                     setValue(
                                       `transactionDetails.${index}.debit`,
                                       0,

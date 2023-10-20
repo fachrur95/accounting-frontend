@@ -14,22 +14,21 @@ const GLOBAL_URL = `${env.BACKEND_URL}/v1/transactions/sell`;
 export const salesRouter = createTRPCRouter({
   create: protectedProcedure.input(
     z.object({
-      code: z.string(),
-      description: z.string().nullish(),
-      itemCategoryId: z.string(),
-      taxId: z.string().nullish(),
-      name: z.string(),
-      manualCogs: z.number(),
-      price: z.number(),
-      maxQty: z.number(),
-      minQty: z.number(),
+      transactionNumber: z.string(),
+      peopleId: z.string(),
+      termId: z.string().nullish(),
+      paymentInput: z.number(),
       note: z.string().nullish(),
-      isActive: z.boolean(),
-      multipleUoms: z.array(
+      transactionDetails: z.array(
         z.object({
-          unitOfMeasureId: z.string(),
+          multipleUomId: z.string(),
+          chartOfAccountId: z.string(),
+          taxId: z.string().nullish(),
+          qtyInput: z.number(),
           conversionQty: z.number(),
-          barcode: z.string().nullish(),
+          priceInput: z.number(),
+          discountInput: z.number(),
+          note: z.string().nullish(),
         })
       ).min(1),
     }),
@@ -54,23 +53,21 @@ export const salesRouter = createTRPCRouter({
   update: protectedProcedure.input(
     z.object({
       id: z.string(),
-      code: z.string(),
-      description: z.string().nullish(),
-      itemCategoryId: z.string(),
-      taxId: z.string().nullish(),
-      name: z.string(),
-      manualCogs: z.number(),
-      price: z.number(),
-      maxQty: z.number(),
-      minQty: z.number(),
+      transactionNumber: z.string(),
+      peopleId: z.string(),
+      termId: z.string().nullish(),
+      paymentInput: z.number(),
       note: z.string().nullish(),
-      isActive: z.boolean(),
-      multipleUoms: z.array(
+      transactionDetails: z.array(
         z.object({
-          id: z.string().nullish(),
-          unitOfMeasureId: z.string(),
+          multipleUomId: z.string(),
+          chartOfAccountId: z.string(),
+          taxId: z.string().nullish(),
+          qtyInput: z.number(),
           conversionQty: z.number(),
-          barcode: z.string().nullish(),
+          priceInput: z.number(),
+          discountInput: z.number(),
+          note: z.string().nullish(),
         })
       ).min(1),
     }),

@@ -1,13 +1,13 @@
-import useInfiniteItem from "@/components/hooks/options/masters/useInfiniteItem";
-import type { AutoDefault } from "@/types/options";
-import React from "react";
+import useInfiniteMultipleUom from "@/components/hooks/options/masters/useInfiniteMultipleUom";
+import type { AutoDefault, IDataOption } from "@/types/options";
+import React, { useEffect } from "react";
 import { type FieldValues } from "react-hook-form";
 import {
   AutocompleteElement,
   type AutocompleteElementProps,
 } from "react-hook-form-mui";
 
-const AutocompleteItem = <TFieldValues extends FieldValues>(
+const AutocompleteMultipleUom = <TFieldValues extends FieldValues>(
   props: Omit<
     AutocompleteElementProps<
       TFieldValues,
@@ -17,16 +17,28 @@ const AutocompleteItem = <TFieldValues extends FieldValues>(
     >,
     "options"
   > & {
-    type?: "sale" | "purchase" | "stock" | "adjustment";
+    itemId: string;
+    setDefault: (value: IDataOption) => void;
   },
 ): JSX.Element => {
-  const { type, ...rest } = props;
+  const { itemId, setDefault, ...rest } = props;
   const {
     options: optionsItem,
     isFetching: isFetchingItem,
     renderOption: renderOptionItem,
     onSearch: onSearchItem,
-  } = useInfiniteItem({ type });
+  } = useInfiniteMultipleUom({ itemId });
+
+  useEffect(() => {
+    if (optionsItem.length > 0) {
+      const defaultUnit = optionsItem.find(
+        (option) => option.conversionQty === 1,
+      );
+      if (defaultUnit) {
+        setDefault(defaultUnit);
+      }
+    }
+  }, [setDefault, optionsItem]);
 
   return (
     <AutocompleteElement
@@ -47,4 +59,4 @@ const AutocompleteItem = <TFieldValues extends FieldValues>(
   );
 };
 
-export default AutocompleteItem;
+export default AutocompleteMultipleUom;

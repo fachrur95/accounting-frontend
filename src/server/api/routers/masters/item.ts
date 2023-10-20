@@ -43,9 +43,10 @@ export const itemRouter = createTRPCRouter({
           sort: z.enum(["asc", "desc"]).nullish().default("asc"),
         })
       ).nullish(),
+      type: z.enum(["sale", "purchase", "stock", "adjustment"]).nullish(),
     }),
   ).query(async ({ ctx, input }) => {
-    const { limit, cursor, search, filter, sort } = input;
+    const { limit, cursor, search, filter, sort, type } = input;
 
     let url = `${GLOBAL_URL}?page=${cursor ?? 0}&limit=${limit}`;
 
@@ -59,6 +60,18 @@ export const itemRouter = createTRPCRouter({
 
     if (sort) {
       url += convertSortToURL(sort as GridSortModel)
+    }
+
+    if (type) {
+      url += `${type === "sale"
+        ? "&itemCategory.itemType.isSale=true"
+        : type === "purchase"
+          ? "&itemCategory.itemType.isPurchase=true"
+          : type === "stock"
+            ? "&itemCategory.itemType.isStock=true"
+            : type === "adjustment"
+              ? "&itemCategory.itemType.isAdjustment=true"
+              : ""}`
     }
 
     const result = await axios.get<PaginationResponse<IItem>>(

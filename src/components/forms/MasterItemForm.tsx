@@ -1,7 +1,10 @@
 import useNotification from "@/components/hooks/useNotification";
 import type { FormSlugType } from "@/types/global";
 import type { IDataOption } from "@/types/options";
-import type { IItemMutation } from "@/types/prisma-api/item";
+import type {
+  IItemMutation,
+  IMultipleUomMutation,
+} from "@/types/prisma-api/item";
 import type { ITax } from "@/types/prisma-api/tax";
 import { api } from "@/utils/api";
 import Add from "@mui/icons-material/Add";
@@ -75,13 +78,14 @@ const MasterItemForm = (props: IMasterItemForm) => {
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [defaultUnit, setDefaultUnit] = useState<string | null>(null);
+  // const [defaultUnit, setDefaultUnit] = useState<string | null>(null);
   const formContext = useForm<IItemMutation>({ defaultValues });
   const { setOpenNotification } = useNotification();
 
   const {
     control,
     setValue,
+    watch,
     formState: { isSubmitting },
     handleSubmit,
     setError,
@@ -104,6 +108,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
   // const selectedCategory = watch("itemCategory");
   // const currentVariantCategory = watch("variantCategories");
   // const currentVariants = watch("variants");
+  const defaultUnit: IMultipleUomMutation[] = watch("multipleUoms");
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.item.findOne.useQuery(
@@ -265,9 +270,9 @@ const MasterItemForm = (props: IMasterItemForm) => {
                   id: unit.unitOfMeasure?.id ?? "",
                   label: unit.unitOfMeasure?.name ?? "",
                 };
-                if (unit.conversionQty === 1) {
+                /* if (unit.conversionQty === 1) {
                   setDefaultUnit(unit.unitOfMeasure?.name ?? "");
-                }
+                } */
                 return {
                   id: unit.id,
                   unitOfMeasure: selectedUnit,
@@ -525,14 +530,14 @@ const MasterItemForm = (props: IMasterItemForm) => {
                               autocompleteProps={{
                                 size: "small",
                                 disabled: mode === "view",
-                                onChange: (_, data) => {
+                                /* onChange: (_, data) => {
                                   if (index === 0) {
                                     setDefaultUnit(
                                       (data as IDataOption | null)?.label ??
                                         null,
                                     );
                                   }
-                                },
+                                }, */
                               }}
                               textFieldProps={{
                                 hiddenLabel: true,
@@ -551,7 +556,16 @@ const MasterItemForm = (props: IMasterItemForm) => {
                               size="small"
                             />
                           </TableCell>
-                          <TableCell>{defaultUnit ?? "-"}</TableCell>
+                          {/* <TableCell>{defaultUnit ?? "-"}</TableCell> */}
+                          {/* <TableCell>
+                            {fields[0]?.unitOfMeasure?.label ?? "-"}
+                          </TableCell> */}
+                          <TableCell>
+                            {(
+                              defaultUnit?.[0]
+                                ?.unitOfMeasure as IDataOption | null
+                            )?.label ?? "-"}
+                          </TableCell>
                           <TableCell>
                             <TextFieldElement
                               name={`multipleUoms.${index}.barcode`}

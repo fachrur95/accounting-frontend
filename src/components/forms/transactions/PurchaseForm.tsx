@@ -2,7 +2,6 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
-import DatePicker from "@/components/controls/DatePicker";
 import TableFooter from "@mui/material/TableFooter";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
@@ -12,13 +11,13 @@ import {
   TextareaAutosizeElement,
   useFieldArray,
   useForm,
+  // useWatch,
 } from "react-hook-form-mui";
 import Close from "@mui/icons-material/Close";
 import Add from "@mui/icons-material/Add";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
-import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
 import NumericFormatCustom from "../../controls/NumericFormatCustom";
 import { api } from "@/utils/api";
 import Link from "next/link";
@@ -31,44 +30,65 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import type { FormSlugType } from "@/types/global";
-import type { ILiabilityMutation } from "@/types/prisma-api/transaction";
-import type { IPeople } from "@/types/prisma-api/people";
-import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
+import type {
+  IPurchaseMutation,
+  ISalesPurchaseDetailMutation,
+} from "@/types/prisma-api/transaction";
+// import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
+import AutocompleteItem from "../../controls/autocompletes/masters/AutocompleteItem";
+import AutocompleteMultipleUom from "../../controls/autocompletes/masters/AutocompleteMultipleUom";
+import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
+import { formatNumber } from "@/utils/helpers";
 import useNotification from "@/components/hooks/useNotification";
 
-interface ILiabilityForm {
+interface IPurchaseForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
-  type: "revenue" | "expense";
 }
 
-const LiabilityForm = (props: ILiabilityForm) => {
-  const { slug, showIn, type } = props;
-  const router = useRouter();
+type TotalType = {
+  subTotal: number;
+  totalDiscount: number;
+  totalTax: number;
+  grandTotal: number;
+};
 
-  const defaultValues: ILiabilityMutation = {
-    transactionNumber: "",
-    chartOfAccountId: null,
-    chartOfAccount: null,
-    peopleId: "",
-    people: null,
-    entryDate: new Date(),
-    note: "",
-    transactionDetails: [],
-  };
+const basePath = `/purchase`;
+
+const defaultValues: IPurchaseMutation = {
+  transactionNumber: "",
+  peopleId: "",
+  people: null,
+  termId: "",
+  term: null,
+  chartOfAccountId: "",
+  chartOfAccount: null,
+  paymentInput: 0,
+  note: "",
+  transactionDetails: [],
+};
+
+const PurchaseForm = (props: IPurchaseForm) => {
+  const { slug, showIn } = props;
+  const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const formContext = useForm<ILiabilityMutation>({ defaultValues });
+  /* const [total, setTotal] = useState<TotalType>({
+    subTotal: 0,
+    totalDiscount: 0,
+    totalTax: 0,
+    grandTotal: 0,
+  }); */
+  const formContext = useForm<IPurchaseMutation>({ defaultValues });
   const { setOpenNotification } = useNotification();
-
-  const basePath = `/cash-and-bank/${type}s`;
 
   const {
     control,
     setValue,
+    watch,
     formState: { isSubmitting },
     handleSubmit,
     setError,
@@ -79,7 +99,9 @@ const LiabilityForm = (props: ILiabilityForm) => {
     name: "transactionDetails",
   });
 
-  // const test = useWatch(control, "transactionDetails[0].chartOfAccount.name");
+  // const transactionDetails = useWatch({ control, name: "transactionDetails" });
+  const transactionDetails: ISalesPurchaseDetailMutation[] =
+    watch("transactionDetails");
 
   /* console.log({
     test,
@@ -99,12 +121,12 @@ const LiabilityForm = (props: ILiabilityForm) => {
     );
 
   const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
-    transactionType: type === "revenue" ? "REVENUE" : "EXPENSE",
+    transactionType: "PURCHASE_INVOICE",
   });
 
   // console.log({ dataNumber });
 
-  const mutationCreate = api.liability.create.useMutation({
+  const mutationCreate = api.purchase.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       if (error.message) {
@@ -113,7 +135,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof ILiabilityMutation, {
+          void setError(field as keyof IPurchaseMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -122,7 +144,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
     },
   });
 
-  const mutationUpdate = api.liability.update.useMutation({
+  const mutationUpdate = api.purchase.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       if (error.message) {
@@ -131,7 +153,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof ILiabilityMutation, {
+          void setError(field as keyof IPurchaseMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -140,21 +162,22 @@ const LiabilityForm = (props: ILiabilityForm) => {
     },
   });
 
-  const onSubmit = (data: ILiabilityMutation) => {
-    const dataSave: ILiabilityMutation = {
+  const onSubmit = (data: IPurchaseMutation) => {
+    const dataSave: IPurchaseMutation = {
       ...data,
-      entryDate: new Date(data.entryDate),
       note: data.note === "" || data.note === null ? undefined : data.note,
-      chartOfAccountId: data.chartOfAccount?.id ?? "",
-      peopleId: data.people?.id ?? undefined,
+      chartOfAccountId: data.chartOfAccount?.id ?? undefined,
+      termId: data.term?.id ?? undefined,
+      peopleId: data.people?.id ?? "",
       transactionDetails: data.transactionDetails.map((detail) => ({
         ...detail,
-        chartOfAccountId: detail.chartOfAccount?.id ?? "",
+        conversionQty: detail.multipleUom?.conversionQty ?? 0,
+        multipleUomId: detail.multipleUom?.id ?? "",
+        chartOfAccountId: detail.chartOfAccount?.id ?? undefined,
         taxId: detail.tax?.id ?? undefined,
         note:
           detail.note === "" || detail.note === null ? undefined : detail.note,
       })),
-      type,
     };
     console.log({ dataSave });
     if (selectedId) {
@@ -185,32 +208,50 @@ const LiabilityForm = (props: ILiabilityForm) => {
     }
   }, [dataNumber, mode, setValue]);
 
+  /* useEffect(() => {
+    if (transactionDetails) {
+      const sumTotal = transactionDetails.reduce<TotalType>(
+        (obj, detail) => {
+          obj.debit += detail.debit;
+          obj.credit += detail.credit;
+          return obj;
+        },
+        { debit: 0, credit: 0 },
+      );
+      setTotal(sumTotal);
+    }
+  }, [transactionDetails]); */
+
   useEffect(() => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
-          if (key === "entryDate") {
-            const entryDate = dataSelected[key]!;
-            if (entryDate) {
-              setValue("entryDate", new Date(entryDate));
-            }
-          }
-          if (key === "chartOfAccount") {
-            const selectedAccount = dataSelected[key]!;
-            if (selectedAccount) {
-              setValue("chartOfAccount", {
-                id: selectedAccount.id,
-                label: selectedAccount.name,
-              });
-            }
-            continue;
-          }
           if (key === "people") {
-            const selectedPeople = dataSelected[key] as IPeople | null;
+            const selectedPeople = dataSelected[key]!;
             if (selectedPeople) {
               setValue("people", {
                 id: selectedPeople.id,
                 label: selectedPeople.name,
+              });
+            }
+            continue;
+          }
+          if (key === "term") {
+            const selectedTerm = dataSelected[key]!;
+            if (selectedTerm) {
+              setValue("term", {
+                id: selectedTerm.id,
+                label: selectedTerm.name,
+              });
+            }
+            continue;
+          }
+          if (key === "chartOfAccount") {
+            const selectedChartOfAccount = dataSelected[key]!;
+            if (selectedChartOfAccount) {
+              setValue("chartOfAccount", {
+                id: selectedChartOfAccount.id,
+                label: selectedChartOfAccount.name,
               });
             }
             continue;
@@ -220,21 +261,40 @@ const LiabilityForm = (props: ILiabilityForm) => {
 
             if (transactionDetail.length > 0) {
               const dataDetail = transactionDetail.map((row) => {
-                const selectedAccount = {
-                  id: row.chartOfAccount?.id ?? "",
-                  label: row.chartOfAccount?.name ?? "",
-                };
+                let selectedItem = null;
+                let selectedUnit = null;
+                let selectedAccount = null;
                 let selectedTax = null;
+                if (row.multipleUom) {
+                  selectedItem = {
+                    id: row.multipleUom.item?.id ?? "",
+                    label: row.multipleUom.item?.name ?? "",
+                  };
+                  selectedUnit = {
+                    id: row.multipleUom.id,
+                    label: row.multipleUom.unitOfMeasure?.name ?? "",
+                  };
+                }
                 if (row.tax) {
                   selectedTax = {
-                    id: row.tax.id ?? "",
-                    label: row.tax.name ?? "",
+                    id: row.tax.id,
+                    label: row.tax.name,
+                  };
+                }
+                if (row.chartOfAccount) {
+                  selectedAccount = {
+                    id: row.chartOfAccount.id,
+                    label: row.chartOfAccount.name,
                   };
                 }
                 return {
                   id: row.id,
+                  item: selectedItem,
+                  multipleUom: selectedUnit,
                   chartOfAccount: selectedAccount,
                   tax: selectedTax,
+                  qtyInput: row.qtyInput,
+                  conversionQty: row.conversionQty,
                   priceInput: row.priceInput,
                   discountInput: row.discountInput,
                   note: row.note,
@@ -245,15 +305,14 @@ const LiabilityForm = (props: ILiabilityForm) => {
 
             continue;
           }
-          if (key === "files") {
-            continue;
-          }
           // "itemCategory" | "transactionDetails" | "tax" | "files" | "id"
 
           if (
             key === "transactionNumber" ||
-            key === "chartOfAccountId" ||
             key === "peopleId" ||
+            key === "termId" ||
+            key === "chartOfAccountId" ||
+            key === "paymentInput" ||
             key === "note"
           ) {
             setValue(key, dataSelected[key]);
@@ -285,9 +344,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">
-              {type === "revenue" ? "Pendapatan" : "Pengeluaran"}
-            </Typography>
+            <Typography variant="h6">Pembelian</Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (
@@ -334,24 +391,14 @@ const LiabilityForm = (props: ILiabilityForm) => {
                   disabled: mode === "view",
                 }}
               />
-              <AutocompleteChartOfAccount
-                name="chartOfAccount"
-                label="Akun"
+              <AutocompletePeople
+                name="people"
+                label="Pemasok"
                 required
                 autocompleteProps={{
                   disabled: mode === "view",
                 }}
-              />
-              <DatePicker label="Tanggal" name="entryDate" required />
-              <AutocompletePeople
-                name="people"
-                label={`${
-                  type === "revenue" ? "Pelanggan" : "Pemasok"
-                } (opsional)`}
-                autocompleteProps={{
-                  disabled: mode === "view",
-                }}
-                type={type === "revenue" ? "customer" : "supplier"}
+                type="supplier"
               />
             </Box>
             <div className="overflow-auto">
@@ -364,15 +411,27 @@ const LiabilityForm = (props: ILiabilityForm) => {
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell width="5%" align="right">
+                        <TableCell width="3%" align="right">
                           No
                         </TableCell>
-                        <TableCell width="50%">Sumber Akun</TableCell>
-                        <TableCell width="25%" align="right">
-                          Nilai
+                        <TableCell width="26%">Produk</TableCell>
+                        <TableCell width="8%" align="right">
+                          Qty
                         </TableCell>
-                        <TableCell width="15%">Catatan</TableCell>
-                        <TableCell width="5%" align="center">
+                        <TableCell width="15%" align="right">
+                          Satuan
+                        </TableCell>
+                        <TableCell width="15%" align="right">
+                          Harga Satuan
+                        </TableCell>
+                        <TableCell width="10%" align="right">
+                          Diskon
+                        </TableCell>
+                        <TableCell width="10%" align="right">
+                          Total
+                        </TableCell>
+                        <TableCell width="10%">Catatan</TableCell>
+                        <TableCell width="3%" align="center">
                           <Delete />
                         </TableCell>
                       </TableRow>
@@ -389,23 +448,67 @@ const LiabilityForm = (props: ILiabilityForm) => {
                             {index + 1}
                           </TableCell>
                           <TableCell align="right">
-                            <AutocompleteChartOfAccount
-                              name={`transactionDetails.${index}.chartOfAccount`}
+                            <AutocompleteItem
+                              name={`transactionDetails.${index}.item`}
                               required
                               autocompleteProps={{
                                 size: "small",
                                 disabled: mode === "view",
                                 /* onChange: (_, data) => {
-                                  if (index === 0) {
-                                    setDefaultUnit(
-                                      (data as IDataOption | null)?.label ??
-                                        null,
+                                  if (!transactionDetails[index]?.priceInput) {
+                                    setValue(
+                                      `transactionDetails.${index}.priceInput`,
+                                      (data as IDataOption | null)?.price ?? 0,
                                     );
                                   }
                                 }, */
                               }}
                               textFieldProps={{
                                 hiddenLabel: true,
+                              }}
+                            />
+                            {/* <AutocompleteChartOfAccount
+                              name={`transactionDetails.${index}.chartOfAccount`}
+                              required
+                              autocompleteProps={{
+                                size: "small",
+                                disabled: mode === "view",
+                              }}
+                              textFieldProps={{
+                                hiddenLabel: true,
+                              }}
+                            /> */}
+                          </TableCell>
+                          <TableCell align="right">
+                            <TextFieldElement
+                              name={`transactionDetails.${index}.qtyInput`}
+                              hiddenLabel
+                              InputProps={{
+                                inputComponent: NumericFormatCustom as never,
+                              }}
+                              fullWidth
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <AutocompleteMultipleUom
+                              name={`transactionDetails.${index}.multipleUom`}
+                              required
+                              autocompleteProps={{
+                                size: "small",
+                                disabled: mode === "view",
+                              }}
+                              textFieldProps={{
+                                hiddenLabel: true,
+                              }}
+                              itemId={transactionDetails[index]?.item?.id ?? ""}
+                              setDefault={(value) => {
+                                if (!transactionDetails[index]?.multipleUom) {
+                                  setValue(
+                                    `transactionDetails.${index}.multipleUom`,
+                                    value,
+                                  );
+                                }
                               }}
                             />
                           </TableCell>
@@ -419,6 +522,27 @@ const LiabilityForm = (props: ILiabilityForm) => {
                               fullWidth
                               size="small"
                             />
+                          </TableCell>
+                          <TableCell align="right">
+                            <TextFieldElement
+                              name={`transactionDetails.${index}.discountInput`}
+                              hiddenLabel
+                              InputProps={{
+                                inputComponent: NumericFormatCustom as never,
+                              }}
+                              fullWidth
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            {formatNumber(
+                              (transactionDetails[index]?.qtyInput ?? 0) *
+                                (transactionDetails[index]?.multipleUom
+                                  ?.conversionQty ?? 0) *
+                                ((transactionDetails[index]?.priceInput ?? 0) -
+                                  (transactionDetails[index]?.discountInput ??
+                                    0)),
+                            )}
                           </TableCell>
                           <TableCell>
                             <TextFieldElement
@@ -440,17 +564,24 @@ const LiabilityForm = (props: ILiabilityForm) => {
                         </TableRow>
                       ))}
                     </TableBody>
-                    {mode !== "view" && (
-                      <TableFooter>
+                    <TableFooter>
+                      {mode !== "view" && (
                         <TableRow>
-                          <TableCell colSpan={6}>
+                          <TableCell colSpan={9}>
                             <Button
                               startIcon={<Add />}
                               onClick={() =>
                                 void append({
+                                  itemId: "",
+                                  item: null,
+                                  multipleUomId: "",
+                                  multipleUom: null,
                                   chartOfAccountId: "",
                                   chartOfAccount: null,
+                                  qtyInput: 0,
+                                  conversionQty: 0,
                                   priceInput: 0,
+                                  discountInput: 0,
                                   note: "",
                                 })
                               }
@@ -461,8 +592,8 @@ const LiabilityForm = (props: ILiabilityForm) => {
                             </Button>
                           </TableCell>
                         </TableRow>
-                      </TableFooter>
-                    )}
+                      )}
+                    </TableFooter>
                   </Table>
                 </TableContainer>
               </Box>
@@ -490,4 +621,4 @@ const LiabilityForm = (props: ILiabilityForm) => {
   );
 };
 
-export default LiabilityForm;
+export default PurchaseForm;

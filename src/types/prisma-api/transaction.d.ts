@@ -8,6 +8,7 @@ import type { TransactionType } from "./transaction-type";
 import type { IUnit } from "./unit";
 import type { ITax } from "./tax";
 import type { IMultipleUom } from "./multiple-uom";
+import type { IItem } from "./item";
 // import type { IWarehouse } from "./warehouse";
 
 export declare interface ITransaction {
@@ -54,10 +55,12 @@ export declare interface ITransaction {
   transactionDetailPayments?: ITransactionDetail[];
 }
 
-declare interface ISalesPurchaseUomMutation {
+export declare interface ISalesPurchaseDetailMutation {
   id?: string;
   multipleUomId?: string | null;
   multipleUom?: IDataOption | IMultipleUom | null;
+  itemId?: string | null;
+  item?: IDataOption | IItem | null;
   chartOfAccountId?: string | null;
   chartOfAccount?: IDataOption | IChartOfAccount | null;
   taxId?: string | null;
@@ -103,10 +106,10 @@ export declare interface ISalesMutation {
   people: IDataOption | IPeople | null;
   termId?: string;
   term?: IDataOption | ITerm | null;
-  entryDate?: Date;
+  // entryDate?: Date;
   paymentInput: number;
   note?: string;
-  transactionDetails: ISalesPurchaseUomMutation[];
+  transactionDetails: ISalesPurchaseDetailMutation[];
 }
 
 export declare interface IPurchaseMutation {
@@ -117,10 +120,10 @@ export declare interface IPurchaseMutation {
   term?: IDataOption | ITerm | null;
   chartOfAccountId?: string | null;
   chartOfAccount?: IDataOption | IChartOfAccount | null;
-  entryDate?: Date;
+  // entryDate?: Date;
   paymentInput: number;
   note?: string;
-  transactionDetails: ISalesPurchaseUomMutation[];
+  transactionDetails: ISalesPurchaseDetailMutation[];
 }
 
 export declare interface IPaymentMutation {

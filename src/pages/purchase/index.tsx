@@ -33,7 +33,7 @@ import { useEffect, useState } from "react";
 import CustomMenu from "@/components/displays/StyledMenu";
 import { useRouter } from "next/router";
 import ModalTransition from "@/components/dialogs/ModalTransition";
-import JournalEntryForm from "@/components/forms/transactions/JournalEntryForm";
+import PurchaseForm from "@/components/forms/transactions/PurchaseForm";
 import type { FormSlugType } from "@/types/global";
 import type { IJwtDecode } from "@/types/session";
 import type { ITransaction } from "@/types/prisma-api/transaction";
@@ -315,11 +315,10 @@ const PurchasesPage: MyPage = () => {
             <ModalTransition
               open
               handleClose={router.back}
-              maxWidth="lg"
-              fullWidth
+              fullScreen
               scroll="paper"
             >
-              <JournalEntryForm
+              <PurchaseForm
                 slug={router.query.slug as FormSlugType}
                 showIn="popup"
               />

@@ -16,10 +16,13 @@ import { priceBookRouter } from "./routers/masters/price-book";
 import { taxRouter } from "./routers/masters/tax";
 import { termRouter } from "./routers/masters/term";
 import { unitOfMeasureRouter } from "./routers/masters/unit-of-measure";
+import { multipleUomRouter } from "./routers/masters/multiple-uom";
 import { warehouseRouter } from "./routers/masters/warehouse";
 import { globalTransactionRouter } from "./routers/transactions/global";
 import { liabilityRouter } from "./routers/transactions/liability";
 import { journalEntryRouter } from "./routers/transactions/journal-entry";
+import { salesRouter } from "./routers/transactions/sales";
+import { purchaseRouter } from "./routers/transactions/purchase";
 import { logActivityRouter } from "./routers/log-activity";
 
 /**
@@ -45,10 +48,13 @@ export const appRouter = createTRPCRouter({
   tax: taxRouter,
   term: termRouter,
   unitOfMeasure: unitOfMeasureRouter,
+  multipleUom: multipleUomRouter,
   warehouse: warehouseRouter,
   globalTransaction: globalTransactionRouter,
   liability: liabilityRouter,
   journalEntry: journalEntryRouter,
+  sales: salesRouter,
+  purchase: purchaseRouter,
   logActivity: logActivityRouter,
 });
 

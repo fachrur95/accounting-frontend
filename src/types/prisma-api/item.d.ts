@@ -33,7 +33,7 @@ export declare interface IItem {
   itemCogs?: IItemCogs[];
 }
 
-type IMultipleUomMutation = {
+export type IMultipleUomMutation = {
   id?: string;
   unitOfMeasureId: string,
   conversionQty: number,
