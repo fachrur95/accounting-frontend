@@ -69,6 +69,7 @@ const useInfinitePeople = ({
           page.rows.map((row: IPeople) => ({
             id: row.id,
             label: row.name ?? "-",
+            specialDiscount: row.peopleCategory?.discount ?? 0,
           })),
         )
         .flat();

@@ -1,7 +1,7 @@
 import DatePicker from "@/components/controls/DatePicker";
 import type { FormSlugType } from "@/types/global";
 import type {
-  IPurchaseMutation,
+  ISalesMutation,
   ISalesPurchaseDetailMutation,
 } from "@/types/prisma-api/transaction";
 import { api } from "@/utils/api";
@@ -47,7 +47,7 @@ import AutocompleteItem from "../../controls/autocompletes/masters/AutocompleteI
 import AutocompleteMultipleUom from "../../controls/autocompletes/masters/AutocompleteMultipleUom";
 import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
 
-interface IPurchaseForm {
+interface ISalesForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
 }
@@ -62,17 +62,15 @@ type TotalType = {
   balance: number;
 };
 
-const basePath = `/purchase`;
+const basePath = `/sales`;
 
-const defaultValues: IPurchaseMutation = {
+const defaultValues: ISalesMutation = {
   entryDate: new Date(),
   transactionNumber: "",
   peopleId: "",
   people: null,
   termId: "",
   term: null,
-  chartOfAccountId: "",
-  chartOfAccount: null,
   paymentInput: 0,
   specialDiscount: 0,
   discountGroupInput: 0,
@@ -80,7 +78,7 @@ const defaultValues: IPurchaseMutation = {
   transactionDetails: [],
 };
 
-const PurchaseForm = (props: IPurchaseForm) => {
+const SalesForm = (props: ISalesForm) => {
   const { slug, showIn } = props;
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
@@ -94,7 +92,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
     grandTotal: 0,
     balance: 0,
   });
-  const formContext = useForm<IPurchaseMutation>({ defaultValues });
+  const formContext = useForm<ISalesMutation>({ defaultValues });
   const { setOpenNotification } = useNotification();
 
   const {
@@ -133,12 +131,12 @@ const PurchaseForm = (props: IPurchaseForm) => {
     );
 
   const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
-    transactionType: "PURCHASE_INVOICE",
+    transactionType: "SALE_INVOICE",
   });
 
   // console.log({ dataNumber });
 
-  const mutationCreate = api.purchase.create.useMutation({
+  const mutationCreate = api.sales.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       if (error.message) {
@@ -147,7 +145,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IPurchaseMutation, {
+          void setError(field as keyof ISalesMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -156,7 +154,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
     },
   });
 
-  const mutationUpdate = api.purchase.update.useMutation({
+  const mutationUpdate = api.sales.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       if (error.message) {
@@ -165,7 +163,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IPurchaseMutation, {
+          void setError(field as keyof ISalesMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -174,13 +172,13 @@ const PurchaseForm = (props: IPurchaseForm) => {
     },
   });
 
-  const onSubmit = (data: IPurchaseMutation) => {
-    const dataSave: IPurchaseMutation = {
+  const onSubmit = (data: ISalesMutation) => {
+    const dataSave: ISalesMutation = {
       ...data,
       specialDiscount: data.specialDiscount ?? 0,
       discountGroupInput: data.discountGroupInput ?? 0,
       note: data.note === "" || data.note === null ? undefined : data.note,
-      chartOfAccountId: data.chartOfAccount?.id ?? undefined,
+      // chartOfAccountId: data.chartOfAccount?.id ?? undefined,
       termId: data.term?.id ?? undefined,
       peopleId: data.people?.id ?? "",
       transactionDetails: data.transactionDetails.map((detail) => ({
@@ -281,16 +279,6 @@ const PurchaseForm = (props: IPurchaseForm) => {
             }
             continue;
           }
-          if (key === "chartOfAccount") {
-            const selectedChartOfAccount = dataSelected[key]!;
-            if (selectedChartOfAccount) {
-              setValue("chartOfAccount", {
-                id: selectedChartOfAccount.id,
-                label: selectedChartOfAccount.name,
-              });
-            }
-            continue;
-          }
           if (key === "transactionDetails") {
             const transactionDetail = dataSelected[key]!;
 
@@ -347,7 +335,6 @@ const PurchaseForm = (props: IPurchaseForm) => {
             key === "transactionNumber" ||
             key === "peopleId" ||
             key === "termId" ||
-            key === "chartOfAccountId" ||
             key === "paymentInput" ||
             key === "specialDiscount" ||
             key === "discountGroupInput" ||
@@ -431,7 +418,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
               />
               <AutocompletePeople
                 name="people"
-                label="Pemasok"
+                label="Pelanggan"
                 required
                 autocompleteProps={{
                   disabled: mode === "view",
@@ -444,17 +431,9 @@ const PurchaseForm = (props: IPurchaseForm) => {
                     }
                   },
                 }}
-                type="supplier"
+                type="customer"
               />
               <DatePicker label="Tanggal" name="entryDate" disabled />
-              <AutocompleteChartOfAccount
-                name="chartOfAccount"
-                label="Akun"
-                required
-                autocompleteProps={{
-                  disabled: mode === "view",
-                }}
-              />
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
@@ -767,4 +746,4 @@ const PurchaseForm = (props: IPurchaseForm) => {
   );
 };
 
-export default PurchaseForm;
+export default SalesForm;

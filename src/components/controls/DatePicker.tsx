@@ -11,6 +11,7 @@ const DatePicker = (props: {
   size?: "small" | "medium";
   minDate?: Date;
   maxDate?: Date;
+  disabled?: boolean;
 }): JSX.Element => {
   const { size, ...rest } = props;
   const theme = useTheme();

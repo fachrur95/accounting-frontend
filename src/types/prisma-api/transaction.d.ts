@@ -16,6 +16,8 @@ export declare interface ITransaction {
   transactionType: TransactionType;
   transactionNumber: string;
   paymentInput: number;
+  specialDiscount: number;
+  discountGroupInput: number;
   change: number;
   beforeTax: number;
   taxValue: number;
@@ -106,7 +108,7 @@ export declare interface ISalesMutation {
   people: IDataOption | IPeople | null;
   termId?: string;
   term?: IDataOption | ITerm | null;
-  // entryDate?: Date;
+  entryDate?: Date;
   paymentInput: number;
   specialDiscount?: number;
   discountGroupInput?: number;
@@ -122,7 +124,7 @@ export declare interface IPurchaseMutation {
   term?: IDataOption | ITerm | null;
   chartOfAccountId?: string | null;
   chartOfAccount?: IDataOption | IChartOfAccount | null;
-  // entryDate?: Date;
+  entryDate?: Date;
   paymentInput: number;
   specialDiscount?: number;
   discountGroupInput?: number;

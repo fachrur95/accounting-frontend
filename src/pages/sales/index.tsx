@@ -33,7 +33,7 @@ import { useEffect, useState } from "react";
 import CustomMenu from "@/components/displays/StyledMenu";
 import { useRouter } from "next/router";
 import ModalTransition from "@/components/dialogs/ModalTransition";
-import JournalEntryForm from "@/components/forms/transactions/JournalEntryForm";
+import SalesForm from "@/components/forms/transactions/SalesForm";
 import type { FormSlugType } from "@/types/global";
 import type { IJwtDecode } from "@/types/session";
 import type { ITransaction } from "@/types/prisma-api/transaction";
@@ -319,7 +319,7 @@ const SalesPage: MyPage = () => {
               fullWidth
               scroll="paper"
             >
-              <JournalEntryForm
+              <SalesForm
                 slug={router.query.slug as FormSlugType}
                 showIn="popup"
               />

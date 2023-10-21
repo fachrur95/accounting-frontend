@@ -6,6 +6,7 @@ export declare interface IDataOption {
   inputValue?: string;
   conversionQty?: number;
   price?: number;
+  specialDiscount?: number;
 }
 
 export declare type AutoDefault = {
