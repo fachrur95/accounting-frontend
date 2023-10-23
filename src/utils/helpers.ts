@@ -220,3 +220,42 @@ export const convertSortToURL = (sorts: GridSortModel, front: "&" | "?" = "&") =
 
   return url;
 }
+
+/* export const dataURLtoFile = (dataURL: string, filename: string): File | null => {
+  console.log({ dataURL })
+  const arr = dataURL.split(',');
+  const mime = arr[0].match(/:(.*?);/);
+
+  if (mime && mime[1]) {
+    const type = mime[1];
+    const byteString = atob(arr[1]);
+    const buffer = new ArrayBuffer(byteString.length);
+    const view = new Uint8Array(buffer);
+
+    for (let i = 0; i < byteString.length; i++) {
+      view[i] = byteString.charCodeAt(i);
+    }
+
+    const blob = new Blob([buffer], { type });
+    return new File([blob], filename, { type });
+  }
+
+  return null;
+} */
+
+export const imageUrlToFile = async (imageUrl: string, filename: string): Promise<File> => {
+  try {
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const blob = await response.blob();
+
+    // console.log({ blob });
+
+    return new File([blob], filename);
+  } catch (error) {
+    console.error("Gagal mengunduh dan mengonversi URL gambar ke objek File:", error);
+    return null;
+  }
+}

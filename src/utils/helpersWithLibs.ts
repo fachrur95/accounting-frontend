@@ -6,7 +6,7 @@ export const resizeFile = (
   file: File
 ): Promise<string | File | Blob | ProgressEvent<FileReader>> =>
   new Promise((resolve) => {
-    FileResizer.imageFileResizer(file, 100, 100, "WEBP", 100, 0, (uri) => { resolve(uri); }, "base64");
+    FileResizer.imageFileResizer(file, 200, 200, "WEBP", 100, 0, (uri) => { resolve(uri); }, "base64");
   });
 
 

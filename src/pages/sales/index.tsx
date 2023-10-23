@@ -16,6 +16,7 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
+import PointOfSale from "@mui/icons-material/PointOfSale";
 import type {
   GridColDef,
   GridFilterModel,
@@ -34,11 +35,14 @@ import CustomMenu from "@/components/displays/StyledMenu";
 import { useRouter } from "next/router";
 import ModalTransition from "@/components/dialogs/ModalTransition";
 import SalesForm from "@/components/forms/transactions/SalesForm";
+import OpenCashRegisterForm from "@/components/forms/OpenCashRegister";
+import CloseCashRegisterForm from "@/components/forms/CloseCashRegister";
 import type { FormSlugType } from "@/types/global";
 import type { IJwtDecode } from "@/types/session";
 import type { ITransaction } from "@/types/prisma-api/transaction";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
+import useSessionData from "@/components/hooks/useSessionData";
 
 const sortDefault: GridSortModel = [{ field: "entryDate", sort: "desc" }];
 
@@ -49,8 +53,18 @@ const pathname = "/sales";
 
 const SalesPage: MyPage = () => {
   const router = useRouter();
+  const { data: sessionData } = useSessionData();
+
+  console.log({ sessionData });
 
   const [rows, setRows] = useState<ITransaction[]>([]);
+  const [open, setOpen] = useState<{
+    openCashRegister: boolean;
+    closeCashRegister: boolean;
+  }>({
+    openCashRegister: false,
+    closeCashRegister: false,
+  });
   const [countAll, setCountAll] = useState<number>(0);
   const [sortModel, setSortModel] = useState<GridSortModel | undefined>(
     sortDefault,
@@ -254,7 +268,7 @@ const SalesPage: MyPage = () => {
             <Typography variant="h5" gutterBottom>
               {title}
             </Typography>
-            <div>
+            <div className="flex flex-col gap-2 md:flex-row">
               <DeleteMultiple
                 path={path}
                 ids={selectionModel as string[]}
@@ -263,17 +277,39 @@ const SalesPage: MyPage = () => {
               <IconButton onClick={() => void refetch()}>
                 <Refresh />
               </IconButton>
-              <Link
-                href={{
-                  pathname,
-                  query: { slug: ["f"] },
-                }}
-                as={`${pathname}/f`}
-              >
-                <Button variant="contained" endIcon={<Add />}>
-                  Tambah
+              {!sessionData?.session?.cashRegister ? (
+                <Button
+                  variant="contained"
+                  startIcon={<PointOfSale />}
+                  onClick={() => setOpen({ ...open, openCashRegister: true })}
+                >
+                  Buka Mesin Kasir
                 </Button>
-              </Link>
+              ) : (
+                <>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    startIcon={<PointOfSale />}
+                    onClick={() =>
+                      setOpen({ ...open, closeCashRegister: true })
+                    }
+                  >
+                    Tutup Mesin Kasir
+                  </Button>
+                  <Link
+                    href={{
+                      pathname,
+                      query: { slug: ["f"] },
+                    }}
+                    as={`${pathname}/f`}
+                  >
+                    <Button variant="contained" endIcon={<Add />}>
+                      Tambah
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </Box>
           <DataGridProAdv
@@ -315,8 +351,7 @@ const SalesPage: MyPage = () => {
             <ModalTransition
               open
               handleClose={router.back}
-              maxWidth="lg"
-              fullWidth
+              fullScreen
               scroll="paper"
             >
               <SalesForm
@@ -332,6 +367,18 @@ const SalesPage: MyPage = () => {
               message="Apakah Anda yakin ingin menghapus ini?"
               onClose={() => setSelectedId(null)}
               onSubmit={handleDelete}
+            />
+          )}
+          {open.openCashRegister && (
+            <OpenCashRegisterForm
+              open
+              setClose={() => setOpen({ ...open, openCashRegister: false })}
+            />
+          )}
+          {open.closeCashRegister && (
+            <CloseCashRegisterForm
+              open
+              setClose={() => setOpen({ ...open, closeCashRegister: false })}
             />
           )}
         </Box>

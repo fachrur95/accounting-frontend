@@ -9,6 +9,7 @@ import Add from "@mui/icons-material/Add";
 import Close from "@mui/icons-material/Close";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
+import PointOfSale from "@mui/icons-material/PointOfSale";
 import Save from "@mui/icons-material/Save";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
@@ -37,7 +38,7 @@ import {
   useWatch,
 } from "react-hook-form-mui";
 import NumericFormatCustom from "../../controls/NumericFormatCustom";
-import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
+// import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
 import useNotification from "@/components/hooks/useNotification";
 import { formatNumber } from "@/utils/helpers";
 import DialogContent from "@mui/material/DialogContent";
@@ -46,6 +47,8 @@ import { useRouter } from "next/router";
 import AutocompleteItem from "../../controls/autocompletes/masters/AutocompleteItem";
 import AutocompleteMultipleUom from "../../controls/autocompletes/masters/AutocompleteMultipleUom";
 import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
+import OpenCashRegisterForm from "../OpenCashRegister";
+import useSessionData from "@/components/hooks/useSessionData";
 
 interface ISalesForm {
   slug: FormSlugType;
@@ -80,7 +83,15 @@ const defaultValues: ISalesMutation = {
 
 const SalesForm = (props: ISalesForm) => {
   const { slug, showIn } = props;
+  const { data: sessionData } = useSessionData();
   const router = useRouter();
+  const [open, setOpen] = useState<{
+    openCashRegister: boolean;
+    closeCashRegister: boolean;
+  }>({
+    openCashRegister: false,
+    closeCashRegister: false,
+  });
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [total, setTotal] = useState<TotalType>({
@@ -133,8 +144,6 @@ const SalesForm = (props: ISalesForm) => {
   const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
     transactionType: "SALE_INVOICE",
   });
-
-  // console.log({ dataNumber });
 
   const mutationCreate = api.sales.create.useMutation({
     onSuccess: () => void router.push(basePath),
@@ -347,6 +356,60 @@ const SalesForm = (props: ISalesForm) => {
     }
   }, [dataSelected, setValue]);
 
+  if (!sessionData?.session?.cashRegister) {
+    return (
+      <>
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={isFetchingSelected}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        <DialogTitle>
+          <Box
+            component={showIn === "page" ? Paper : undefined}
+            className={`flex items-center justify-between ${
+              showIn === "page" ? "px-4 py-2" : ""
+            }`}
+          >
+            <div className="mb-2 flex items-center gap-2">
+              <Link href={basePath}>
+                <IconButton color="error">
+                  <Close />
+                </IconButton>
+              </Link>
+              <Typography variant="h6">Penjualan</Typography>
+            </div>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Box
+            component={Paper}
+            className="flex flex-col items-center justify-center gap-2 p-4"
+          >
+            <Typography variant="h6" align="center">
+              Sekarang saatnya untuk membuka mesin kasir! Ayo, mari kita buka
+              pintunya dan siapkan diri untuk melayani pelanggan dengan senyuman
+              dan profesionalisme.
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<PointOfSale />}
+              onClick={() => setOpen({ ...open, openCashRegister: true })}
+            >
+              Buka Sekarang
+            </Button>
+          </Box>
+          <OpenCashRegisterForm
+            open={open.openCashRegister}
+            setClose={() => setOpen({ ...open, openCashRegister: false })}
+          />
+        </DialogContent>
+      </>
+    );
+  }
+
   return (
     <>
       <Backdrop
@@ -369,7 +432,7 @@ const SalesForm = (props: ISalesForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">Pembelian</Typography>
+            <Typography variant="h6">Penjualan</Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (

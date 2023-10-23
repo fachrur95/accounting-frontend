@@ -6,7 +6,6 @@ import type {
   IItemMutation,
   IMultipleUomMutation,
 } from "@/types/prisma-api/item";
-import type { ITax } from "@/types/prisma-api/tax";
 import { api } from "@/utils/api";
 import Add from "@mui/icons-material/Add";
 import Close from "@mui/icons-material/Close";
@@ -32,10 +31,11 @@ import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import Image from "next/image";
 import { useDropzone } from "react-dropzone";
-import { CldImage } from "next-cloudinary";
+// import { CldImage } from "next-cloudinary";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { resizeFile } from "@/utils/helpersWithLibs";
+import { imageUrlToFile } from "@/utils/helpers";
 import {
   FormContainer,
   SwitchElement,
@@ -89,7 +89,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
   const formContext = useForm<IItemMutation>({ defaultValues });
   const { setOpenNotification } = useNotification();
 
-  console.log({ imagesUploaded });
+  // console.log({ imagesUploaded });
   const {
     control,
     setValue,
@@ -103,6 +103,8 @@ const MasterItemForm = (props: IMasterItemForm) => {
     control,
     name: "multipleUoms",
   });
+
+  // console.log({ files });
 
   // const test = useWatch(control, "multipleUoms[0].unitOfMeasure.name");
 
@@ -234,7 +236,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
     for (const file of files) {
       // const blobed = await fileToBase64(file);
       const blobed = await resizeFile(file);
-      fileBlob.push(JSON.stringify(blobed.toString()));
+      fileBlob.push(JSON.stringify(blobed));
     }
     const dataSave: IItemMutation = {
       ...data,
@@ -283,7 +285,30 @@ const MasterItemForm = (props: IMasterItemForm) => {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
           if (key === "images") {
             const images = dataSelected[key]!;
-            setImagesUploaded(images);
+            if (images && images.length > 0) {
+              const getImages = async () => {
+                const filesImage: File[] = [];
+                for (const [index, image] of images.entries()) {
+                  const converted: File | null = await imageUrlToFile(
+                    image.imageUrl,
+                    `image-${index}.webp`,
+                  );
+                  if (converted instanceof File) {
+                    filesImage.push(converted);
+                  }
+                }
+                return filesImage;
+              };
+
+              Promise.all([getImages()])
+                .then(([imageResult]) => {
+                  // Kedua proses telah selesai dijalankan
+                  setFile(imageResult);
+                })
+                .catch((error) => {
+                  console.error("Terjadi kesalahan:", error);
+                });
+            }
             continue;
           }
           if (key === "itemCategory") {
@@ -297,7 +322,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
             continue;
           }
           if (key === "tax") {
-            const selectedTax = dataSelected[key] as ITax | null;
+            const selectedTax = dataSelected[key]!;
             if (selectedTax) {
               setValue("tax", {
                 id: selectedTax.id,
@@ -315,9 +340,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
                   id: unit.unitOfMeasure?.id ?? "",
                   label: unit.unitOfMeasure?.name ?? "",
                 };
-                /* if (unit.conversionQty === 1) {
-                  setDefaultUnit(unit.unitOfMeasure?.name ?? "");
-                } */
                 return {
                   id: unit.id,
                   unitOfMeasure: selectedUnit,
@@ -335,38 +357,21 @@ const MasterItemForm = (props: IMasterItemForm) => {
           }
           // "itemCategory" | "multipleUoms" | "tax" | "files" | "id"
 
-          setValue(
-            key as keyof (keyof Pick<
-              IItemMutation,
-              | "itemCategoryId"
-              | "taxId"
-              | "code"
-              | "name"
-              | "description"
-              | "minQty"
-              | "maxQty"
-              | "manualCogs"
-              | "price"
-              | "note"
-              | "isActive"
-            >),
-            dataSelected[
-              key as keyof Pick<
-                IItemMutation,
-                | "itemCategoryId"
-                | "taxId"
-                | "code"
-                | "name"
-                | "description"
-                | "minQty"
-                | "maxQty"
-                | "manualCogs"
-                | "price"
-                | "note"
-                | "isActive"
-              >
-            ],
-          );
+          if (
+            key === "itemCategoryId" ||
+            key === "taxId" ||
+            key === "code" ||
+            key === "name" ||
+            key === "description" ||
+            key === "minQty" ||
+            key === "maxQty" ||
+            key === "manualCogs" ||
+            key === "price" ||
+            key === "note" ||
+            key === "isActive"
+          ) {
+            setValue(key, dataSelected[key]);
+          }
         }
       }
     }
@@ -662,54 +667,79 @@ const MasterItemForm = (props: IMasterItemForm) => {
             <Box component={Paper}>
               <div className="flex items-center justify-center">
                 <div className="w-full rounded-lg shadow-xl">
-                  <div className="m-4">
-                    <div className="flex w-full items-center justify-center">
-                      <label className="flex h-32 w-full cursor-pointer flex-col rounded-md border-2 border-dashed">
-                        <div className="flex flex-col items-center justify-center pt-7">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-12 w-12 text-gray-400 group-hover:text-gray-600"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <p className="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-gray-600">
-                            Pilih Gambar
-                          </p>
-                        </div>
-                        <input {...getInputProps()} className="opacity-0" />
-                        {/* <input
-                      type="file"
-                      onChange={handleFile}
-                      className="opacity-0"
-                      multiple={true}
-                      name="files[]"
-                    /> */}
-                      </label>
-                    </div>
+                  <div className="m-4 rounded-md border-2 border-dashed p-4">
+                    {mode !== "view" && (
+                      <div className="flex w-full items-center justify-center">
+                        <label className="flex h-auto w-full cursor-pointer flex-col">
+                          <div className="flex flex-col items-center justify-center pt-7">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-12 w-12 text-gray-400 group-hover:text-gray-600"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            <p className="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-gray-600">
+                              Pilih Gambar
+                            </p>
+                          </div>
+                          <input {...getInputProps()} className="opacity-0" />
+                        </label>
+                      </div>
+                    )}
                     {/* <Typography variant="caption" color="error">
                       {errors?.images}
                     </Typography> */}
-                    {files.length > 0 && (
+                    {(files.length > 0 || imagesUploaded.length > 0) && (
                       <div>
-                        <Typography variant="caption">New Images</Typography>
+                        <Typography variant="caption">
+                          Selected Images
+                        </Typography>
                         <div className="mt-2 flex flex-wrap gap-2">
+                          {imagesUploaded.map((image, key) => (
+                            <div key={key} className="relative overflow-hidden">
+                              {mode !== "view" && (
+                                <IconButton
+                                  onClick={() => {
+                                    removeImageUploaded(image.id);
+                                  }}
+                                  className="absolute right-1 cursor-pointer transition-all duration-300 hover:text-red-500"
+                                  size="small"
+                                  color="error"
+                                >
+                                  <Close fontSize="small" />
+                                </IconButton>
+                              )}
+                              <Image
+                                height={100}
+                                width={100}
+                                // alt={image?.label ?? "No label"}
+                                alt={"No label"}
+                                // className="rounded-md"
+                                className="h-20 w-20 rounded-md"
+                                src={image.imageUrl}
+                              />
+                            </div>
+                          ))}
                           {files.map((file, key) => (
                             <div key={key} className="relative overflow-hidden">
-                              <IconButton
-                                onClick={() => {
-                                  removeImage(file.name);
-                                }}
-                                className="absolute right-1 cursor-pointer transition-all duration-300 hover:text-red-500"
-                                size="small"
-                              >
-                                <Close fontSize="small" />
-                              </IconButton>
+                              {mode !== "view" && (
+                                <IconButton
+                                  onClick={() => {
+                                    removeImage(file.name);
+                                  }}
+                                  className="absolute right-1 cursor-pointer transition-all duration-300 hover:text-red-500"
+                                  size="small"
+                                  color="error"
+                                >
+                                  <Close fontSize="small" />
+                                </IconButton>
+                              )}
                               <Image
                                 height={100}
                                 width={100}
@@ -723,7 +753,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
                         </div>
                       </div>
                     )}
-                    {imagesUploaded.length > 0 && (
+                    {/* {imagesUploaded.length > 0 && (
                       <div>
                         <Typography variant="caption">
                           Uploaded Images
@@ -753,7 +783,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
                           ))}
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
               </div>

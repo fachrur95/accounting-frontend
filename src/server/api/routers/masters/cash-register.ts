@@ -6,7 +6,8 @@ import axios from "axios";
 import { env } from "@/env.mjs";
 import { z } from "zod";
 import type { ApiCatchError, PaginationResponse } from "@/types/api-response";
-import type { ICashRegister } from "@/types/prisma-api/cash-register";
+import type { ICashRegister, ICashRegisterStatus } from "@/types/prisma-api/cash-register";
+import type { ITransaction } from "@/types/prisma-api/transaction";
 import { convertFilterToURL, convertSortToURL } from "@/utils/helpers";
 import type { GridFilterModel, GridSortModel } from "@mui/x-data-grid-pro";
 
@@ -172,5 +173,84 @@ export const cashRegisterRouter = createTRPCRouter({
     } catch (error) {
       throw new Error((error as ApiCatchError).response?.data?.message ?? (error as ApiCatchError).message ?? "An error occurred");
     }
+  }),
+  open: protectedProcedure.input(
+    z.object({
+      transactionNumber: z.string(),
+      cashRegisterId: z.string(),
+      amount: z.number(),
+    }),
+  ).mutation(async ({ ctx, input }) => {
+    try {
+      const result = await axios.post<ITransaction>(
+        `${env.BACKEND_URL}/v1/transactions/cash-register/open`,
+        input,
+        {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+        }
+      ).then((response) => {
+        return response.data;
+      });
+
+      return result;
+    } catch (error) {
+      throw new Error((error as ApiCatchError).response?.data?.message ?? (error as ApiCatchError).message ?? "An error occurred");
+    }
+  }),
+  close: protectedProcedure.input(
+    z.object({
+      transactionNumber: z.string(),
+      amount: z.number(),
+    }),
+  ).mutation(async ({ ctx, input }) => {
+    try {
+      const result = await axios.post<ITransaction>(
+        `${env.BACKEND_URL}/v1/transactions/cash-register/close`,
+        input,
+        {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+        }
+      ).then((response) => {
+        return response.data;
+      });
+
+      return result;
+    } catch (error) {
+      throw new Error((error as ApiCatchError).response?.data?.message ?? (error as ApiCatchError).message ?? "An error occurred");
+    }
+  }),
+  getAllStatus: protectedProcedure.query(async ({ ctx }) => {
+    const result = await axios.get<ICashRegisterStatus[]>(
+      `${env.BACKEND_URL}/v1/transactions/cash-register/stand-by`,
+      {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+      }
+    ).then((response) => {
+      return response.data;
+    }).catch((err) => {
+      console.log(err)
+      return [];
+    });
+
+    return result;
+  }),
+  getLastBalance: protectedProcedure.query(async ({ ctx }) => {
+    const result = await axios.get<{ balance: number }>(
+      `${env.BACKEND_URL}/v1/transactions/cash-register/last-balance`,
+      {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+      }
+    ).then((response) => {
+      return response.data;
+    }).catch((err) => {
+      console.log(err)
+      return 0;
+    });
+
+    return result;
   }),
 });
