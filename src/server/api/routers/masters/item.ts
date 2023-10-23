@@ -129,15 +129,21 @@ export const itemRouter = createTRPCRouter({
           barcode: z.string().nullish(),
         })
       ).min(1),
+      files: z.array(z.string()),
     }),
   ).mutation(async ({ ctx, input }) => {
     try {
       const result = await axios.post<IItem>(
         `${GLOBAL_URL}`,
         input,
+        // { ...data, files: dataFiles },
+        // formData,
         {
           withCredentials: true,
-          headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+          headers: {
+            Authorization: `Bearer ${ctx.session.accessToken}`,
+            // 'Content-Type': 'multipart/form-data; boundary=' + formData._boundary
+          },
         }
       ).then((response) => {
         return response.data;
@@ -170,6 +176,7 @@ export const itemRouter = createTRPCRouter({
           barcode: z.string().nullish(),
         })
       ).min(1),
+      files: z.array(z.string()).nullish(),
     }),
   ).mutation(async ({ ctx, input }) => {
     const { id, ...data } = input;

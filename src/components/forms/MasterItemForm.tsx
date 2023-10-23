@@ -1,5 +1,6 @@
 import useNotification from "@/components/hooks/useNotification";
 import type { FormSlugType } from "@/types/global";
+import type { IImage } from "@/types/prisma-api/image";
 import type { IDataOption } from "@/types/options";
 import type {
   IItemMutation,
@@ -29,8 +30,12 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
+import Image from "next/image";
+import { useDropzone } from "react-dropzone";
+import { CldImage } from "next-cloudinary";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { resizeFile } from "@/utils/helpersWithLibs";
 import {
   FormContainer,
   SwitchElement,
@@ -78,10 +83,13 @@ const MasterItemForm = (props: IMasterItemForm) => {
   const router = useRouter();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [files, setFile] = useState<File[]>([]);
+  const [imagesUploaded, setImagesUploaded] = useState<IImage[]>([]);
   // const [defaultUnit, setDefaultUnit] = useState<string | null>(null);
   const formContext = useForm<IItemMutation>({ defaultValues });
   const { setOpenNotification } = useNotification();
 
+  console.log({ imagesUploaded });
   const {
     control,
     setValue,
@@ -115,6 +123,26 @@ const MasterItemForm = (props: IMasterItemForm) => {
       { id: selectedId ?? "" },
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
+
+  const { getInputProps } = useDropzone({
+    onDrop: (acceptedFiles: File[]) => {
+      setFile((prevFiles) => [...prevFiles, ...acceptedFiles]);
+    },
+    accept: {
+      "image/jpeg": [],
+      "image/jpg": [],
+      "image/png": [],
+      "image/webp": [],
+    },
+  });
+
+  const removeImage = (i: string) => {
+    setFile(files.filter((x) => x?.name !== i));
+  };
+
+  const removeImageUploaded = (i: string) => {
+    setImagesUploaded(imagesUploaded.filter((x) => x.id !== i));
+  };
 
   const mutationCreate = api.item.create.useMutation({
     onSuccess: () => void router.push("/masters/products"),
@@ -152,7 +180,10 @@ const MasterItemForm = (props: IMasterItemForm) => {
     },
   });
 
-  const onSubmit = (data: IItemMutation) => {
+  const onSubmit = async (data: IItemMutation) => {
+    if (isSubmitting) {
+      return;
+    }
     // const check = data.multipleUoms.some((unit) => unit.unitOfMeasure === null)
     let baseUnit: string | null = null;
     let unitTemp: string | null | undefined = null;
@@ -197,6 +228,14 @@ const MasterItemForm = (props: IMasterItemForm) => {
       unitTemp = unit.unitOfMeasure?.id;
       conversionQtyTemp = unit.conversionQty;
     }
+
+    const fileBlob: string[] = [];
+
+    for (const file of files) {
+      // const blobed = await fileToBase64(file);
+      const blobed = await resizeFile(file);
+      fileBlob.push(JSON.stringify(blobed.toString()));
+    }
     const dataSave: IItemMutation = {
       ...data,
       description:
@@ -214,6 +253,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
             ? undefined
             : unit.barcode,
       })),
+      files: fileBlob,
     };
     if (selectedId) {
       return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
@@ -241,6 +281,11 @@ const MasterItemForm = (props: IMasterItemForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
+          if (key === "images") {
+            const images = dataSelected[key]!;
+            setImagesUploaded(images);
+            continue;
+          }
           if (key === "itemCategory") {
             const selectedCategory = dataSelected[key]!;
             if (selectedCategory) {
@@ -614,6 +659,105 @@ const MasterItemForm = (props: IMasterItemForm) => {
                 </TableContainer>
               </Box>
             </div>
+            <Box component={Paper}>
+              <div className="flex items-center justify-center">
+                <div className="w-full rounded-lg shadow-xl">
+                  <div className="m-4">
+                    <div className="flex w-full items-center justify-center">
+                      <label className="flex h-32 w-full cursor-pointer flex-col rounded-md border-2 border-dashed">
+                        <div className="flex flex-col items-center justify-center pt-7">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-12 w-12 text-gray-400 group-hover:text-gray-600"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <p className="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-gray-600">
+                            Pilih Gambar
+                          </p>
+                        </div>
+                        <input {...getInputProps()} className="opacity-0" />
+                        {/* <input
+                      type="file"
+                      onChange={handleFile}
+                      className="opacity-0"
+                      multiple={true}
+                      name="files[]"
+                    /> */}
+                      </label>
+                    </div>
+                    {/* <Typography variant="caption" color="error">
+                      {errors?.images}
+                    </Typography> */}
+                    {files.length > 0 && (
+                      <div>
+                        <Typography variant="caption">New Images</Typography>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {files.map((file, key) => (
+                            <div key={key} className="relative overflow-hidden">
+                              <IconButton
+                                onClick={() => {
+                                  removeImage(file.name);
+                                }}
+                                className="absolute right-1 cursor-pointer transition-all duration-300 hover:text-red-500"
+                                size="small"
+                              >
+                                <Close fontSize="small" />
+                              </IconButton>
+                              <Image
+                                height={100}
+                                width={100}
+                                alt={file.name}
+                                // className="rounded-md"
+                                className="h-20 w-20 rounded-md"
+                                src={URL.createObjectURL(file)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {imagesUploaded.length > 0 && (
+                      <div>
+                        <Typography variant="caption">
+                          Uploaded Images
+                        </Typography>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {imagesUploaded.map((image, key) => (
+                            <div key={key} className="relative overflow-hidden">
+                              <IconButton
+                                onClick={() => {
+                                  removeImageUploaded(image.id);
+                                }}
+                                className="absolute right-1 cursor-pointer transition-all duration-300 hover:text-red-500"
+                                size="small"
+                              >
+                                <Close fontSize="small" />
+                              </IconButton>
+                              <Image
+                                height={100}
+                                width={100}
+                                // alt={image?.label ?? "No label"}
+                                alt={"No label"}
+                                // className="rounded-md"
+                                className="h-20 w-20 rounded-md"
+                                src={image.imageUrl}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </Box>
             <Button type="submit" disabled={isSubmitting} className="hidden">
               Simpan
             </Button>
