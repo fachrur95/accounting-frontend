@@ -1,6 +1,7 @@
 import { exampleRouter } from "@/server/api/routers/example";
 import { createTRPCRouter } from "@/server/api/trpc";
 import { sessionRouter } from "./routers/auth/session";
+import { userRouter } from "./routers/auth/user";
 import { instituteCredentialsRouter } from "./routers/auth/institute";
 import { unitCredentialsRouter } from "./routers/auth/unit";
 import { accountClassRouter } from "./routers/masters/account-class";
@@ -33,6 +34,7 @@ import { logActivityRouter } from "./routers/log-activity";
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
   session: sessionRouter,
+  user: userRouter,
   instituteCredentials: instituteCredentialsRouter,
   unitCredentials: unitCredentialsRouter,
   accountClass: accountClassRouter,

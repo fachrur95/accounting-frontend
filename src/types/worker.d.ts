@@ -21,6 +21,7 @@ export declare type WorkerPathType =
   | "term"
   | "unit-of-measure"
   | "warehouse"
+  | "user"
   | "transaction";
 
 export declare type DeleteWorkerEventType = {

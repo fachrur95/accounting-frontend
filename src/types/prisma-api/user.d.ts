@@ -10,3 +10,9 @@ export declare interface IUser {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export declare type IUserMutation = Pick<IUser,
+  | "email"
+  | "name"
+  | "role"
+>

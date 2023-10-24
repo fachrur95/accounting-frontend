@@ -23,7 +23,7 @@ export const salesRouter = createTRPCRouter({
       note: z.string().nullish(),
       transactionDetails: z.array(
         z.object({
-          multipleUomId: z.string(),
+          multipleUomId: z.string().nullish(),
           chartOfAccountId: z.string().nullish(),
           taxId: z.string().nullish(),
           qtyInput: z.number(),
@@ -65,7 +65,7 @@ export const salesRouter = createTRPCRouter({
       transactionDetails: z.array(
         z.object({
           id: z.string().nullish(),
-          multipleUomId: z.string(),
+          multipleUomId: z.string().nullish(),
           chartOfAccountId: z.string().nullish(),
           taxId: z.string().nullish(),
           qtyInput: z.number(),

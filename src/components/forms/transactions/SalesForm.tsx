@@ -11,6 +11,7 @@ import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
 import PointOfSale from "@mui/icons-material/PointOfSale";
 import Save from "@mui/icons-material/Save";
+import DocumentScanner from "@mui/icons-material/DocumentScanner";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -50,6 +51,7 @@ import AutocompletePeople from "../../controls/autocompletes/masters/Autocomplet
 import OpenCashRegisterForm from "../OpenCashRegister";
 import useSessionData from "@/components/hooks/useSessionData";
 import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
 
 interface ISalesForm {
   slug: FormSlugType;
@@ -94,7 +96,10 @@ const SalesForm = (props: ISalesForm) => {
     closeCashRegister: false,
   });
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
-  const [barcode, setBarcode] = useState<string>("");
+  const [barcode, setBarcode] = useState<{ code: string; qty: number }>({
+    code: "",
+    qty: 1,
+  });
   const [enteredBarcode, setEnteredBarcode] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [total, setTotal] = useState<TotalType>({
@@ -157,7 +162,7 @@ const SalesForm = (props: ISalesForm) => {
     if (e.key === "Enter") {
       e.preventDefault();
       // Di sini Anda dapat menambahkan logika pemindaian barcode Anda
-      setEnteredBarcode(barcode);
+      setEnteredBarcode(barcode.code);
     }
   };
 
@@ -248,10 +253,11 @@ const SalesForm = (props: ISalesForm) => {
   useEffect(() => {
     if (dataScanned === null) {
       setOpenNotification("Barcode Not Found");
-      setBarcode("");
+      setBarcode((prev) => ({ ...prev, code: "" }));
       setEnteredBarcode(null);
     }
     if (dataScanned) {
+      const qty = barcode.qty;
       const newRow = {
         itemId: dataScanned.itemId,
         item: {
@@ -270,28 +276,35 @@ const SalesForm = (props: ISalesForm) => {
         },
         chartOfAccountId: "",
         chartOfAccount: null,
-        qtyInput: 1,
+        qtyInput: qty ?? 1,
         conversionQty: dataScanned.conversionQty,
         priceInput: dataScanned.item?.price ?? 0,
         discountInput: 0,
         note: "",
       };
       const getIndex = transactionDetails.findIndex(
-        (detail) => detail.multipleUomId === newRow.multipleUomId,
+        (detail) => detail.multipleUom?.id === newRow.multipleUomId,
       );
       if (getIndex !== -1) {
         console.log({ getIndex });
         setValue(
           `transactionDetails.${getIndex}.qtyInput`,
-          (transactionDetails?.[getIndex]?.qtyInput ?? 1) + 1,
+          (transactionDetails?.[getIndex]?.qtyInput ?? 1) + (qty ?? 1),
         );
       } else {
         append(newRow, { shouldFocus: false });
       }
-      setBarcode("");
+      setBarcode((prev) => ({ ...prev, code: "" }));
       setEnteredBarcode(null);
     }
-  }, [dataScanned, append, setOpenNotification, transactionDetails, setValue]);
+  }, [
+    dataScanned,
+    append,
+    setOpenNotification,
+    transactionDetails,
+    setValue,
+    barcode.qty,
+  ]);
 
   useEffect(() => {
     if (transactionDetails) {
@@ -562,26 +575,49 @@ const SalesForm = (props: ISalesForm) => {
               />
               <DatePicker label="Tanggal" name="entryDate" disabled />
             </Box>
-            <Box
-              component={Paper}
-              variant="outlined"
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <TextField
-                label="Pindai Barcode"
-                value={barcode}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setBarcode(event.target.value);
-                }}
-                onKeyDown={handleBarcodeKeyDown}
-                /* onKeyUp={(event: React.KeyboardEvent) => {
-                  event.preventDefault();
-                  if (event.keyCode === 13) {
-                    return setEnteredBarcode(barcode);
-                  }
-                }} */
-              />
-            </Box>
+            {mode !== "view" && (
+              <Box
+                component={Paper}
+                variant="outlined"
+                className="grid grid-cols-1 gap-4 p-4 md:grid-cols-5"
+              >
+                <TextField
+                  label="Pindai Barcode"
+                  value={barcode.code}
+                  className="col-span-2"
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setBarcode((prev) => ({
+                      ...prev,
+                      code: event.target.value,
+                    }));
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <DocumentScanner />
+                      </InputAdornment>
+                    ),
+                    // disabled: mode === "view",
+                  }}
+                  onKeyDown={handleBarcodeKeyDown}
+                />
+                <TextField
+                  label="Qty"
+                  InputProps={{
+                    inputComponent: NumericFormatCustom as never,
+                    // disabled: mode === "view",
+                  }}
+                  value={barcode.qty}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setBarcode((prev) => ({
+                      ...prev,
+                      qty: parseFloat(event.target.value) ?? 1,
+                    }));
+                  }}
+                  fullWidth
+                />
+              </Box>
+            )}
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
                 <TableContainer
@@ -595,28 +631,35 @@ const SalesForm = (props: ISalesForm) => {
                   >
                     <TableHead>
                       <TableRow>
-                        <TableCell width="3%" align="right">
+                        <TableCell className="w-auto md:w-[3%]" align="right">
                           No
                         </TableCell>
-                        <TableCell width="26%">Produk</TableCell>
-                        <TableCell width="8%" align="right">
+                        <TableCell className="w-auto md:w-[26%]">
+                          Produk
+                        </TableCell>
+                        <TableCell className="w-auto md:w-[8%]" align="right">
                           Qty
                         </TableCell>
-                        <TableCell width="15%" align="right">
+                        <TableCell className="w-auto md:w-[15%]" align="right">
                           Satuan
                         </TableCell>
-                        <TableCell width="15%" align="right">
+                        <TableCell className="w-auto md:w-[15%]" align="right">
                           Harga Satuan
                         </TableCell>
-                        <TableCell width="10%" align="right">
+                        <TableCell className="w-auto md:w-[10%]" align="right">
                           Diskon
                         </TableCell>
-                        <TableCell width="10%" align="right">
+                        <TableCell className="w-auto md:w-[10%]" align="right">
                           Total
                         </TableCell>
-                        <TableCell width="10%">Catatan</TableCell>
+                        <TableCell className="w-auto md:w-[10%]">
+                          Catatan
+                        </TableCell>
                         {mode !== "view" && (
-                          <TableCell width="3%" align="center">
+                          <TableCell
+                            className="w-auto md:w-[3%]"
+                            align="center"
+                          >
                             <Delete />
                           </TableCell>
                         )}
@@ -653,17 +696,6 @@ const SalesForm = (props: ISalesForm) => {
                                 hiddenLabel: true,
                               }}
                             />
-                            {/* <AutocompleteChartOfAccount
-                              name={`transactionDetails.${index}.chartOfAccount`}
-                              required
-                              autocompleteProps={{
-                                size: "small",
-                                disabled: mode === "view",
-                              }}
-                              textFieldProps={{
-                                hiddenLabel: true,
-                              }}
-                            /> */}
                           </TableCell>
                           <TableCell align="right">
                             <TextFieldElement
