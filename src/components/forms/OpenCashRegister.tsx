@@ -10,7 +10,7 @@ import Save from "@mui/icons-material/Save";
 import { api } from "@/utils/api";
 import Link from "next/link";
 // import type { FormSlugType } from "@/types/global";
-import type { IOpenCashRegister } from "@/types/prisma-api/cash-register";
+import type { IOpenCashRegisterMutation } from "@/types/prisma-api/cash-register";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
@@ -21,7 +21,7 @@ import PointOfSale from "@mui/icons-material/PointOfSale";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
-const defaultValues: IOpenCashRegister = {
+const defaultValues: IOpenCashRegisterMutation = {
   transactionNumber: "",
   cashRegisterId: "",
   cashRegister: null,
@@ -38,7 +38,7 @@ const basePath = "/sales/f";
 const OpenCashRegisterForm = (props: IOpenCashRegisterForm) => {
   const { open, setClose } = props;
   const router = useRouter();
-  const formContext = useForm<IOpenCashRegister>({ defaultValues });
+  const formContext = useForm<IOpenCashRegisterMutation>({ defaultValues });
   const [cashRegisterSelected, setCashRegisterSelected] = useState<
     string | null
   >(null);
@@ -73,7 +73,7 @@ const OpenCashRegisterForm = (props: IOpenCashRegisterForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof IOpenCashRegister, {
+          void setError(field as keyof IOpenCashRegisterMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -82,7 +82,7 @@ const OpenCashRegisterForm = (props: IOpenCashRegisterForm) => {
     },
   });
 
-  const onSubmit = (data: IOpenCashRegister) => {
+  const onSubmit = (data: IOpenCashRegisterMutation) => {
     if (!cashRegisterSelected) {
       return setOpenNotification("Pilih Mesin Kasir");
     }

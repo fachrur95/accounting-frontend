@@ -36,14 +36,14 @@ export declare type ICashRegisterMutation = Pick<ICashRegister,
   beginBalanceAccount: IDataOption | IChartOfAccount | null;
 }
 
-export declare type IOpenCashRegister = {
+export declare type IOpenCashRegisterMutation = {
   transactionNumber: string;
   cashRegisterId: string | null;
   cashRegister: IDataOption | ICashRegister | null;
   amount: number;
 }
 
-export declare type ICloseCashRegister = {
+export declare type ICloseCashRegisterMutation = {
   transactionNumber: string;
   amount: number;
 }

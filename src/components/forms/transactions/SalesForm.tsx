@@ -49,6 +49,7 @@ import AutocompleteMultipleUom from "../../controls/autocompletes/masters/Autoco
 import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
 import OpenCashRegisterForm from "../OpenCashRegister";
 import useSessionData from "@/components/hooks/useSessionData";
+import TextField from "@mui/material/TextField";
 
 interface ISalesForm {
   slug: FormSlugType;
@@ -93,6 +94,8 @@ const SalesForm = (props: ISalesForm) => {
     closeCashRegister: false,
   });
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
+  const [barcode, setBarcode] = useState<string>("");
+  const [enteredBarcode, setEnteredBarcode] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [total, setTotal] = useState<TotalType>({
     subTotal: 0,
@@ -141,9 +144,22 @@ const SalesForm = (props: ISalesForm) => {
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
+  const { data: dataScanned } = api.item.scanBarcode.useQuery(
+    { barcode: enteredBarcode ?? "" },
+    { enabled: !!enteredBarcode, refetchOnWindowFocus: false },
+  );
+
   const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
     transactionType: "SALE_INVOICE",
   });
+
+  const handleBarcodeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      // Di sini Anda dapat menambahkan logika pemindaian barcode Anda
+      setEnteredBarcode(barcode);
+    }
+  };
 
   const mutationCreate = api.sales.create.useMutation({
     onSuccess: () => void router.push(basePath),
@@ -228,6 +244,54 @@ const SalesForm = (props: ISalesForm) => {
       setValue("transactionNumber", dataNumber.transactionNumber);
     }
   }, [dataNumber, mode, setValue]);
+
+  useEffect(() => {
+    if (dataScanned === null) {
+      setOpenNotification("Barcode Not Found");
+      setBarcode("");
+      setEnteredBarcode(null);
+    }
+    if (dataScanned) {
+      const newRow = {
+        itemId: dataScanned.itemId,
+        item: {
+          id: dataScanned.itemId,
+          label: dataScanned.item?.name ?? "",
+          price: dataScanned.item?.price ?? 0,
+        },
+        multipleUomId: dataScanned.id,
+        multipleUom: {
+          id: dataScanned.id,
+          label:
+            dataScanned.unitOfMeasure?.code ??
+            dataScanned.unitOfMeasure?.name ??
+            "",
+          conversionQty: dataScanned.conversionQty,
+        },
+        chartOfAccountId: "",
+        chartOfAccount: null,
+        qtyInput: 1,
+        conversionQty: dataScanned.conversionQty,
+        priceInput: dataScanned.item?.price ?? 0,
+        discountInput: 0,
+        note: "",
+      };
+      const getIndex = transactionDetails.findIndex(
+        (detail) => detail.multipleUomId === newRow.multipleUomId,
+      );
+      if (getIndex !== -1) {
+        console.log({ getIndex });
+        setValue(
+          `transactionDetails.${getIndex}.qtyInput`,
+          (transactionDetails?.[getIndex]?.qtyInput ?? 1) + 1,
+        );
+      } else {
+        append(newRow, { shouldFocus: false });
+      }
+      setBarcode("");
+      setEnteredBarcode(null);
+    }
+  }, [dataScanned, append, setOpenNotification, transactionDetails, setValue]);
 
   useEffect(() => {
     if (transactionDetails) {
@@ -497,6 +561,26 @@ const SalesForm = (props: ISalesForm) => {
                 type="customer"
               />
               <DatePicker label="Tanggal" name="entryDate" disabled />
+            </Box>
+            <Box
+              component={Paper}
+              variant="outlined"
+              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+            >
+              <TextField
+                label="Pindai Barcode"
+                value={barcode}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  setBarcode(event.target.value);
+                }}
+                onKeyDown={handleBarcodeKeyDown}
+                /* onKeyUp={(event: React.KeyboardEvent) => {
+                  event.preventDefault();
+                  if (event.keyCode === 13) {
+                    return setEnteredBarcode(barcode);
+                  }
+                }} */
+              />
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">

@@ -7,6 +7,7 @@ import { env } from "@/env.mjs";
 import { z } from "zod";
 import type { ApiCatchError, PaginationResponse } from "@/types/api-response";
 import type { IItem } from "@/types/prisma-api/item";
+import type { IMultipleUom } from "@/types/prisma-api/multiple-uom";
 import { convertFilterToURL, convertSortToURL } from "@/utils/helpers";
 import type { GridFilterModel, GridSortModel } from "@mui/x-data-grid-pro";
 
@@ -96,6 +97,26 @@ export const itemRouter = createTRPCRouter({
   ).query(async ({ ctx, input }) => {
     const result = await axios.get<IItem>(
       `${GLOBAL_URL}/${input.id}`,
+      {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+      }
+    ).then((response) => {
+      return response.data;
+    }).catch((err) => {
+      console.log(err)
+      return null;
+    });
+
+    return result;
+  }),
+  scanBarcode: protectedProcedure.input(
+    z.object({
+      barcode: z.string(),
+    }),
+  ).query(async ({ ctx, input }) => {
+    const result = await axios.get<IMultipleUom>(
+      `${GLOBAL_URL}/scan/${input.barcode}`,
       {
         withCredentials: true,
         headers: { Authorization: `Bearer ${ctx.session.accessToken}` },

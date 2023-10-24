@@ -620,6 +620,9 @@ const MasterItemForm = (props: IMasterItemForm) => {
                             <TextFieldElement
                               name={`multipleUoms.${index}.barcode`}
                               hiddenLabel
+                              InputProps={{
+                                disabled: mode === "view",
+                              }}
                               fullWidth
                               size="small"
                             />

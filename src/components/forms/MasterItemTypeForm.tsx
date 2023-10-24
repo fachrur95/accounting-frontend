@@ -243,11 +243,11 @@ const MasterItemTypeForm = (props: IMasterItemTypeForm) => {
                 label="Pengaturan Stok"
                 switchProps={{ disabled: mode === "view" }}
               />
-              <SwitchElement
+              {/* <SwitchElement
                 name="isTransfer"
                 label="Ditransfer"
                 switchProps={{ disabled: mode === "view" }}
-              />
+              /> */}
             </Box>
             <Box
               component={Paper}

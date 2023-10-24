@@ -248,7 +248,7 @@ export const cashRegisterRouter = createTRPCRouter({
       return response.data;
     }).catch((err) => {
       console.log(err)
-      return 0;
+      return null;
     });
 
     return result;

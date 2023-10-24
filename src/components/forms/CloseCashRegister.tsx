@@ -3,14 +3,14 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
 import Close from "@mui/icons-material/Close";
 import Save from "@mui/icons-material/Save";
 import { api } from "@/utils/api";
 import Link from "next/link";
 // import type { FormSlugType } from "@/types/global";
-import type { ICloseCashRegister } from "@/types/prisma-api/cash-register";
+import type { ICloseCashRegisterMutation } from "@/types/prisma-api/cash-register";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
@@ -19,26 +19,22 @@ import NumericFormatCustom from "../controls/NumericFormatCustom";
 import ModalTransition from "@/components/dialogs/ModalTransition";
 import { formatCurrency } from "@/utils/helpers";
 
-import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft";
-import ToggleButton from "@mui/material/ToggleButton";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-
-const defaultValues: ICloseCashRegister = {
+const defaultValues: ICloseCashRegisterMutation = {
   transactionNumber: "",
   amount: 0,
 };
 
-interface ICloseCashRegister {
+interface ICloseCashRegisterForm {
   open: boolean;
   setClose: () => void;
 }
 
-const basePath = "/sales/f";
+const basePath = "/sales";
 
-const CloseCashRegister = (props: ICloseCashRegister) => {
+const CloseCashRegisterForm = (props: ICloseCashRegisterForm) => {
   const { open, setClose } = props;
   const router = useRouter();
-  const formContext = useForm<ICloseCashRegister>({ defaultValues });
+  const formContext = useForm<ICloseCashRegisterMutation>({ defaultValues });
   const { setOpenNotification } = useNotification();
 
   const {
@@ -56,7 +52,10 @@ const CloseCashRegister = (props: ICloseCashRegister) => {
   console.log({ dataLastBalance });
 
   const mutation = api.cashRegister.close.useMutation({
-    onSuccess: () => void router.push(basePath),
+    onSuccess: () => {
+      setClose();
+      void router.push(basePath);
+    },
     onError: (error) => {
       if (error.message) {
         setOpenNotification(error.message, { variant: "error" });
@@ -64,7 +63,7 @@ const CloseCashRegister = (props: ICloseCashRegister) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof ICloseCashRegister, {
+          void setError(field as keyof ICloseCashRegisterMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -73,7 +72,7 @@ const CloseCashRegister = (props: ICloseCashRegister) => {
     },
   });
 
-  const onSubmit = (data: ICloseCashRegister) => {
+  const onSubmit = (data: ICloseCashRegisterMutation) => {
     return void mutation.mutate(data);
   };
 
@@ -140,7 +139,7 @@ const CloseCashRegister = (props: ICloseCashRegister) => {
               >
                 <Typography variant="body2" align="right">
                   Saldo Akhir Seharusnya:{" "}
-                  {formatCurrency(dataLastBalance.balance ?? 0)}
+                  {formatCurrency(dataLastBalance?.balance ?? 0)}
                 </Typography>
                 <TextFieldElement
                   name="amount"
@@ -162,4 +161,4 @@ const CloseCashRegister = (props: ICloseCashRegister) => {
   );
 };
 
-export default CloseCashRegister;
+export default CloseCashRegisterForm;
