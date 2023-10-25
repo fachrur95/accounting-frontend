@@ -157,13 +157,10 @@ export const itemRouter = createTRPCRouter({
       const result = await axios.post<IItem>(
         `${GLOBAL_URL}`,
         input,
-        // { ...data, files: dataFiles },
-        // formData,
         {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${ctx.session.accessToken}`,
-            // 'Content-Type': 'multipart/form-data; boundary=' + formData._boundary
           },
         }
       ).then((response) => {

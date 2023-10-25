@@ -6,18 +6,18 @@ import { useInView } from "react-intersection-observer";
 import Box from "@mui/material/Box";
 import Done from "@mui/icons-material/Done";
 import debounce from "lodash.debounce";
-import type { IMultipleUom } from "@/types/prisma-api/multiple-uom";
+import type { IUnit } from "@/types/prisma-api/unit";
 
-const useInfiniteMultipleUom = ({ itemId }: { itemId: string }) => {
+const useInfiniteUnit = () => {
   const { ref, inView } = useInView();
   const [search, setSearch] = useState<string>("");
   const [options, setOptions] = useState<IDataOption[]>([]);
   const [countAll, setCountAll] = useState<number>(0);
   const { data, hasNextPage, fetchNextPage, isFetching } =
-    api.multipleUom.findAll.useInfiniteQuery(
-      { limit: 25, search, itemId },
+    api.unitCredentials.getAll.useInfiniteQuery(
+      { limit: 25, search },
       {
-        getNextPageParam: (lastPage: PaginationResponse<IMultipleUom>) =>
+        getNextPageParam: (lastPage: PaginationResponse<IUnit>) =>
           typeof lastPage.currentPage === "number" && options.length < countAll
             ? (lastPage.currentPage ?? 0) + 1
             : undefined,
@@ -41,7 +41,7 @@ const useInfiniteMultipleUom = ({ itemId }: { itemId: string }) => {
   ) => {
     return (
       <li {...props}>
-        <div className="flex w-full items-center justify-between">
+        <div className="items-center flex w-full justify-between">
           {option.label}
           <Box
             component={Done}
@@ -62,13 +62,10 @@ const useInfiniteMultipleUom = ({ itemId }: { itemId: string }) => {
     if (data) {
       const dataOptions: IDataOption[] = data?.pages
         .map((page) =>
-          page.rows.map((row: IMultipleUom) => {
-            return {
-              id: row.id,
-              label: row.unitOfMeasure?.code ?? row.unitOfMeasure?.name ?? "-",
-              conversionQty: row.conversionQty ?? 0,
-            };
-          }),
+          page.rows.map((row: IUnit) => ({
+            id: row.id,
+            label: row.name ?? "-",
+          })),
         )
         .flat();
       const dataCountAll: number = data.pages[0]?.countAll ?? 0;
@@ -86,4 +83,4 @@ const useInfiniteMultipleUom = ({ itemId }: { itemId: string }) => {
   return { options, isFetching, renderOption, onSearch };
 };
 
-export default useInfiniteMultipleUom;
+export default useInfiniteUnit;

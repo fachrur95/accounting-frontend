@@ -41,7 +41,7 @@ const useInfiniteUnitOfMeasure = () => {
   ) => {
     return (
       <li {...props}>
-        <div className="unitofmeasures-center flex w-full justify-between">
+        <div className="flex w-full items-center justify-between">
           {option.label}
           <Box
             component={Done}

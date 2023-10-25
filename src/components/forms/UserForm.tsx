@@ -4,25 +4,46 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
-import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
+import {
+  FormContainer,
+  TextFieldElement,
+  RadioButtonGroup,
+  PasswordElement,
+  PasswordRepeatElement,
+  useFieldArray,
+  useForm,
+  useWatch,
+} from "react-hook-form-mui";
+import Add from "@mui/icons-material/Add";
 import Close from "@mui/icons-material/Close";
+import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
 import { api } from "@/utils/api";
 import Link from "next/link";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableFooter from "@mui/material/TableFooter";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import type { FormSlugType } from "@/types/global";
 import type { IUserMutation } from "@/types/prisma-api/user";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
+import AutocompleteUnit from "../controls/autocompletes/masters/AutocompleteUnit";
 
 const defaultValues: IUserMutation = {
   email: "",
   name: "",
+  password: "",
   role: "USER",
+  userUnits: [],
 };
 
 interface IUserForm {
@@ -41,11 +62,19 @@ const UserForm = (props: IUserForm) => {
   const { setOpenNotification } = useNotification();
 
   const {
+    control,
     setValue,
     formState: { isSubmitting },
     handleSubmit,
     setError,
   } = formContext;
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "userUnits",
+  });
+
+  const role = useWatch({ control, name: "role" });
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.user.findOne.useQuery(
@@ -92,9 +121,21 @@ const UserForm = (props: IUserForm) => {
   const onSubmit = (data: IUserMutation) => {
     const dataSave: IUserMutation = {
       ...data,
+      userUnits:
+        data.role !== "SUPERADMIN"
+          ? data.userUnits.map((unit) => ({
+              ...unit,
+              unitId: unit.unit?.id ?? "",
+            }))
+          : undefined,
     };
     if (selectedId) {
-      return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
+      return void mutationUpdate.mutate({
+        ...dataSave,
+        password:
+          data.password === "" || !data.password ? undefined : data.password,
+        id: selectedId,
+      });
     }
     return void mutationCreate.mutate(dataSave);
   };
@@ -119,6 +160,26 @@ const UserForm = (props: IUserForm) => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
+          if (key === "userUnits") {
+            const userUnits = dataSelected[key]!;
+
+            if (userUnits.length > 0) {
+              const dataUnit = userUnits.map((unit) => {
+                const selectedUnit = {
+                  id: unit.unit?.id ?? "",
+                  label: unit.unit?.name ?? "",
+                };
+                return {
+                  id: unit.id,
+                  unitId: selectedUnit.id,
+                  unit: selectedUnit,
+                };
+              });
+              setValue("userUnits", dataUnit);
+            }
+
+            continue;
+          }
           if (key === "email" || key === "name" || key === "role") {
             setValue(key, dataSelected[key]);
           }
@@ -186,7 +247,7 @@ const UserForm = (props: IUserForm) => {
             <Box
               component={Paper}
               variant="outlined"
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+              className="grid grid-cols-1 gap-4 p-4"
             >
               <TextFieldElement
                 name="email"
@@ -204,7 +265,127 @@ const UserForm = (props: IUserForm) => {
                   disabled: mode === "view",
                 }}
               />
+              <PasswordElement
+                label="Kata Sandi"
+                required
+                name="password"
+                disabled={mode === "view"}
+              />
+              <PasswordRepeatElement
+                passwordFieldName="password"
+                name="password-repeat"
+                label="Konfirmasi Kata Sandi"
+                required
+                disabled={mode === "view"}
+              />
+              <RadioButtonGroup
+                label="Peran"
+                name="role"
+                required
+                options={[
+                  {
+                    id: "USER",
+                    label: "KASIR",
+                  },
+                  {
+                    id: "ADMIN",
+                    label: "ADMIN UNIT",
+                  },
+                  {
+                    id: "AUDITOR",
+                    label: "AUDITOR/ LEMBAGA",
+                  },
+                  {
+                    id: "SUPERADMIN",
+                    label: "SUPER ADMIN",
+                  },
+                ]}
+                disabled={mode === "view"}
+              />
             </Box>
+            {role !== "SUPERADMIN" && (
+              <div className="overflow-auto">
+                <Box component={Paper} className="table w-full table-fixed">
+                  <TableContainer
+                    component={Paper}
+                    elevation={0}
+                    variant="outlined"
+                  >
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell width="5%" align="right">
+                            No
+                          </TableCell>
+                          <TableCell width="90%">Unit</TableCell>
+                          <TableCell width="5%" align="center">
+                            <Delete />
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {fields.map((row, index) => (
+                          <TableRow
+                            key={row.id}
+                            sx={{
+                              "&:last-child td, &:last-child th": { border: 0 },
+                            }}
+                          >
+                            <TableCell component="th" scope="row" align="right">
+                              {index + 1}
+                            </TableCell>
+                            <TableCell align="right">
+                              <AutocompleteUnit
+                                name={`userUnits.${index}.unit`}
+                                required
+                                autocompleteProps={{
+                                  size: "small",
+                                  disabled: mode === "view",
+                                }}
+                                textFieldProps={{
+                                  hiddenLabel: true,
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell align="center">
+                              <IconButton
+                                onClick={() => void remove(index)}
+                                color="error"
+                                size="small"
+                                disabled={mode === "view"}
+                              >
+                                <Close />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                      {mode !== "view" && (
+                        <TableFooter>
+                          <TableRow>
+                            <TableCell colSpan={6}>
+                              <Button
+                                startIcon={<Add />}
+                                onClick={() =>
+                                  void append({
+                                    unitId: "",
+                                    unit: null,
+                                  })
+                                }
+                                size="large"
+                                fullWidth
+                              >
+                                Tambah Akses Unit
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        </TableFooter>
+                      )}
+                    </Table>
+                  </TableContainer>
+                </Box>
+              </div>
+            )}
             <Button type="submit" disabled={isSubmitting} className="hidden">
               Simpan
             </Button>

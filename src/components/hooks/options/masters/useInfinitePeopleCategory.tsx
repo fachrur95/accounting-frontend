@@ -45,7 +45,7 @@ const useInfinitePeopleCategory = ({
   ) => {
     return (
       <li {...props}>
-        <div className="peoplecategorys-center flex w-full justify-between">
+        <div className="flex w-full items-center justify-between">
           {option.label}
           <Box
             component={Done}

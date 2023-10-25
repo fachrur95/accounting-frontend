@@ -9,7 +9,7 @@ import FormatListNumberedOutlined from "@mui/icons-material/FormatListNumberedOu
 import GroupAddOutlined from "@mui/icons-material/GroupAddOutlined";
 import Groups from "@mui/icons-material/Groups";
 import Hiking from "@mui/icons-material/Hiking";
-import ImportExportOutlined from "@mui/icons-material/ImportExportOutlined";
+// import ImportExportOutlined from "@mui/icons-material/ImportExportOutlined";
 import InsertChartOutlined from "@mui/icons-material/InsertChartOutlined";
 import LocalAtmOutlined from "@mui/icons-material/LocalAtmOutlined";
 import LocalOfferOutlined from "@mui/icons-material/LocalOfferOutlined";
@@ -189,14 +189,14 @@ const data: DataMenuType[] = [
         icon: <CallReceivedOutlined fontSize="small" />,
         children: [],
       },
-      {
+      /* {
         id: "transfer-fund",
         label: "transfer dana",
         depth: 1,
         url: "/cash-and-bank/transfer-funds",
         icon: <ImportExportOutlined fontSize="small" />,
         children: [],
-      },
+      }, */
     ],
   },
   /* {

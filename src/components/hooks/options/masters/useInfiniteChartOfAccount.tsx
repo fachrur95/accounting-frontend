@@ -41,7 +41,7 @@ const useInfiniteChartOfAccount = () => {
   ) => {
     return (
       <li {...props}>
-        <div className="chartofaccounts-center flex w-full justify-between">
+        <div className="flex w-full items-center justify-between">
           {option.label}
           <Box
             component={Done}

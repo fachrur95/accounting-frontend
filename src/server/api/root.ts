@@ -24,6 +24,7 @@ import { liabilityRouter } from "./routers/transactions/liability";
 import { journalEntryRouter } from "./routers/transactions/journal-entry";
 import { salesRouter } from "./routers/transactions/sales";
 import { purchaseRouter } from "./routers/transactions/purchase";
+import { generalSettingRouter } from "./routers/general-setting";
 import { logActivityRouter } from "./routers/log-activity";
 
 /**
@@ -57,6 +58,7 @@ export const appRouter = createTRPCRouter({
   journalEntry: journalEntryRouter,
   sales: salesRouter,
   purchase: purchaseRouter,
+  generalSetting: generalSettingRouter,
   logActivity: logActivityRouter,
 });
 

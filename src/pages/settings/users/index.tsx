@@ -289,15 +289,7 @@ const UsersPage: MyPage = () => {
                 `${pathname}/v/${params.row.id}`,
               )
             }
-            /* onRowDoubleClick={(params: GridCellParams<unknown, IItem, unknown>) =>
-              router.push(
-                {
-                  pathname,
-                  query: { slug: ["f", params.row.id] },
-                },
-                `${pathname}/f/${params.row.id}`,
-              )
-            } */
+            isRowSelectable={(params) => params.row.role !== "SUPERADMIN"}
             checkboxSelection
             disableSelectionOnClick
           />
@@ -305,7 +297,7 @@ const UsersPage: MyPage = () => {
             <ModalTransition
               open
               handleClose={router.back}
-              maxWidth="lg"
+              maxWidth="sm"
               fullWidth
               scroll="paper"
             >

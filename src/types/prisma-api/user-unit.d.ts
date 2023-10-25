@@ -4,9 +4,7 @@ import type { IUser } from "./user";
 export declare interface IUserUnit {
   id: string;
   createdAt: Date;
-  createdBy: string;
   updatedAt: Date;
-  updatedBy: string | null;
   userId: string;
   unitId: string;
   user?: IUser;

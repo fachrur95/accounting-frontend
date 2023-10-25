@@ -1,9 +1,9 @@
 import { api } from "@/utils/api";
 
 const useSessionData = () => {
-  const { data: dataSession } = api.session.me.useQuery();
+  const { data: dataSession, isFetching } = api.session.me.useQuery();
 
-  return { data: dataSession };
+  return { data: dataSession, isFetching };
 };
 
 export default useSessionData;

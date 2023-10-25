@@ -305,15 +305,6 @@ const EmployeesPage: MyPage = () => {
                 `${pathname}/v/${params.row.id}`,
               )
             }
-            /* onRowDoubleClick={(params: GridCellParams<unknown, IItem, unknown>) =>
-              router.push(
-                {
-                  pathname,
-                  query: { slug: ["f", params.row.id] },
-                },
-                `${pathname}/f/${params.row.id}`,
-              )
-            } */
             checkboxSelection
             disableSelectionOnClick
           />

@@ -101,26 +101,22 @@ export const userRouter = createTRPCRouter({
       email: z.string(),
       name: z.string().nullish(),
       role: z.enum(["USER", "ADMIN", "AUDITOR", "SUPERADMIN"]).default("USER"),
-      /* multipleUoms: z.array(
+      password: z.string(),
+      userUnits: z.array(
         z.object({
-          unitOfMeasureId: z.string(),
-          conversionQty: z.number(),
-          barcode: z.string().nullish(),
+          unitId: z.string(),
         })
-      ).min(1), */
+      ).nullish(),
     }),
   ).mutation(async ({ ctx, input }) => {
     try {
       const result = await axios.post<IUser>(
         `${GLOBAL_URL}`,
         input,
-        // { ...data, files: dataFiles },
-        // formData,
         {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${ctx.session.accessToken}`,
-            // 'Content-Type': 'multipart/form-data; boundary=' + formData._boundary
           },
         }
       ).then((response) => {
@@ -138,13 +134,12 @@ export const userRouter = createTRPCRouter({
       email: z.string(),
       name: z.string().nullish(),
       role: z.enum(["USER", "ADMIN", "AUDITOR", "SUPERADMIN"]).default("USER"),
-      /* multipleUoms: z.array(
+      password: z.string().nullish(),
+      userUnits: z.array(
         z.object({
-          unitOfMeasureId: z.string(),
-          conversionQty: z.number(),
-          barcode: z.string().nullish(),
+          unitId: z.string(),
         })
-      ).min(1), */
+      ).nullish(),
     }),
   ).mutation(async ({ ctx, input }) => {
     const { id, ...data } = input;
