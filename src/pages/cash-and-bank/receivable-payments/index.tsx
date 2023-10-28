@@ -79,7 +79,7 @@ const ReceivablePaymentsPage: MyPage = () => {
       search,
       filter: filterModel,
       sort: sortModel,
-      transactionType: "RECEIVEABLE_PAYMENT",
+      transactionType: "RECEIVABLE_PAYMENT",
     },
     {
       getNextPageParam: (lastPage: PaginationResponse<ITransaction>) =>
