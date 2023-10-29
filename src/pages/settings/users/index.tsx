@@ -35,12 +35,15 @@ import { useEffect, useState } from "react";
 import CustomMenu from "@/components/displays/StyledMenu";
 import { useRouter } from "next/router";
 import ModalTransition from "@/components/dialogs/ModalTransition";
-import UserForm from "@/components/forms/UserForm";
+// import UserForm from "@/components/forms/UserForm";
 import type { FormSlugType } from "@/types/global";
 import type { IJwtDecode } from "@/types/session";
 import type { IUser } from "@/types/prisma-api/user";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
+import dynamic from "next/dynamic";
+
+const UserForm = dynamic(() => import("@/components/forms/UserForm"));
 
 const sortDefault: GridSortModel = [{ field: "name", sort: "asc" }];
 

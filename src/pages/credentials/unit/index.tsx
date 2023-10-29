@@ -33,7 +33,10 @@ import Edit from "@mui/icons-material/Edit";
 import IconButton from "@mui/material/IconButton";
 import Link from "next/link";
 import Add from "@mui/icons-material/Add";
-import UnitForm from "@/components/forms/UnitForm";
+// import UnitForm from "@/components/forms/UnitForm";
+import dynamic from "next/dynamic";
+
+const UnitForm = dynamic(() => import("@/components/forms/UnitForm"));
 
 const pathname = "/credentials/unit";
 

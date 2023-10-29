@@ -21,6 +21,7 @@ import { multipleUomRouter } from "./routers/masters/multiple-uom";
 import { warehouseRouter } from "./routers/masters/warehouse";
 import { globalTransactionRouter } from "./routers/transactions/global";
 import { liabilityRouter } from "./routers/transactions/liability";
+import { paymentRouter } from "./routers/transactions/payment";
 import { journalEntryRouter } from "./routers/transactions/journal-entry";
 import { salesRouter } from "./routers/transactions/sales";
 import { purchaseRouter } from "./routers/transactions/purchase";
@@ -55,6 +56,7 @@ export const appRouter = createTRPCRouter({
   warehouse: warehouseRouter,
   globalTransaction: globalTransactionRouter,
   liability: liabilityRouter,
+  payment: paymentRouter,
   journalEntry: journalEntryRouter,
   sales: salesRouter,
   purchase: purchaseRouter,

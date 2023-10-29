@@ -76,8 +76,12 @@ export declare interface ISalesPurchaseDetailMutation {
 
 declare interface IPaymentDetailMutation {
   id?: string;
-  chartOfAccountId?: string | null;
-  chartOfAccount?: IDataOption | IChartOfAccount | null;
+  transactionPaymentId: string;
+  transactionPaymentNumber: string;
+  entryDate: Date,
+  dueDate?: Date,
+  underPayment: number;
+  remainingPayment: number;
   priceInput: number;
   note?: string | null;
 }
@@ -138,7 +142,7 @@ export declare interface IPaymentMutation {
   chartOfAccount?: IDataOption | IChartOfAccount | null;
   peopleId: string;
   people: IDataOption | IPeople | null;
-  entryDate?: Date;
+  entryDate: Date;
   note?: string;
   transactionDetails: IPaymentDetailMutation[];
 }
@@ -149,7 +153,7 @@ export declare interface ILiabilityMutation {
   chartOfAccount?: IDataOption | IChartOfAccount | null;
   peopleId?: string | null;
   people: IDataOption | IPeople | null;
-  entryDate?: Date;
+  entryDate: Date;
   note?: string;
   transactionDetails: ILiabilityDetailMutation[];
 }
@@ -158,14 +162,24 @@ export declare interface ITransferFundMutation {
   transactionNumber: string;
   chartOfAccountId?: string | null;
   chartOfAccount?: IDataOption | IChartOfAccount | null;
-  entryDate?: Date;
+  entryDate: Date;
   note?: string;
   transactionDetails: IPaymentDetailMutation[];
 }
 
 export declare interface IJournalEntryMutation {
   transactionNumber: string;
-  entryDate?: Date;
+  entryDate: Date;
   note?: string;
   transactionDetails: IJournalEntryDetailMutation[];
+}
+
+export declare interface IPaymentDraft {
+  id: string;
+  transactionType: TransactionType;
+  transactionNumber: string;
+  entryDate: Date;
+  dueDate: Date;
+  underPayment: number;
+  remainingPayment: number;
 }

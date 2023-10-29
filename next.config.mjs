@@ -11,7 +11,17 @@ const config = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ["lh3.googleusercontent.com", "res.cloudinary.com"],
+    // domains: ["lh3.googleusercontent.com", "res.cloudinary.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+    ],
   },
   /**
    * If you are using `appDir` then you must comment the below `i18n` config out.
@@ -25,16 +35,20 @@ const config = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  modularizeImports: {
-    '@mui/icons-material': {
-      transform: '@mui/icons-material/{{member}}',
+  /* eslint: {
+    ignoreDuringBuilds: true,
+  }, */
+  /* modularizeImports: {
+    "@mui/icons-material": {
+      transform: "@mui/icons-material/{{member}}",
     },
     // TODO: Consider enabling modularizeImports for material when https://github.com/mui/material-ui/issues/36218 is resolved
     // '@mui/material': {
     //   transform: '@mui/material/{{member}}',
     // },
-  },
+  }, */
   experimental: {
+    webpackBuildWorker: true,
     esmExternals: false,
   },
 };

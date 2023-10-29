@@ -1,7 +1,7 @@
 import SearchInput from "@/components/controls/SearchInput";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import ModalTransition from "@/components/dialogs/ModalTransition";
-import InstituteForm from "@/components/forms/InstituteForm";
+// import InstituteForm from "@/components/forms/InstituteForm";
 import useNotification from "@/components/hooks/useNotification";
 import type { MyPage } from "@/components/layouts/layoutTypes";
 import { getServerAuthSession } from "@/server/auth";
@@ -32,6 +32,9 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useInView } from "react-intersection-observer";
+import dynamic from "next/dynamic";
+
+const InstituteForm = dynamic(() => import("@/components/forms/InstituteForm"));
 
 const pathname = "/credentials/institute";
 

@@ -3,7 +3,6 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import DatePicker from "@/components/controls/DatePicker";
-import TableFooter from "@mui/material/TableFooter";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import {
@@ -12,9 +11,10 @@ import {
   TextareaAutosizeElement,
   useFieldArray,
   useForm,
+  useWatch,
 } from "react-hook-form-mui";
 import Close from "@mui/icons-material/Close";
-import Add from "@mui/icons-material/Add";
+import { dateID, formatNumber } from "@/utils/helpers";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
@@ -31,25 +31,24 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import type { FormSlugType } from "@/types/global";
-import type { ILiabilityMutation } from "@/types/prisma-api/transaction";
-import type { IPeople } from "@/types/prisma-api/people";
+import type { IPaymentMutation } from "@/types/prisma-api/transaction";
 import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
 
-interface ILiabilityForm {
+interface IPaymentForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
-  type: "revenue" | "expense";
+  type: "debt" | "receivable";
 }
 
-const LiabilityForm = (props: ILiabilityForm) => {
+const PaymentForm = (props: IPaymentForm) => {
   const { slug, showIn, type } = props;
   const router = useRouter();
 
-  const defaultValues: ILiabilityMutation = {
+  const defaultValues: IPaymentMutation = {
     transactionNumber: "",
     chartOfAccountId: null,
     chartOfAccount: null,
@@ -61,10 +60,12 @@ const LiabilityForm = (props: ILiabilityForm) => {
   };
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const formContext = useForm<ILiabilityMutation>({ defaultValues });
+  const formContext = useForm<IPaymentMutation>({ defaultValues });
   const { setOpenNotification } = useNotification();
 
-  const basePath = `/cash-and-bank/${type}s`;
+  const basePath = `/cash-and-bank/${
+    type === "debt" ? "payable" : type
+  }-payments`;
 
   const {
     control,
@@ -74,12 +75,13 @@ const LiabilityForm = (props: ILiabilityForm) => {
     setError,
   } = formContext;
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, remove } = useFieldArray({
     control,
     name: "transactionDetails",
   });
 
-  // const test = useWatch(control, "transactionDetails[0].chartOfAccount.name");
+  const peopleSelected = useWatch({ control, name: "people" });
+  const transactionDetails = useWatch({ control, name: "transactionDetails" });
 
   /* console.log({
     test,
@@ -98,13 +100,21 @@ const LiabilityForm = (props: ILiabilityForm) => {
       { enabled: !!selectedId, refetchOnWindowFocus: false },
     );
 
+  const { data: dataDraft } = api.payment.draft.useQuery(
+    { peopleId: peopleSelected?.id ?? "xx", type },
+    {
+      enabled: !!peopleSelected && mode === "create",
+      refetchOnWindowFocus: false,
+    },
+  );
+
   const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
-    transactionType: type === "revenue" ? "REVENUE" : "EXPENSE",
+    transactionType: type === "debt" ? "DEBT_PAYMENT" : "RECEIVABLE_PAYMENT",
   });
 
   // console.log({ dataNumber });
 
-  const mutationCreate = api.liability.create.useMutation({
+  const mutationCreate = api.payment.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       if (error.message) {
@@ -113,7 +123,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof ILiabilityMutation, {
+          void setError(field as keyof IPaymentMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -122,7 +132,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
     },
   });
 
-  const mutationUpdate = api.liability.update.useMutation({
+  const mutationUpdate = api.payment.update.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
       if (error.message) {
@@ -131,7 +141,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
       const errors = error.data?.zodError?.fieldErrors;
       if (errors) {
         for (const field in errors) {
-          void setError(field as keyof ILiabilityMutation, {
+          void setError(field as keyof IPaymentMutation, {
             type: "custom",
             message: errors[field]?.join(", "),
           });
@@ -140,27 +150,25 @@ const LiabilityForm = (props: ILiabilityForm) => {
     },
   });
 
-  const onSubmit = (data: ILiabilityMutation) => {
-    const dataSave: ILiabilityMutation = {
+  const onSubmit = (data: IPaymentMutation) => {
+    const dataSave = {
       ...data,
       entryDate: new Date(data.entryDate),
       note: data.note === "" || data.note === null ? undefined : data.note,
       chartOfAccountId: data.chartOfAccount?.id ?? "",
-      peopleId: data.people?.id ?? undefined,
+      peopleId: data.people?.id ?? "",
       transactionDetails: data.transactionDetails.map((detail) => ({
         ...detail,
-        chartOfAccountId: detail.chartOfAccount?.id ?? "",
-        taxId: detail.tax?.id ?? undefined,
+        transactionPaymentId: detail.transactionPaymentId ?? "",
         note:
           detail.note === "" || detail.note === null ? undefined : detail.note,
       })),
-      type,
     };
     console.log({ dataSave });
     if (selectedId) {
-      return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
+      return void mutationUpdate.mutate({ ...dataSave, type, id: selectedId });
     }
-    return void mutationCreate.mutate(dataSave);
+    return void mutationCreate.mutate({ ...dataSave, type });
   };
 
   useEffect(() => {
@@ -186,6 +194,22 @@ const LiabilityForm = (props: ILiabilityForm) => {
   }, [dataNumber, mode, setValue]);
 
   useEffect(() => {
+    if (dataDraft && mode === "create") {
+      const drafts = dataDraft.map((draft) => ({
+        transactionPaymentId: draft.id,
+        transactionPaymentNumber: draft.transactionNumber,
+        entryDate: draft.entryDate,
+        dueDate: draft.dueDate,
+        underPayment: draft.underPayment,
+        remainingPayment: draft.remainingPayment,
+        priceInput: 0,
+        note: "",
+      }));
+      setValue("transactionDetails", drafts);
+    }
+  }, [dataDraft, mode, setValue]);
+
+  useEffect(() => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
@@ -206,7 +230,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
             continue;
           }
           if (key === "people") {
-            const selectedPeople = dataSelected[key] as IPeople | null;
+            const selectedPeople = dataSelected[key]!;
             if (selectedPeople) {
               setValue("people", {
                 id: selectedPeople.id,
@@ -220,23 +244,26 @@ const LiabilityForm = (props: ILiabilityForm) => {
 
             if (transactionDetail.length > 0) {
               const dataDetail = transactionDetail.map((row) => {
-                const selectedAccount = {
-                  id: row.chartOfAccount?.id ?? "",
-                  label: row.chartOfAccount?.name ?? "",
-                };
-                let selectedTax = null;
-                if (row.tax) {
-                  selectedTax = {
-                    id: row.tax.id ?? "",
-                    label: row.tax.name ?? "",
-                  };
-                }
                 return {
                   id: row.id,
-                  chartOfAccount: selectedAccount,
-                  tax: selectedTax,
+                  transactionPaymentId: row.transactionPaymentId,
+                  transactionPaymentNumber:
+                    row.transactionPayment?.transactionNumber,
+                  entryDate: new Date(
+                    row.transactionPayment?.entryDate ?? new Date(),
+                  ),
+                  dueDate: new Date(
+                    row.transactionPayment?.dueDate ?? new Date(),
+                  ),
+                  underPayment: row.transactionPayment?.underPayment ?? 0,
+                  remainingPayment:
+                    (row.transactionPayment?.underPayment ?? 0) -
+                    (row.transactionPayment?.transactionDetailPayments?.reduce(
+                      (sum, opt) => sum + opt.priceInput,
+                      0,
+                    ) ?? 0) +
+                    (row.priceInput ?? 0),
                   priceInput: row.priceInput,
-                  discountInput: row.discountInput,
                   note: row.note,
                 };
               });
@@ -286,7 +313,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
               </IconButton>
             </Link>
             <Typography variant="h6">
-              {type === "revenue" ? "Pendapatan" : "Pengeluaran"}
+              {type === "debt" ? "Pembayaran Hutang" : "Penerimaan Piutang"}
             </Typography>
           </div>
           <div>
@@ -334,13 +361,14 @@ const LiabilityForm = (props: ILiabilityForm) => {
                   disabled: mode === "view",
                 }}
               />
-              <AutocompleteChartOfAccount
-                name="chartOfAccount"
-                label="Akun"
+              <AutocompletePeople
+                name="people"
+                label={`${type === "debt" ? "Pemasok" : "Pelanggan"}`}
                 required
                 autocompleteProps={{
                   disabled: mode === "view",
                 }}
+                type={type === "debt" ? "supplier" : "customer"}
               />
               <DatePicker
                 label="Tanggal"
@@ -348,15 +376,13 @@ const LiabilityForm = (props: ILiabilityForm) => {
                 required
                 disabled={mode === "view"}
               />
-              <AutocompletePeople
-                name="people"
-                label={`${
-                  type === "revenue" ? "Pelanggan" : "Pemasok"
-                } (opsional)`}
+              <AutocompleteChartOfAccount
+                name="chartOfAccount"
+                label="Akun"
+                required
                 autocompleteProps={{
                   disabled: mode === "view",
                 }}
-                type={type === "revenue" ? "customer" : "supplier"}
               />
             </Box>
             <div className="overflow-auto">
@@ -372,11 +398,16 @@ const LiabilityForm = (props: ILiabilityForm) => {
                         <TableCell width="5%" align="right">
                           No
                         </TableCell>
-                        <TableCell width="50%">Sumber Akun</TableCell>
-                        <TableCell width="25%" align="right">
-                          Nilai
+                        <TableCell width="25%">No. Transaksi/ Bukti</TableCell>
+                        <TableCell width="20%">Tanggal</TableCell>
+                        <TableCell width="10%" align="right">
+                          {`Nilai ${type === "debt" ? "Hutang" : "Piutang"}`}
                         </TableCell>
-                        <TableCell width="15%">Catatan</TableCell>
+                        <TableCell width="10%" align="right">
+                          {`Sisa ${type === "debt" ? "Hutang" : "Piutang"}`}
+                        </TableCell>
+                        <TableCell width="15%">Bayar</TableCell>
+                        <TableCell width="10%">Catatan</TableCell>
                         {mode !== "view" && (
                           <TableCell width="5%" align="center">
                             <Delete />
@@ -395,26 +426,17 @@ const LiabilityForm = (props: ILiabilityForm) => {
                           <TableCell component="th" scope="row" align="right">
                             {index + 1}
                           </TableCell>
+                          <TableCell>
+                            {row.transactionPaymentNumber ?? "-"}
+                          </TableCell>
+                          <TableCell>
+                            {dateID(new Date(row.entryDate))}
+                          </TableCell>
                           <TableCell align="right">
-                            <AutocompleteChartOfAccount
-                              name={`transactionDetails.${index}.chartOfAccount`}
-                              required
-                              autocompleteProps={{
-                                size: "small",
-                                disabled: mode === "view",
-                                /* onChange: (_, data) => {
-                                  if (index === 0) {
-                                    setDefaultUnit(
-                                      (data as IDataOption | null)?.label ??
-                                        null,
-                                    );
-                                  }
-                                }, */
-                              }}
-                              textFieldProps={{
-                                hiddenLabel: true,
-                              }}
-                            />
+                            {formatNumber(row.underPayment ?? 0)}
+                          </TableCell>
+                          <TableCell align="right">
+                            {formatNumber(row.remainingPayment ?? 0)}
                           </TableCell>
                           <TableCell align="right">
                             <TextFieldElement
@@ -423,6 +445,17 @@ const LiabilityForm = (props: ILiabilityForm) => {
                               InputProps={{
                                 inputComponent: NumericFormatCustom as never,
                                 disabled: mode === "view",
+                                inputProps: {
+                                  isAllowed: (values: {
+                                    floatValue: number;
+                                  }) => {
+                                    const { floatValue } = values;
+                                    return (
+                                      (floatValue ?? 0) <=
+                                      (row.remainingPayment ?? 0)
+                                    );
+                                  },
+                                },
                               }}
                               fullWidth
                               size="small"
@@ -431,10 +464,10 @@ const LiabilityForm = (props: ILiabilityForm) => {
                           <TableCell>
                             <TextFieldElement
                               name={`transactionDetails.${index}.note`}
+                              hiddenLabel
                               InputProps={{
                                 disabled: mode === "view",
                               }}
-                              hiddenLabel
                               fullWidth
                               size="small"
                             />
@@ -453,29 +486,6 @@ const LiabilityForm = (props: ILiabilityForm) => {
                         </TableRow>
                       ))}
                     </TableBody>
-                    {mode !== "view" && (
-                      <TableFooter>
-                        <TableRow>
-                          <TableCell colSpan={6}>
-                            <Button
-                              startIcon={<Add />}
-                              onClick={() =>
-                                void append({
-                                  chartOfAccountId: "",
-                                  chartOfAccount: null,
-                                  priceInput: 0,
-                                  note: "",
-                                })
-                              }
-                              size="large"
-                              fullWidth
-                            >
-                              Tambah
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      </TableFooter>
-                    )}
                   </Table>
                 </TableContainer>
               </Box>
@@ -492,6 +502,19 @@ const LiabilityForm = (props: ILiabilityForm) => {
                 className="col-start-1"
                 disabled={mode === "view"}
               />
+              <Box className="grid w-full gap-2 md:col-start-3">
+                <Box className="grid-child grid grid-cols-2 items-end justify-center">
+                  <Typography variant="body1">Total</Typography>
+                  <Typography variant="body1" align="right">
+                    {formatNumber(
+                      transactionDetails?.reduce(
+                        (sum, detail) => sum + detail.priceInput,
+                        0,
+                      ),
+                    ) ?? 0}
+                  </Typography>
+                </Box>
+              </Box>
             </Box>
             <Button type="submit" disabled={isSubmitting} className="hidden">
               Simpan
@@ -503,4 +526,4 @@ const LiabilityForm = (props: ILiabilityForm) => {
   );
 };
 
-export default LiabilityForm;
+export default PaymentForm;

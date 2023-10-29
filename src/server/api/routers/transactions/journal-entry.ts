@@ -52,6 +52,7 @@ export const journalEntryRouter = createTRPCRouter({
       note: z.string().nullish(),
       transactionDetails: z.array(
         z.object({
+          id: z.string().nullish(),
           chartOfAccountId: z.string(),
           debit: z.number(),
           credit: z.number(),

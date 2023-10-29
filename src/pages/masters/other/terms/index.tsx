@@ -37,12 +37,17 @@ import NavTabs from "@/components/tabs";
 import { otherTabs } from "@/components/tabs/data";
 import { useRouter } from "next/router";
 import ModalTransition from "@/components/dialogs/ModalTransition";
-import MasterTermForm from "@/components/forms/MasterTermForm";
+// import MasterTermForm from "@/components/forms/MasterTermForm";
 import type { FormSlugType } from "@/types/global";
 import type { IJwtDecode } from "@/types/session";
 import type { ITerm } from "@/types/prisma-api/term";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
+import dynamic from "next/dynamic";
+
+const MasterTermForm = dynamic(
+  () => import("@/components/forms/MasterTermForm"),
+);
 
 const sortDefault: GridSortModel = [{ field: "name", sort: "asc" }];
 

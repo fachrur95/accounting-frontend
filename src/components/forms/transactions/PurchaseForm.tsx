@@ -449,8 +449,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
               <DatePicker label="Tanggal" name="entryDate" disabled />
               <AutocompleteChartOfAccount
                 name="chartOfAccount"
-                label="Akun"
-                required
+                label="Akun Pembayaran"
                 autocompleteProps={{
                   disabled: mode === "view",
                 }}
@@ -678,9 +677,9 @@ const PurchaseForm = (props: IPurchaseForm) => {
                 className="col-start-1"
                 disabled={mode === "view"}
               />
-              <Box className="w-full md:col-start-3">
+              <Box className="grid w-full gap-2 md:col-start-3">
                 {total.subTotal !== total.total && (
-                  <Box className="grid grid-cols-2 items-center justify-center">
+                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
                     <Typography variant="subtitle2">Sub Total</Typography>
                     <Typography variant="subtitle2" align="right">
                       {formatNumber(total.subTotal)}
@@ -688,7 +687,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
                   </Box>
                 )}
                 {total.totalDiscountDetail > 0 && (
-                  <Box className="grid grid-cols-2 items-center justify-center">
+                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
                     <Typography variant="subtitle2">
                       Total Diskon Baris
                     </Typography>
@@ -697,15 +696,16 @@ const PurchaseForm = (props: IPurchaseForm) => {
                     </Typography>
                   </Box>
                 )}
-                <Box className="grid grid-cols-2 items-center justify-center">
+                <Box className="grid-child grid grid-cols-2 items-center justify-center">
                   <Typography variant="subtitle2">Total</Typography>
                   <Typography variant="subtitle2" align="right">
                     {formatNumber(total.total)}
                   </Typography>
                 </Box>
-                <Box className="grid grid-cols-2 items-center justify-center">
+                <Box className="grid-child grid grid-cols-2 items-center justify-center">
                   <Typography variant="subtitle2">Diskon Tambahan</Typography>
                   <TextFieldElement
+                    variant="standard"
                     name="discountGroupInput"
                     hiddenLabel
                     InputProps={{
@@ -718,7 +718,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
                 </Box>
                 {total.totalDiscount > 0 &&
                   total.totalDiscount !== discountGroupInput && (
-                    <Box className="grid grid-cols-2 items-center justify-center">
+                    <Box className="grid-child grid grid-cols-2 items-center justify-center">
                       <Typography variant="subtitle2">Total Diskon</Typography>
                       <Typography variant="subtitle2" align="right">
                         {formatNumber(total.totalDiscount)}
@@ -726,15 +726,16 @@ const PurchaseForm = (props: IPurchaseForm) => {
                     </Box>
                   )}
                 <Divider />
-                <Box className="grid grid-cols-2 items-center justify-center">
+                <Box className="grid-child grid grid-cols-2 items-center justify-center">
                   <Typography variant="h6">Total Akhir</Typography>
                   <Typography variant="h6" align="right">
                     {formatNumber(total.grandTotal)}
                   </Typography>
                 </Box>
-                <Box className="grid grid-cols-2 items-center justify-center">
+                <Box className="grid-child grid grid-cols-2 items-center justify-center">
                   <Typography variant="subtitle2">Bayar</Typography>
                   <TextFieldElement
+                    variant="standard"
                     name="paymentInput"
                     hiddenLabel
                     InputProps={{
@@ -745,7 +746,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
                     size="small"
                   />
                 </Box>
-                <Box className="grid grid-cols-2 items-center justify-center">
+                <Box className="grid-child grid grid-cols-2 items-center justify-center">
                   <Typography variant="subtitle2">
                     {total.balance <= 0 ? "Kembalian" : "Kurang"}
                   </Typography>

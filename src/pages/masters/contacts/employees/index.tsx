@@ -38,12 +38,17 @@ import NavTabs from "@/components/tabs";
 import { employeeTabs } from "@/components/tabs/data";
 import { useRouter } from "next/router";
 import ModalTransition from "@/components/dialogs/ModalTransition";
-import MasterPeopleForm from "@/components/forms/MasterPeopleForm";
+// import MasterPeopleForm from "@/components/forms/MasterPeopleForm";
 import type { FormSlugType } from "@/types/global";
 import type { IJwtDecode } from "@/types/session";
 import type { IPeople } from "@/types/prisma-api/people";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
+import dynamic from "next/dynamic";
+
+const MasterPeopleForm = dynamic(
+  () => import("@/components/forms/MasterPeopleForm"),
+);
 
 const sortDefault: GridSortModel = [{ field: "code", sort: "asc" }];
 
@@ -84,7 +89,6 @@ const EmployeesPage: MyPage = () => {
       search,
       filter: filterModel,
       sort: sortModel,
-      isEmployee: true,
       type: "employee",
     },
     {

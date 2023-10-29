@@ -34,7 +34,7 @@ import { useEffect, useState } from "react";
 import CustomMenu from "@/components/displays/StyledMenu";
 import { useRouter } from "next/router";
 import ModalTransition from "@/components/dialogs/ModalTransition";
-import SalesForm from "@/components/forms/transactions/SalesForm";
+// import SalesForm from "@/components/forms/transactions/SalesForm";
 import OpenCashRegisterForm from "@/components/forms/OpenCashRegister";
 import CloseCashRegisterForm from "@/components/forms/CloseCashRegister";
 import type { FormSlugType } from "@/types/global";
@@ -43,6 +43,11 @@ import type { ITransaction } from "@/types/prisma-api/transaction";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
 import useSessionData from "@/components/hooks/useSessionData";
+import dynamic from "next/dynamic";
+
+const SalesForm = dynamic(
+  () => import("@/components/forms/transactions/SalesForm"),
+);
 
 const sortDefault: GridSortModel = [{ field: "entryDate", sort: "desc" }];
 

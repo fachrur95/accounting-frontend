@@ -33,12 +33,17 @@ import { useEffect, useState } from "react";
 import CustomMenu from "@/components/displays/StyledMenu";
 import { useRouter } from "next/router";
 import ModalTransition from "@/components/dialogs/ModalTransition";
-import LiabilityForm from "@/components/forms/transactions/LiabilityForm";
+// import LiabilityForm from "@/components/forms/transactions/LiabilityForm";
 import type { FormSlugType } from "@/types/global";
 import type { IJwtDecode } from "@/types/session";
 import type { ITransaction } from "@/types/prisma-api/transaction";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
+import dynamic from "next/dynamic";
+
+const LiabilityForm = dynamic(
+  () => import("@/components/forms/transactions/LiabilityForm"),
+);
 
 const sortDefault: GridSortModel = [{ field: "entryDate", sort: "desc" }];
 

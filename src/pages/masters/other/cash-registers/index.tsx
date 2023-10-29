@@ -38,12 +38,17 @@ import NavTabs from "@/components/tabs";
 import { otherTabs } from "@/components/tabs/data";
 import { useRouter } from "next/router";
 import ModalTransition from "@/components/dialogs/ModalTransition";
-import MasterCashRegisterForm from "@/components/forms/MasterCashRegisterForm";
+// import MasterCashRegisterForm from "@/components/forms/MasterCashRegisterForm";
 import type { FormSlugType } from "@/types/global";
 import type { IJwtDecode } from "@/types/session";
 import type { ICashRegister } from "@/types/prisma-api/cash-register";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
+import dynamic from "next/dynamic";
+
+const MasterCashRegisterForm = dynamic(
+  () => import("@/components/forms/MasterCashRegisterForm"),
+);
 
 const sortDefault: GridSortModel = [{ field: "name", sort: "asc" }];
 
@@ -112,6 +117,15 @@ const CashRegistersPage: MyPage = () => {
       headerName: "Nama",
       type: "string",
       flex: 1,
+    },
+    {
+      field: "mainAccount.name",
+      headerName: "Akun Utama",
+      type: "string",
+      flex: 1,
+      valueGetter: (params: GridValueGetterParams<unknown, ICashRegister>) => {
+        return params.row.mainAccount?.name ?? "-";
+      },
     },
     {
       field: "depositAccount.name",

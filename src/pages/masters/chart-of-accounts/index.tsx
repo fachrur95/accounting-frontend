@@ -38,12 +38,17 @@ import NavTabs from "@/components/tabs";
 import { chartOfAccountTabs } from "@/components/tabs/data";
 import { useRouter } from "next/router";
 import ModalTransition from "@/components/dialogs/ModalTransition";
-import MasterChartOfAccountForm from "@/components/forms/MasterChartOfAccountForm";
+// import MasterChartOfAccountForm from "@/components/forms/MasterChartOfAccountForm";
 import type { FormSlugType } from "@/types/global";
 import type { IJwtDecode } from "@/types/session";
 import type { IChartOfAccount } from "@/types/prisma-api/chart-of-account";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
+import dynamic from "next/dynamic";
+
+const MasterChartOfAccountForm = dynamic(
+  () => import("@/components/forms/MasterChartOfAccountForm"),
+);
 
 const sortDefault: GridSortModel = [{ field: "code", sort: "asc" }];
 

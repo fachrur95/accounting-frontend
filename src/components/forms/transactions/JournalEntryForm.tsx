@@ -310,7 +310,12 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
                   disabled: mode === "view",
                 }}
               />
-              <DatePicker label="Tanggal" name="entryDate" required />
+              <DatePicker
+                label="Tanggal"
+                name="entryDate"
+                required
+                disabled={mode === "view"}
+              />
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
@@ -333,9 +338,11 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
                           Kredit
                         </TableCell>
                         <TableCell width="10%">Catatan</TableCell>
-                        <TableCell width="5%" align="center">
-                          <Delete />
-                        </TableCell>
+                        {mode !== "view" && (
+                          <TableCell width="5%" align="center">
+                            <Delete />
+                          </TableCell>
+                        )}
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -376,6 +383,7 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
                               hiddenLabel
                               InputProps={{
                                 inputComponent: NumericFormatCustom as never,
+                                disabled: mode === "view",
                                 onBlur: (event) => {
                                   if (parseFloat(event.target.value) > 0) {
                                     setValue(
@@ -395,6 +403,7 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
                               hiddenLabel
                               InputProps={{
                                 inputComponent: NumericFormatCustom as never,
+                                disabled: mode === "view",
                                 onBlur: (event) => {
                                   if (parseFloat(event.target.value) > 0) {
                                     setValue(
@@ -411,20 +420,25 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
                           <TableCell>
                             <TextFieldElement
                               name={`transactionDetails.${index}.note`}
+                              InputProps={{
+                                disabled: mode === "view",
+                              }}
                               hiddenLabel
                               fullWidth
                               size="small"
                             />
                           </TableCell>
-                          <TableCell align="center">
-                            <IconButton
-                              onClick={() => void remove(index)}
-                              color="error"
-                              size="small"
-                            >
-                              <Close />
-                            </IconButton>
-                          </TableCell>
+                          {mode !== "view" && (
+                            <TableCell align="center">
+                              <IconButton
+                                onClick={() => void remove(index)}
+                                color="error"
+                                size="small"
+                              >
+                                <Close />
+                              </IconButton>
+                            </TableCell>
+                          )}
                         </TableRow>
                       ))}
                     </TableBody>

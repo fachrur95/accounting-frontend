@@ -10,7 +10,7 @@ interface CustomProps {
 
 const NumericFormatCustom = forwardRef<NumericFormatProps, CustomProps>(
   function NumericFormatCustom(props, ref) {
-    const { onChange, ...other } = props;
+    const { onChange, allowNegative, ...other } = props;
 
     return (
       <NumericFormat
@@ -30,6 +30,7 @@ const NumericFormatCustom = forwardRef<NumericFormatProps, CustomProps>(
         decimalSeparator=","
         thousandSeparator="."
         allowLeadingZeros={false}
+        allowNegative={allowNegative ?? false}
         style={{ textAlign: "right" }}
       />
     );

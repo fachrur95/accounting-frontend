@@ -37,12 +37,17 @@ import NavTabs from "@/components/tabs";
 import { employeeTabs } from "@/components/tabs/data";
 import { useRouter } from "next/router";
 import ModalTransition from "@/components/dialogs/ModalTransition";
-import MasterPeopleCategoryForm from "@/components/forms/MasterPeopleCategoryForm";
+// import MasterPeopleCategoryForm from "@/components/forms/MasterPeopleCategoryForm";
 import type { FormSlugType } from "@/types/global";
 import type { IJwtDecode } from "@/types/session";
 import type { IPeopleCategory } from "@/types/prisma-api/people-category";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
+import dynamic from "next/dynamic";
+
+const MasterPeopleCategoryForm = dynamic(
+  () => import("@/components/forms/MasterPeopleCategoryForm"),
+);
 
 const sortDefault: GridSortModel = [{ field: "name", sort: "asc" }];
 

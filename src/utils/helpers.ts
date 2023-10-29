@@ -107,6 +107,14 @@ export const currentDate = (param = new Date()): string => {
   return `${year}/${month}/${date}`
 }
 
+export const dateID = (param = new Date()): string => {
+  const date = param.getDate();
+  const month = param.getMonth() + 1;
+  const year = param.getFullYear();
+
+  return `${date}/${month}/${year}`
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 export const convertToArabicText = (conventionalNumber: string): string => {
   const arabicNumbers: Record<string, string> = {

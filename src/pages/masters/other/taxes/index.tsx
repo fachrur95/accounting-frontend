@@ -37,12 +37,15 @@ import NavTabs from "@/components/tabs";
 import { otherTabs } from "@/components/tabs/data";
 import { useRouter } from "next/router";
 import ModalTransition from "@/components/dialogs/ModalTransition";
-import MasterTaxForm from "@/components/forms/MasterTaxForm";
+// import MasterTaxForm from "@/components/forms/MasterTaxForm";
 import type { FormSlugType } from "@/types/global";
 import type { IJwtDecode } from "@/types/session";
 import type { ITax } from "@/types/prisma-api/tax";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
+import dynamic from "next/dynamic";
+
+const MasterTaxForm = dynamic(() => import("@/components/forms/MasterTaxForm"));
 
 const sortDefault: GridSortModel = [{ field: "name", sort: "asc" }];
 
