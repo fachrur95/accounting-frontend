@@ -480,7 +480,6 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
                           </Typography>
                         </TableCell>
                         <TableCell></TableCell>
-                        <TableCell></TableCell>
                       </TableRow>
                     </TableFooter>
                   </Table>

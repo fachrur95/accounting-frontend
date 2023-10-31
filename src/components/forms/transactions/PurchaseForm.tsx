@@ -447,13 +447,16 @@ const PurchaseForm = (props: IPurchaseForm) => {
                 type="supplier"
               />
               <DatePicker label="Tanggal" name="entryDate" disabled />
-              <AutocompleteChartOfAccount
-                name="chartOfAccount"
-                label="Akun Pembayaran"
-                autocompleteProps={{
-                  disabled: mode === "view",
-                }}
-              />
+              {paymentInput > 0 && (
+                <AutocompleteChartOfAccount
+                  name="chartOfAccount"
+                  label="Akun Pembayaran"
+                  autocompleteProps={{
+                    disabled: mode === "view",
+                  }}
+                  required={paymentInput > 0}
+                />
+              )}
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
@@ -591,6 +594,18 @@ const PurchaseForm = (props: IPurchaseForm) => {
                               InputProps={{
                                 inputComponent: NumericFormatCustom as never,
                                 disabled: mode === "view",
+                                inputProps: {
+                                  isAllowed: (values: {
+                                    floatValue: number;
+                                  }) => {
+                                    const { floatValue } = values;
+                                    return (
+                                      (floatValue ?? 0) <=
+                                      (transactionDetails[index]?.priceInput ??
+                                        0)
+                                    );
+                                  },
+                                },
                               }}
                               fullWidth
                               size="small"
@@ -711,6 +726,12 @@ const PurchaseForm = (props: IPurchaseForm) => {
                     InputProps={{
                       inputComponent: NumericFormatCustom as never,
                       disabled: mode === "view",
+                      inputProps: {
+                        isAllowed: (values: { floatValue: number }) => {
+                          const { floatValue } = values;
+                          return (floatValue ?? 0) <= (total.total ?? 0);
+                        },
+                      },
                     }}
                     fullWidth
                     size="small"

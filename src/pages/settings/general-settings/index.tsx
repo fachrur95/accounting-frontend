@@ -32,8 +32,10 @@ const basePath = "/settings/general-settings";
 const defaultValues: IGeneralSettingMutation = {
   companyName: "",
   recalculateMethod: "FIFO",
+  currentProfitAccountId: "",
   debitAccountId: "",
   creditAccountId: "",
+  currentProfitAccount: null,
   debitAccount: null,
   creditAccount: null,
 };
@@ -75,6 +77,7 @@ const GeneralSettingsPage: MyPage = () => {
   const onSubmit = (data: IGeneralSettingMutation) => {
     const dataSave: IGeneralSettingMutation = {
       ...data,
+      currentProfitAccountId: data.currentProfitAccount?.id ?? null,
       debitAccountId: data.debitAccount?.id ?? null,
       creditAccountId: data.creditAccount?.id ?? null,
     };
@@ -100,6 +103,16 @@ const GeneralSettingsPage: MyPage = () => {
           setValue("debitAccount", {
             id: generalSetting.debitAccount.id,
             label: `${generalSetting.debitAccount.code} - ${generalSetting.debitAccount.name}`,
+          });
+        }
+        if (generalSetting.currentProfitAccount) {
+          setValue(
+            "currentProfitAccountId",
+            generalSetting.currentProfitAccount.id,
+          );
+          setValue("currentProfitAccount", {
+            id: generalSetting.currentProfitAccount.id,
+            label: `${generalSetting.currentProfitAccount.code} - ${generalSetting.currentProfitAccount.name}`,
           });
         }
       }
@@ -168,6 +181,11 @@ const GeneralSettingsPage: MyPage = () => {
                     label: "MANUAL (Manual diatur dari Produk)",
                   },
                 ]}
+              />
+              <AutocompleteChartOfAccount
+                name="currentProfitAccount"
+                label="Saldo Laba Berjalan"
+                required
               />
               <AutocompleteChartOfAccount
                 name="debitAccount"

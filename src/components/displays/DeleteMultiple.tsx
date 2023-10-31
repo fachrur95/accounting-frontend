@@ -51,7 +51,7 @@ const DeleteMultiple = ({
         startIcon={<Delete />}
         color="error"
       >
-        Delete
+        Hapus
       </LoadingButton>
       <ConfirmationDialog
         open={open}
@@ -59,6 +59,7 @@ const DeleteMultiple = ({
         message="Apakah Anda yakin ingin menghapus ini?"
         onClose={() => setOpen(false)}
         onSubmit={handleDelete}
+        confirmColor="error"
       />
     </>
   );

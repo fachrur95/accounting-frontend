@@ -13,8 +13,10 @@ export declare interface IGeneralSetting {
   updatedAt: Date;
   unitId: string;
   unit?: IUnit;
+  currentProfitAccountId: string | null;
   debitAccountId: string | null;
   creditAccountId: string | null;
+  currentProfitAccount?: IChartOfAccount | null;
   debitAccount?: IChartOfAccount | null;
   creditAccount?: IChartOfAccount | null;
 }
@@ -22,9 +24,11 @@ export declare interface IGeneralSetting {
 export declare type IGeneralSettingMutation = Pick<IGeneralSetting,
   | "companyName"
   | "recalculateMethod"
+  | "currentProfitAccountId"
   | "debitAccountId"
   | "creditAccountId"
 > & {
+  currentProfitAccount?: IDataOption | IChartOfAccount | null;
   debitAccount?: IDataOption | IChartOfAccount | null;
   creditAccount?: IDataOption | IChartOfAccount | null;
 }

@@ -15,6 +15,7 @@ export const generalSettingRouter = createTRPCRouter({
     z.object({
       companyName: z.string(),
       recalculateMethod: z.enum(["FIFO", "AVG", "MANUAL"]),
+      currentProfitAccountId: z.string().nullish(),
       debitAccountId: z.string().nullish(),
       creditAccountId: z.string().nullish(),
     }),

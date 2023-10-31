@@ -286,7 +286,7 @@ const ChartOfAccountsPage: MyPage = () => {
             <Typography variant="h5" gutterBottom>
               {title}
             </Typography>
-            <div>
+            <div className="flex flex-col items-center justify-center gap-2 md:flex-row">
               <DeleteMultiple
                 path={path}
                 ids={selectionModel as string[]}

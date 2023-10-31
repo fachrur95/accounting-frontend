@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import {
   FormContainer,
   TextFieldElement,
-  RadioButtonGroup,
+  // RadioButtonGroup,
   useForm,
 } from "react-hook-form-mui";
 import Close from "@mui/icons-material/Close";
@@ -233,7 +233,7 @@ const MasterAccountSubClassForm = (props: IMasterAccountSubClassForm) => {
               />
               <TextFieldElement
                 name="group"
-                label="Label"
+                label="Label (opsional)"
                 InputProps={{
                   disabled: mode === "view",
                 }}
@@ -252,7 +252,7 @@ const MasterAccountSubClassForm = (props: IMasterAccountSubClassForm) => {
                   disabled: mode === "view",
                 }}
               />
-              <RadioButtonGroup
+              {/* <RadioButtonGroup
                 label="Posisi dalam Neraca"
                 name="balanceSheetPosition"
                 options={[
@@ -267,7 +267,7 @@ const MasterAccountSubClassForm = (props: IMasterAccountSubClassForm) => {
                 ]}
                 row
                 required
-              />
+              /> */}
             </Box>
             <Button type="submit" disabled={isSubmitting} className="hidden">
               Simpan

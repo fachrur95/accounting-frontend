@@ -11,6 +11,7 @@ interface ConfirmationDialog {
   open: boolean;
   onClose: () => void;
   onSubmit: () => void;
+  confirmColor?: "error" | "primary" | "success" | "secondary";
 }
 
 const ConfirmationDialog = ({
@@ -19,6 +20,7 @@ const ConfirmationDialog = ({
   open,
   onClose,
   onSubmit,
+  confirmColor,
 }: ConfirmationDialog) => {
   return (
     <ModalTransition open={open} onClose={onClose}>
@@ -27,9 +29,13 @@ const ConfirmationDialog = ({
         <DialogContentText>{message ?? `Are you sure!`}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Discard</Button>
-        <Button variant="contained" color="error" onClick={onSubmit}>
-          Confirm
+        <Button onClick={onClose}>Batalkan</Button>
+        <Button
+          variant="contained"
+          color={confirmColor ?? "primary"}
+          onClick={onSubmit}
+        >
+          Konfirmasi
         </Button>
       </DialogActions>
     </ModalTransition>

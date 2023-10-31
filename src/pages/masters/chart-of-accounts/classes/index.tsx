@@ -10,9 +10,9 @@ import Refresh from "@mui/icons-material/Refresh";
 import EditIcon from "@mui/icons-material/Edit";
 import Visibility from "@mui/icons-material/Visibility";
 import DeleteForever from "@mui/icons-material/DeleteForever";
-import Add from "@mui/icons-material/Add";
+// import Add from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
+// import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
@@ -27,7 +27,7 @@ import type {
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
 import Head from "next/head";
-import Link from "next/link";
+// import Link from "next/link";
 import { useEffect, useState } from "react";
 import CustomMenu from "@/components/displays/StyledMenu";
 import NavTabs from "@/components/tabs";
@@ -256,7 +256,7 @@ const AccountClassesPage: MyPage = () => {
             <Typography variant="h5" gutterBottom>
               {title}
             </Typography>
-            <div>
+            <div className="flex flex-col items-center justify-center gap-2 md:flex-row">
               <DeleteMultiple
                 path={path}
                 ids={selectionModel as string[]}
@@ -265,7 +265,7 @@ const AccountClassesPage: MyPage = () => {
               <IconButton onClick={() => void refetch()}>
                 <Refresh />
               </IconButton>
-              <Link
+              {/* <Link
                 href={{
                   pathname,
                   query: { slug: ["f"] },
@@ -275,7 +275,7 @@ const AccountClassesPage: MyPage = () => {
                 <Button variant="contained" endIcon={<Add />}>
                   Tambah
                 </Button>
-              </Link>
+              </Link> */}
             </div>
           </Box>
           <DataGridProAdv
@@ -301,7 +301,7 @@ const AccountClassesPage: MyPage = () => {
                 `${pathname}/v/${params.row.id}`,
               )
             }
-            checkboxSelection
+            // checkboxSelection
             disableSelectionOnClick
           />
           {router.query.slug && (

@@ -101,9 +101,9 @@ export const otherTabs: IDataTab[] = [
     label: "Termin",
     url: "/masters/other/terms",
   },
-  {
+  /* {
     id: "tax",
     label: "Pajak",
     url: "/masters/other/taxes",
-  },
+  }, */
 ];

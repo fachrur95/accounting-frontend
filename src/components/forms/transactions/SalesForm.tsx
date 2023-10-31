@@ -750,6 +750,18 @@ const SalesForm = (props: ISalesForm) => {
                               InputProps={{
                                 inputComponent: NumericFormatCustom as never,
                                 disabled: mode === "view",
+                                inputProps: {
+                                  isAllowed: (values: {
+                                    floatValue: number;
+                                  }) => {
+                                    const { floatValue } = values;
+                                    return (
+                                      (floatValue ?? 0) <=
+                                      (transactionDetails[index]?.priceInput ??
+                                        0)
+                                    );
+                                  },
+                                },
                               }}
                               fullWidth
                               size="small"
@@ -870,6 +882,12 @@ const SalesForm = (props: ISalesForm) => {
                     InputProps={{
                       inputComponent: NumericFormatCustom as never,
                       disabled: mode === "view",
+                      inputProps: {
+                        isAllowed: (values: { floatValue: number }) => {
+                          const { floatValue } = values;
+                          return (floatValue ?? 0) <= (total.total ?? 0);
+                        },
+                      },
                     }}
                     fullWidth
                     size="small"

@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import {
   FormContainer,
   TextFieldElement,
-  RadioButtonGroup,
+  // RadioButtonGroup,
   useForm,
 } from "react-hook-form-mui";
 import Close from "@mui/icons-material/Close";
@@ -226,7 +226,7 @@ const MasterAccountClassForm = (props: IMasterAccountClassForm) => {
                 }}
               />
             </Box>
-            <Box
+            {/* <Box
               component={Paper}
               variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
@@ -263,7 +263,7 @@ const MasterAccountClassForm = (props: IMasterAccountClassForm) => {
                 row
                 required
               />
-            </Box>
+            </Box> */}
             <Button type="submit" disabled={isSubmitting} className="hidden">
               Simpan
             </Button>
