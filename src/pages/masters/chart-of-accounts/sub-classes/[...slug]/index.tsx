@@ -8,6 +8,7 @@ import MasterAccountSubClassForm from "@/components/forms/MasterAccountSubClassF
 import type { FormSlugType } from "@/types/global";
 import Head from "next/head";
 import React from "react";
+import { Role } from "@/types/prisma-api/role.d";
 
 const title = "Sub Akun";
 
@@ -51,6 +52,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       redirect: {
         destination: "/credentials/unit",
+        permanent: false,
+      },
+    };
+  }
+  if (session.user.role === Role.USER) {
+    return {
+      redirect: {
+        destination: "/not-found",
         permanent: false,
       },
     };

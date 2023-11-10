@@ -24,6 +24,8 @@ import {
   useForm,
 } from "react-hook-form-mui";
 import React, { useEffect } from "react";
+import { Role } from "@/types/prisma-api/role.d";
+import { RecalculateMethod } from "@/types/prisma-api/recalculate-method.d";
 
 const title = "Pengaturan Umum";
 
@@ -31,7 +33,9 @@ const basePath = "/settings/general-settings";
 
 const defaultValues: IGeneralSettingMutation = {
   companyName: "",
-  recalculateMethod: "FIFO",
+  leader: "",
+  accountant: "",
+  recalculateMethod: RecalculateMethod.FIFO,
   currentProfitAccountId: "",
   debitAccountId: "",
   creditAccountId: "",
@@ -77,6 +81,8 @@ const GeneralSettingsPage: MyPage = () => {
   const onSubmit = (data: IGeneralSettingMutation) => {
     const dataSave: IGeneralSettingMutation = {
       ...data,
+      leader: data.leader ?? undefined,
+      accountant: data.accountant ?? undefined,
       currentProfitAccountId: data.currentProfitAccount?.id ?? null,
       debitAccountId: data.debitAccount?.id ?? null,
       creditAccountId: data.creditAccount?.id ?? null,
@@ -90,6 +96,8 @@ const GeneralSettingsPage: MyPage = () => {
       const generalSetting = sessionData.session?.unit?.generalSetting;
       if (generalSetting) {
         setValue("companyName", generalSetting.companyName);
+        setValue("leader", generalSetting.leader ?? "");
+        setValue("accountant", generalSetting.accountant ?? "");
         setValue("recalculateMethod", generalSetting.recalculateMethod);
         if (generalSetting.creditAccount) {
           setValue("creditAccountId", generalSetting.creditAccount.id);
@@ -163,6 +171,8 @@ const GeneralSettingsPage: MyPage = () => {
               className="grid grid-cols-1 gap-4 p-4"
             >
               <TextFieldElement name="companyName" label="Nama Unit" required />
+              <TextFieldElement name="leader" label="Ka. Unit" required />
+              <TextFieldElement name="accountant" label="Akuntan" required />
               <RadioButtonGroup
                 label="Metode Perhitungan HPP (Harga Pokok Penjualan)"
                 name="recalculateMethod"
@@ -230,6 +240,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       redirect: {
         destination: "/credentials/unit",
+        permanent: false,
+      },
+    };
+  }
+  if (session.user.role === Role.USER) {
+    return {
+      redirect: {
+        destination: "/not-found",
         permanent: false,
       },
     };

@@ -212,7 +212,6 @@ const MasterAccountSubClassForm = (props: IMasterAccountSubClassForm) => {
           <div className="grid gap-4">
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -241,7 +240,6 @@ const MasterAccountSubClassForm = (props: IMasterAccountSubClassForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <AutocompleteAccountClass

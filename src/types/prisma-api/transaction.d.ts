@@ -5,6 +5,7 @@ import type { IPeople } from "./people";
 import type { ITerm } from "./term";
 import type { ITransactionDetail } from "./transaction-detail";
 import type { TransactionType } from "./transaction-type";
+import type { PaymentType } from "./payment-type";
 import type { IUnit } from "./unit";
 import type { ITax } from "./tax";
 import type { IMultipleUom } from "./multiple-uom";
@@ -14,6 +15,7 @@ import type { IItem } from "./item";
 export declare interface ITransaction {
   id: string;
   transactionType: TransactionType;
+  paymentType: PaymentType;
   transactionNumber: string;
   paymentInput: number;
   specialDiscount: number;
@@ -106,9 +108,30 @@ declare interface IJournalEntryDetailMutation {
   note?: string | null;
 }
 
+declare interface IBeginBalanceStockDetailMutation {
+  id?: string;
+  multipleUomId: string;
+  itemName: string;
+  unit: string;
+  qtyInput: number;
+  conversionQty: number;
+  priceInput: number;
+  note?: string | null;
+}
+
+declare interface IBeginBalanceDebtReceivableDetailMutation {
+  id?: string;
+  peopleId: string;
+  peopleName: string;
+  dueDate: Date;
+  priceInput: number;
+  note?: string | null;
+}
+
 export declare interface ISalesMutation {
   transactionNumber: string;
   peopleId: string;
+  paymentType: PaymentType;
   people: IDataOption | IPeople | null;
   termId?: string;
   term?: IDataOption | ITerm | null;
@@ -117,6 +140,8 @@ export declare interface ISalesMutation {
   specialDiscount?: number;
   discountGroupInput?: number;
   note?: string;
+  chartOfAccountId?: string | null;
+  chartOfAccount?: IDataOption | IChartOfAccount | null;
   transactionDetails: ISalesPurchaseDetailMutation[];
 }
 
@@ -182,4 +207,20 @@ export declare interface IPaymentDraft {
   dueDate: Date;
   underPayment: number;
   remainingPayment: number;
+}
+
+export declare interface IBeginBalanceStockMutation {
+  transactionNumber: string;
+  chartOfAccountId?: string | null;
+  chartOfAccount?: IDataOption | IChartOfAccount | null;
+  entryDate: Date;
+  note?: string;
+  transactionDetails: IBeginBalanceStockDetailMutation[];
+}
+
+export declare interface IBeginBalanceDebtReceivableMutation {
+  chartOfAccountId?: string | null;
+  chartOfAccount?: IDataOption | IChartOfAccount | null;
+  entryDate: Date;
+  transactionDetails: IBeginBalanceDebtReceivableDetailMutation[];
 }

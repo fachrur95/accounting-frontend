@@ -52,8 +52,8 @@ const SearchInput = () => {
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setSearch(event.target.value);
     },
-    500,
-  ); // Menunda eksekusi selama 500ms
+    150,
+  );
 
   return (
     <Search>

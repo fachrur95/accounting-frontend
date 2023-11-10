@@ -49,7 +49,6 @@ const CloseCashRegisterForm = (props: ICloseCashRegisterForm) => {
   });
 
   const { data: dataLastBalance } = api.cashRegister.getLastBalance.useQuery();
-  console.log({ dataLastBalance });
 
   const mutation = api.cashRegister.close.useMutation({
     onSuccess: () => {
@@ -124,7 +123,7 @@ const CloseCashRegisterForm = (props: ICloseCashRegisterForm) => {
         <DialogContent>
           <FormContainer formContext={formContext} onSuccess={onSubmit}>
             <div className="grid gap-4">
-              <Box component={Paper} variant="outlined" className="p-4">
+              <Box component={Paper} className="p-4">
                 <TextFieldElement
                   name="transactionNumber"
                   label="No. Transaksi"
@@ -132,11 +131,7 @@ const CloseCashRegisterForm = (props: ICloseCashRegisterForm) => {
                   fullWidth
                 />
               </Box>
-              <Box
-                component={Paper}
-                variant="outlined"
-                className="flex flex-col gap-2 p-4"
-              >
+              <Box component={Paper} className="flex flex-col gap-2 p-4">
                 <Typography variant="body2" align="right">
                   Saldo Akhir Seharusnya:{" "}
                   {formatCurrency(dataLastBalance?.balance ?? 0)}

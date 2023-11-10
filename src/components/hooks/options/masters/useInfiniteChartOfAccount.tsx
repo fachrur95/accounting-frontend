@@ -7,15 +7,21 @@ import Box from "@mui/material/Box";
 import Done from "@mui/icons-material/Done";
 import debounce from "lodash.debounce";
 import type { IChartOfAccount } from "@/types/prisma-api/chart-of-account";
+import type { GridFilterModel } from "@mui/x-data-grid-pro";
 
-const useInfiniteChartOfAccount = () => {
+const useInfiniteChartOfAccount = ({
+  type,
+}: {
+  type?: "cash-bank" | "bank";
+}) => {
   const { ref, inView } = useInView();
+  const [filter, setFilter] = useState<GridFilterModel | undefined>(undefined);
   const [search, setSearch] = useState<string>("");
   const [options, setOptions] = useState<IDataOption[]>([]);
   const [countAll, setCountAll] = useState<number>(0);
   const { data, hasNextPage, fetchNextPage, isFetching } =
     api.chartOfAccount.findAll.useInfiniteQuery(
-      { limit: 25, search },
+      { limit: 25, search, filter },
       {
         getNextPageParam: (lastPage: PaginationResponse<IChartOfAccount>) =>
           typeof lastPage.currentPage === "number" && options.length < countAll
@@ -28,8 +34,8 @@ const useInfiniteChartOfAccount = () => {
     (event?: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setSearch(event?.target.value ?? "");
     },
-    500,
-  ); // Menunda eksekusi selama 500ms
+    150,
+  );
 
   const renderOption = (
     props: React.HtmlHTMLAttributes<HTMLLIElement>,
@@ -57,6 +63,33 @@ const useInfiniteChartOfAccount = () => {
       </li>
     );
   };
+
+  useEffect(() => {
+    if (type) {
+      if (type === "cash-bank") {
+        setFilter({
+          items: [
+            {
+              columnField: "accountSubClass.code",
+              operatorValue: "in",
+              value: JSON.stringify(["110", "120"]),
+            },
+          ],
+        });
+      }
+      if (type === "bank") {
+        setFilter({
+          items: [
+            {
+              columnField: "accountSubClass.code",
+              operatorValue: "in",
+              value: JSON.stringify(["120"]),
+            },
+          ],
+        });
+      }
+    }
+  }, [type]);
 
   useEffect(() => {
     if (data) {

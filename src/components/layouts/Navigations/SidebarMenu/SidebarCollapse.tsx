@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import SidebarItem from "./SidebarItem";
 import { type DataMenuType } from "./data";
+import { useSession } from "next-auth/react";
 
 interface ISidebarCollapse {
   openDrawer: boolean;
@@ -18,6 +19,7 @@ interface ISidebarCollapse {
 
 const SidebarCollapse = ({ openDrawer, item }: ISidebarCollapse) => {
   const router = useRouter();
+  const { data: session } = useSession();
   const pathName = router.pathname;
   const { openMenu: open, setOpenMenu } = useAppStore();
   const [domLoaded, setDomLoaded] = useState(false);
@@ -49,21 +51,25 @@ const SidebarCollapse = ({ openDrawer, item }: ISidebarCollapse) => {
       <Collapse in={open[item.url]} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {item.children.length > 0 &&
-            item.children.map((child, index) =>
-              child.children.length > 0 ? (
-                <NavCollapse
-                  key={`list-of-child-col-${index}`}
-                  openDrawer={openDrawer}
-                  item={child}
-                />
-              ) : (
-                <SidebarItem
-                  key={`list-of-child-item-${index}`}
-                  openDrawer={openDrawer}
-                  item={child}
-                />
-              ),
-            )}
+            item.children
+              .filter((menu) =>
+                session ? menu.roles.includes(session.user.role) : false,
+              )
+              .map((child, index) =>
+                child.children.length > 0 ? (
+                  <NavCollapse
+                    key={`list-of-child-col-${index}`}
+                    openDrawer={openDrawer}
+                    item={child}
+                  />
+                ) : (
+                  <SidebarItem
+                    key={`list-of-child-item-${index}`}
+                    openDrawer={openDrawer}
+                    item={child}
+                  />
+                ),
+              )}
         </List>
       </Collapse>
     </>

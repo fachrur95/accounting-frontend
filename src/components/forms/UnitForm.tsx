@@ -181,7 +181,7 @@ const UnitForm = (props: IUnitForm) => {
       <DialogContent>
         <FormContainer formContext={formContext} onSuccess={onSubmit}>
           <div className="grid gap-4">
-            <Box component={Paper} variant="outlined" className="p-4">
+            <Box component={Paper} className="p-4">
               <TextFieldElement
                 name="name"
                 label="Nama"
@@ -190,6 +190,7 @@ const UnitForm = (props: IUnitForm) => {
                   disabled: mode === "view",
                 }}
                 fullWidth
+                autoFocus
               />
             </Box>
             <Button type="submit" disabled={isSubmitting} className="hidden">

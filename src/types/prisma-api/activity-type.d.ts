@@ -1,4 +1,4 @@
-export declare type ActivityType =
+/* export declare type ActivityType =
   | "REGISTER"
   | "LOGIN"
   | "LOGOUT"
@@ -8,4 +8,17 @@ export declare type ActivityType =
   | "READ"
   | "INSERT"
   | "UPDATE"
-  | "DELETE";
+  | "DELETE"; */
+
+export enum ActivityType {
+  REGISTER = "REGISTER",
+  LOGIN = "LOGIN",
+  LOGOUT = "LOGOUT",
+  VERIFY_EMAIL = "VERIFY_EMAIL",
+  RESET_PASSWORD = "RESET_PASSWORD",
+  VIEW = "VIEW",
+  READ = "READ",
+  INSERT = "INSERT",
+  UPDATE = "UPDATE",
+  DELETE = "DELETE",
+}

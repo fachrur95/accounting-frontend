@@ -6,6 +6,7 @@ import AppBar from "@mui/material/AppBar";
 import Paper from "@mui/material/Paper";
 import { type IDataTab } from "./data";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 interface LinkTabProps {
   label?: string;
@@ -31,6 +32,7 @@ interface INavTabs {
 
 const NavTabs = ({ data }: INavTabs) => {
   const router = useRouter();
+  const { data: session } = useSession();
   const pathName = router.pathname;
 
   return (
@@ -49,14 +51,18 @@ const NavTabs = ({ data }: INavTabs) => {
         textColor="inherit"
         value={pathName}
       >
-        {data.map((tab) => (
-          <LinkTab
-            key={tab.id}
-            value={tab.url}
-            label={tab.label}
-            href={tab.url}
-          />
-        ))}
+        {data
+          .filter((tab) =>
+            session ? tab.roles.includes(session.user.role) : false,
+          )
+          .map((tab) => (
+            <LinkTab
+              key={tab.id}
+              value={tab.url}
+              label={tab.label}
+              href={tab.url}
+            />
+          ))}
       </Tabs>
     </AppBar>
   );

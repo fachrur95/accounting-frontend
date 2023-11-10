@@ -89,7 +89,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
   const formContext = useForm<IItemMutation>({ defaultValues });
   const { setOpenNotification } = useNotification();
 
-  // console.log({ imagesUploaded });
   const {
     control,
     setValue,
@@ -103,21 +102,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
     control,
     name: "multipleUoms",
   });
-
-  // console.log({ files });
-
-  // const test = useWatch(control, "multipleUoms[0].unitOfMeasure.name");
-
-  /* console.log({
-    test,
-    getValues: getValues(`multipleUoms[0]?.unitOfMeasure?.name`),
-    watch: watch(`multipleUoms[0]?.unitOfMeasure?.name`),
-  }); */
-
-  // const defaultUnit = watch("multipleUoms");
-  // const selectedCategory = watch("itemCategory");
-  // const currentVariantCategory = watch("variantCategories");
-  // const currentVariants = watch("variants");
   const defaultUnit: IMultipleUomMutation[] = watch("multipleUoms");
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
@@ -435,7 +419,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
           <div className="grid gap-4">
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -445,6 +428,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
                 InputProps={{
                   disabled: mode === "view",
                 }}
+                autoFocus
               />
               <TextFieldElement
                 name="name"
@@ -457,7 +441,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextareaAutosizeElement
@@ -478,7 +461,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -500,7 +482,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -529,7 +510,6 @@ const MasterItemForm = (props: IMasterItemForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <SwitchElement
@@ -540,24 +520,56 @@ const MasterItemForm = (props: IMasterItemForm) => {
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer
-                  component={Paper}
-                  elevation={0}
-                  variant="outlined"
-                >
+                <TableContainer component={Paper} elevation={0}>
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell width="5%" align="right">
+                        <TableCell
+                          sx={{ width: "5%", minWidth: { xs: 80, md: "auto" } }}
+                          align="right"
+                        >
                           No
                         </TableCell>
-                        <TableCell width="30%">Satuan</TableCell>
-                        <TableCell width="15%" align="right">
+                        <TableCell
+                          sx={{
+                            width: "30%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                        >
+                          Satuan
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            width: "15%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Qty
                         </TableCell>
-                        <TableCell width="15%">Satuan Dasar</TableCell>
-                        <TableCell width="20%">Barcode</TableCell>
-                        <TableCell width="5%" align="center">
+                        <TableCell
+                          sx={{
+                            width: "15%",
+                            minWidth: { xs: 150, md: "auto" },
+                          }}
+                        >
+                          Satuan Dasar
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            width: "20%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                        >
+                          Barcode
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            width: "5%",
+                            minWidth: { xs: 100, md: "auto" },
+                          }}
+                          align="center"
+                        >
                           <Delete />
                         </TableCell>
                       </TableRow>

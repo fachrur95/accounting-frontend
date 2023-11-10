@@ -11,6 +11,7 @@ import {
   type Awaitable,
 } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import type { ApiCatchError } from "@/types/api-response";
 // import DiscordProvider from "next-auth/providers/discord";
 
 import { env } from "@/env.mjs";
@@ -20,6 +21,7 @@ import jwtDecode from "jwt-decode";
 import type { IJwtDecode } from "@/types/session";
 import type { JWT } from "next-auth/jwt";
 import { type AdapterUser } from "next-auth/adapters";
+import type { Role } from "@/types/prisma-api/role";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -32,7 +34,7 @@ declare module "next-auth" {
     user: DefaultSession["user"] & {
       id: string;
       // ...other properties
-      // role: UserRole;
+      role: Role;
     };
     accessToken: string;
     refreshToken: string;
@@ -92,6 +94,8 @@ async function refreshAccessToken(tokenObject: User) {
   }
 }
 
+const additionalTime = 10 * 60 * 60; // 10 hours
+
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  *
@@ -99,16 +103,21 @@ async function refreshAccessToken(tokenObject: User) {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, token }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: token.sub,
-      },
-      accessToken: token.accessToken,
-      refreshToken: token.refreshToken,
-      error: token.error ?? null,
-    }),
+    session: ({ session, token }) => {
+      const decoded = jwtDecode<IJwtDecode>(token.accessToken as string);
+
+      return ({
+        ...session,
+        user: {
+          ...session.user,
+          id: token.sub,
+          role: decoded.role,
+        },
+        accessToken: token.accessToken,
+        refreshToken: token.refreshToken,
+        error: token.error ?? null,
+      })
+    },
     async jwt(
       { token, user, trigger, session }:
         {
@@ -172,13 +181,12 @@ export const authOptions: NextAuthOptions = {
           },
         )
           .then((response) => response.data)
-          .catch((err) => {
-            console.log(err);
-            return undefined;
+          .catch((error) => {
+            throw new Error((error as ApiCatchError).response?.data?.message ?? (error as ApiCatchError).message ?? "An error occurred");
           });
 
         if (!user) {
-          return null;
+          throw new Error("An error occurred");
         }
 
         const session = jwtDecode<IJwtDecode>(user.tokens.access.token);
@@ -187,6 +195,7 @@ export const authOptions: NextAuthOptions = {
           id: session.sub,
           name: session.name,
           email: session.email,
+          role: session.role,
           image: null,
           accessToken: user.tokens.access.token,
           refreshToken: user.tokens.refresh.token,
@@ -203,8 +212,12 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
+  pages: {
+    signIn: "/auth"
+  },
   session: {
     strategy: "jwt",
+    maxAge: additionalTime,
   },
 };
 

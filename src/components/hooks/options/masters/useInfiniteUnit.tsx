@@ -28,8 +28,8 @@ const useInfiniteUnit = () => {
     (event?: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setSearch(event?.target.value ?? "");
     },
-    500,
-  ); // Menunda eksekusi selama 500ms
+    150,
+  );
 
   const renderOption = (
     props: React.HtmlHTMLAttributes<HTMLLIElement>,
@@ -41,7 +41,7 @@ const useInfiniteUnit = () => {
   ) => {
     return (
       <li {...props}>
-        <div className="items-center flex w-full justify-between">
+        <div className="flex w-full items-center justify-between">
           {option.label}
           <Box
             component={Done}

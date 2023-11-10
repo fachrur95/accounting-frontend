@@ -45,6 +45,7 @@ import type { ICashRegister } from "@/types/prisma-api/cash-register";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
 import dynamic from "next/dynamic";
+import { Role } from "@/types/prisma-api/role.d";
 
 const MasterCashRegisterForm = dynamic(
   () => import("@/components/forms/MasterCashRegisterForm"),
@@ -381,6 +382,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       redirect: {
         destination: "/credentials/unit",
+        permanent: false,
+      },
+    };
+  }
+  if (session.user.role === Role.USER) {
+    return {
+      redirect: {
+        destination: "/not-found",
         permanent: false,
       },
     };

@@ -4,7 +4,7 @@ import DataGridProAdv from "@/components/tables/datagrid/DataGridProAdv";
 import { getServerAuthSession } from "@/server/auth";
 import type { PaginationResponse } from "@/types/api-response";
 import { api } from "@/utils/api";
-import { convertOperator } from "@/utils/helpers";
+import { convertOperator, dateConvertID } from "@/utils/helpers";
 import { useAppStore } from "@/utils/store";
 import Refresh from "@mui/icons-material/Refresh";
 import EditIcon from "@mui/icons-material/Edit";
@@ -40,6 +40,8 @@ import type { ITransaction } from "@/types/prisma-api/transaction";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
 import dynamic from "next/dynamic";
+import { Role } from "@/types/prisma-api/role.d";
+import type { Session } from "next-auth";
 
 const LiabilityForm = dynamic(
   () => import("@/components/forms/transactions/LiabilityForm"),
@@ -52,7 +54,9 @@ const path: WorkerPathType = "transaction";
 
 const pathname = "/cash-and-bank/revenues";
 
-const RevenuesPage: MyPage = () => {
+const RevenuesPage: MyPage<{ userSession: Session["user"] }> = ({
+  userSession,
+}) => {
   const router = useRouter();
 
   const [rows, setRows] = useState<ITransaction[]>([]);
@@ -128,6 +132,12 @@ const RevenuesPage: MyPage = () => {
       headerName: "Tanggal",
       type: "date",
       flex: 1,
+      valueGetter: (params: GridValueGetterParams<unknown, ITransaction>) => {
+        return dateConvertID(new Date(params.row.entryDate), {
+          dateStyle: "long",
+          timeStyle: "short",
+        });
+      },
     },
     {
       field: "total",
@@ -186,11 +196,13 @@ const RevenuesPage: MyPage = () => {
                     },
                     `${pathname}/f/${params}`,
                   ),
+                hidden: userSession.role === Role.USER,
               },
               {
                 icon: <DeleteForever />,
                 label: "Hapus",
                 onClick: (params) => params && setSelectedId(params),
+                hidden: userSession.role === Role.USER,
               },
             ]}
           />
@@ -313,7 +325,7 @@ const RevenuesPage: MyPage = () => {
                 `${pathname}/f/${params.row.id}`,
               )
             } */
-            checkboxSelection
+            checkboxSelection={userSession.role !== Role.USER}
             disableSelectionOnClick
           />
           {router.query.slug && (
@@ -375,10 +387,19 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     };
   }
+  if (session.user.role === Role.USER) {
+    return {
+      redirect: {
+        destination: "/not-found",
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {
       session,
+      userSession: session.user,
     },
   };
 };

@@ -62,7 +62,17 @@ export const checkZero = (value: number | null): number | null => {
   return value;
 }
 
+export const checkNumber = (value?: number | null): number => {
+  if (typeof value === "number" && isNaN(value) || !value) {
+    return 0;
+  }
+
+  return value;
+}
+
 export const dateConvert = (date: Date, options?: Intl.DateTimeFormatOptions): string => date.toLocaleString("en-US", options);
+
+export const dateConvertID = (date: Date, options?: Intl.DateTimeFormatOptions): string => date.toLocaleString("id-ID", options);
 
 export const getPublicIdCloudinary = (url: string): string | undefined => {
   const split1 = url.split("/ptnq/")?.[1];
@@ -113,29 +123,6 @@ export const dateID = (param = new Date()): string => {
   const year = param.getFullYear();
 
   return `${date}/${month}/${year}`
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-export const convertToArabicText = (conventionalNumber: string): string => {
-  const arabicNumbers: Record<string, string> = {
-    '0': '٠',
-    '1': '١',
-    '2': '٢',
-    '3': '٣',
-    '4': '٤',
-    '5': '٥',
-    '6': '٦',
-    '7': '٧',
-    '8': '٨',
-    '9': '٩',
-  };
-
-  const arabicText = conventionalNumber
-    .split('')
-    .map((digit) => (arabicNumbers[digit] ? arabicNumbers[digit] : digit))
-    .join('');
-
-  return arabicText;
 }
 
 export const convertOperator = ({ items }: { items: GridFilterItem[] }) => {
@@ -229,29 +216,7 @@ export const convertSortToURL = (sorts: GridSortModel, front: "&" | "?" = "&") =
   return url;
 }
 
-/* export const dataURLtoFile = (dataURL: string, filename: string): File | null => {
-  console.log({ dataURL })
-  const arr = dataURL.split(',');
-  const mime = arr[0].match(/:(.*?);/);
-
-  if (mime && mime[1]) {
-    const type = mime[1];
-    const byteString = atob(arr[1]);
-    const buffer = new ArrayBuffer(byteString.length);
-    const view = new Uint8Array(buffer);
-
-    for (let i = 0; i < byteString.length; i++) {
-      view[i] = byteString.charCodeAt(i);
-    }
-
-    const blob = new Blob([buffer], { type });
-    return new File([blob], filename, { type });
-  }
-
-  return null;
-} */
-
-export const imageUrlToFile = async (imageUrl: string, filename: string): Promise<File> => {
+export const imageUrlToFile = async (imageUrl: string, filename: string): Promise<File | null> => {
   try {
     const response = await fetch(imageUrl);
     if (!response.ok) {
@@ -259,11 +224,34 @@ export const imageUrlToFile = async (imageUrl: string, filename: string): Promis
     }
     const blob = await response.blob();
 
-    // console.log({ blob });
-
     return new File([blob], filename);
   } catch (error) {
     console.error("Gagal mengunduh dan mengonversi URL gambar ke objek File:", error);
     return null;
   }
+}
+
+export const abbreviateNumber = (value: number): string => {
+  let newValue = value.toString();
+  if (value >= 1000) {
+    const suffixes = ["", "k", "jt", "m", "t"];
+    const suffixNum = Math.floor(value.toString().length / 3);
+    let shortValue = "";
+    for (let precision = 2; precision >= 1; precision--) {
+      shortValue = parseFloat((suffixNum !== 0 ? (value / Math.pow(1000, suffixNum)) : value).toPrecision(precision)).toString();
+      const dotLessShortValue = (shortValue.toString()).replace(/[^a-zA-Z 0-9]+/g, '');
+      if (dotLessShortValue.length <= 2) { break; }
+    }
+    if (parseFloat(shortValue) % 1 !== 0) shortValue = parseFloat(shortValue).toFixed(1);
+    newValue = shortValue + suffixes[suffixNum];
+  }
+
+  return newValue;
+}
+
+export const abbreviateNumberLib = (value: number): string => {
+  return Intl.NumberFormat('id-ID', {
+    notation: "compact",
+    maximumFractionDigits: 1
+  }).format(value)
 }

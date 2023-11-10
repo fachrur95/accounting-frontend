@@ -199,7 +199,6 @@ const MasterTermForm = (props: IMasterTermForm) => {
           <div className="grid gap-4">
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -209,11 +208,11 @@ const MasterTermForm = (props: IMasterTermForm) => {
                 InputProps={{
                   disabled: mode === "view",
                 }}
+                autoFocus
               />
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -227,7 +226,6 @@ const MasterTermForm = (props: IMasterTermForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextareaAutosizeElement

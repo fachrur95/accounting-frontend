@@ -83,17 +83,6 @@ const PaymentForm = (props: IPaymentForm) => {
   const peopleSelected = useWatch({ control, name: "people" });
   const transactionDetails = useWatch({ control, name: "transactionDetails" });
 
-  /* console.log({
-    test,
-    getValues: getValues(`transactionDetails[0]?.chartOfAccount?.name`),
-    watch: watch(`transactionDetails[0]?.chartOfAccount?.name`),
-  }); */
-
-  // const defaultUnit = watch("transactionDetails");
-  // const selectedCategory = watch("itemCategory");
-  // const currentVariantCategory = watch("variantCategories");
-  // const currentVariants = watch("variants");
-
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.globalTransaction.findOne.useQuery(
       { id: selectedId ?? "" },
@@ -111,8 +100,6 @@ const PaymentForm = (props: IPaymentForm) => {
   const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
     transactionType: type === "debt" ? "DEBT_PAYMENT" : "RECEIVABLE_PAYMENT",
   });
-
-  // console.log({ dataNumber });
 
   const mutationCreate = api.payment.create.useMutation({
     onSuccess: () => void router.push(basePath),
@@ -350,7 +337,6 @@ const PaymentForm = (props: IPaymentForm) => {
           <div className="grid gap-4">
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -383,33 +369,79 @@ const PaymentForm = (props: IPaymentForm) => {
                 autocompleteProps={{
                   disabled: mode === "view",
                 }}
+                type="cash-bank"
               />
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer
-                  component={Paper}
-                  elevation={0}
-                  variant="outlined"
-                >
+                <TableContainer component={Paper} elevation={0}>
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell width="5%" align="right">
+                        <TableCell
+                          sx={{ width: "5%", minWidth: { xs: 80, md: "auto" } }}
+                          align="right"
+                        >
                           No
                         </TableCell>
-                        <TableCell width="25%">No. Transaksi/ Bukti</TableCell>
-                        <TableCell width="20%">Tanggal</TableCell>
-                        <TableCell width="10%" align="right">
+                        <TableCell
+                          sx={{
+                            width: "25%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                        >
+                          No. Transaksi/ Bukti
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            width: "20%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                        >
+                          Tanggal
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            width: "10%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           {`Nilai ${type === "debt" ? "Hutang" : "Piutang"}`}
                         </TableCell>
-                        <TableCell width="10%" align="right">
+                        <TableCell
+                          sx={{
+                            width: "10%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           {`Sisa ${type === "debt" ? "Hutang" : "Piutang"}`}
                         </TableCell>
-                        <TableCell width="15%">Bayar</TableCell>
-                        <TableCell width="10%">Catatan</TableCell>
+                        <TableCell
+                          sx={{
+                            width: "15%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                        >
+                          Bayar
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            width: "10%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                        >
+                          Catatan
+                        </TableCell>
                         {mode !== "view" && (
-                          <TableCell width="5%" align="center">
+                          <TableCell
+                            sx={{
+                              width: "5%",
+                              minWidth: { xs: 100, md: "auto" },
+                            }}
+                            align="center"
+                          >
                             <Delete />
                           </TableCell>
                         )}
@@ -492,7 +524,6 @@ const PaymentForm = (props: IPaymentForm) => {
             </div>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextareaAutosizeElement

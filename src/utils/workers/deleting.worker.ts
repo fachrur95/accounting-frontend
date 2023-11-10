@@ -1,9 +1,3 @@
-/* function doSetTimeout(id: string) {
-  setTimeout(function () {
-    console.log(id);
-  }, 5000);
-} */
-
 import type { DeleteWorkerEventType, IEventDeleteWorker } from "@/types/worker";
 import axios from "axios";
 

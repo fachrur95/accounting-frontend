@@ -25,6 +25,10 @@ import ShoppingCartOutlined from "@mui/icons-material/ShoppingCartOutlined";
 import StorageOutlined from "@mui/icons-material/StorageOutlined";
 import StorefrontOutlined from "@mui/icons-material/StorefrontOutlined";
 import EditNote from "@mui/icons-material/EditNote";
+import Book from "@mui/icons-material/Book";
+import Widgets from "@mui/icons-material/Widgets";
+import Category from "@mui/icons-material/Category";
+import { Role } from "@/types/prisma-api/role.d";
 
 export type DataMenuType = {
   id: string;
@@ -32,6 +36,7 @@ export type DataMenuType = {
   depth: number;
   url: string;
   icon: React.ReactNode;
+  roles: Role[];
   children: DataMenuType[];
 };
 
@@ -42,6 +47,7 @@ const data: DataMenuType[] = [
     depth: 0,
     url: "/",
     icon: <InsertChartOutlined fontSize="small" />,
+    roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
     children: [],
   },
   /* {
@@ -50,6 +56,7 @@ const data: DataMenuType[] = [
     depth: 0,
     url: "/pos",
     icon: <PointOfSale fontSize="small" />,
+    roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
     children: [],
   }, */
   {
@@ -58,6 +65,7 @@ const data: DataMenuType[] = [
     depth: 0,
     url: "/sales",
     icon: <MonetizationOnOutlined fontSize="small" />,
+    roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN, Role.USER],
     children: [
       /* {
         id: "sales-quotation",
@@ -65,6 +73,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/sales/sales-quotations",
         icon: <FormatQuote fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       },
       {
@@ -73,6 +82,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/sales/sales-orders",
         icon: <MenuBook fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       },
       {
@@ -81,6 +91,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/sales/sales-deliveries",
         icon: <LocalShippingOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       },
       {
@@ -89,6 +100,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/sales/sales-invoices",
         icon: <AssignmentTurnedInOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       },
       {
@@ -97,6 +109,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/sales/sales-returns",
         icon: <AssignmentReturn fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       }, */
     ],
@@ -107,6 +120,7 @@ const data: DataMenuType[] = [
     depth: 0,
     url: "/purchase",
     icon: <ShoppingCartOutlined fontSize="small" />,
+    roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
     children: [
       /* {
         id: "purchase-quotation",
@@ -114,6 +128,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/purchase/purchase-quotations",
         icon: <FormatQuote fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       },
       {
@@ -122,6 +137,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/purchase/purchase-orders",
         icon: <MenuBook fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       },
       {
@@ -130,6 +146,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/purchase/purchase-deliveries",
         icon: <LocalShippingOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       },
       {
@@ -138,6 +155,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/purchase/purchase-invoices",
         icon: <AssignmentTurnedInOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       },
       {
@@ -146,6 +164,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/purchase/purchase-returns",
         icon: <Undo fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       }, */
     ],
@@ -156,6 +175,7 @@ const data: DataMenuType[] = [
     depth: 0,
     url: "/cash-and-bank",
     icon: <LocalAtmOutlined fontSize="small" />,
+    roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN, Role.USER],
     children: [
       {
         id: "receivable-payment",
@@ -163,6 +183,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/cash-and-bank/receivable-payments",
         icon: <SaveAltOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN, Role.USER],
         children: [],
       },
       {
@@ -171,14 +192,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/cash-and-bank/payable-payments",
         icon: <PaymentOutlined fontSize="small" />,
-        children: [],
-      },
-      {
-        id: "expense",
-        label: "pengeluaran",
-        depth: 1,
-        url: "/cash-and-bank/expenses",
-        icon: <CallMadeOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
       },
       {
@@ -187,6 +201,16 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/cash-and-bank/revenues",
         icon: <CallReceivedOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
+        children: [],
+      },
+      {
+        id: "expense",
+        label: "pengeluaran",
+        depth: 1,
+        url: "/cash-and-bank/expenses",
+        icon: <CallMadeOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
       },
       /* {
@@ -195,6 +219,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/cash-and-bank/transfer-funds",
         icon: <ImportExportOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       }, */
     ],
@@ -205,6 +230,7 @@ const data: DataMenuType[] = [
     depth: 0,
     url: "/inventories",
     icon: <Inventory2Outlined fontSize="small" />,
+    roles: [Role.SUPERADMIN],
     children: [
       {
         id: "stock-opname",
@@ -212,6 +238,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/inventories/stock-opname",
         icon: <ProductionQuantityLimits fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       },
     ],
@@ -222,6 +249,7 @@ const data: DataMenuType[] = [
     depth: 0,
     url: "/other-transactions",
     icon: <MoreOutlined fontSize="small" />,
+    roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
     children: [
       {
         id: "stock-opname",
@@ -229,15 +257,63 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/other-transactions/stock-opname",
         icon: <ProductionQuantityLimits fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
       },
       {
         id: "journal-entry",
-        label: "journal entry",
+        label: "jurnal umum",
         depth: 1,
         url: "/other-transactions/journal-entries",
         icon: <EditNote fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
+      },
+      {
+        id: "financial-closing",
+        label: "tutup buku",
+        depth: 1,
+        url: "/other-transactions/financial-closings",
+        icon: <Book fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
+        children: [],
+      },
+      {
+        id: "beginning-balance",
+        label: "saldo awal",
+        depth: 1,
+        url: "/other-transactions/beginning-balances",
+        icon: <Widgets fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
+        children: [
+          {
+            id: "begin-balance-stock",
+            label: "stock",
+            depth: 2,
+            url: "/other-transactions/beginning-balances/stocks",
+            icon: <Category fontSize="small" />,
+            roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
+            children: [],
+          },
+          {
+            id: "begin-balance-debt",
+            label: "hutang",
+            depth: 2,
+            url: "/other-transactions/beginning-balances/debts",
+            icon: <CircleOutlined fontSize="small" />,
+            roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
+            children: [],
+          },
+          {
+            id: "begin-balance-receivable",
+            label: "piutang",
+            depth: 2,
+            url: "/other-transactions/beginning-balances/receivables",
+            icon: <CircleOutlined fontSize="small" />,
+            roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
+            children: [],
+          },
+        ],
       },
       {
         id: "all-transaction",
@@ -245,6 +321,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/other-transactions/all-transactions",
         icon: <CircleOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
       },
     ],
@@ -255,6 +332,7 @@ const data: DataMenuType[] = [
     depth: 0,
     url: "/",
     icon: <StorageOutlined fontSize="small" />,
+    roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN, Role.USER],
     children: [
       {
         id: "product",
@@ -262,6 +340,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/masters/products",
         icon: <LocalOfferOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN, Role.USER],
         children: [],
       },
       /* {
@@ -270,6 +349,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/masters/price-books",
         icon: <PriceChange fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       }, */
       {
@@ -278,6 +358,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/masters/contacts",
         icon: <ContactsOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN, Role.USER],
         children: [
           {
             id: "customer",
@@ -285,6 +366,7 @@ const data: DataMenuType[] = [
             depth: 2,
             url: "/masters/contacts/customers",
             icon: <Groups fontSize="small" />,
+            roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN, Role.USER],
             children: [],
           },
           {
@@ -293,6 +375,7 @@ const data: DataMenuType[] = [
             depth: 2,
             url: "/masters/contacts/suppliers",
             icon: <Diversity3 fontSize="small" />,
+            roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
             children: [],
           },
           /* {
@@ -301,6 +384,7 @@ const data: DataMenuType[] = [
             depth: 2,
             url: "/masters/contacts/employees",
             icon: <Diversity2 fontSize="small" />,
+            roles: [Role.SUPERADMIN],
             children: [],
           }, */
         ],
@@ -311,6 +395,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/masters/chart-of-accounts",
         icon: <FormatListNumberedOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
       },
       {
@@ -319,6 +404,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/masters/other",
         icon: <StorefrontOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
       },
     ],
@@ -329,6 +415,7 @@ const data: DataMenuType[] = [
     depth: 0,
     url: "/reports",
     icon: <ReceiptLongOutlined fontSize="small" />,
+    roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
     children: [],
   },
   {
@@ -337,6 +424,7 @@ const data: DataMenuType[] = [
     depth: 0,
     url: "/activities",
     icon: <Hiking fontSize="small" />,
+    roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN, Role.USER],
     children: [],
   },
   {
@@ -345,6 +433,7 @@ const data: DataMenuType[] = [
     depth: 0,
     url: "/settings",
     icon: <SettingsApplicationsOutlined fontSize="small" />,
+    roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
     children: [
       {
         id: "users",
@@ -352,6 +441,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/settings/users",
         icon: <GroupAddOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
       },
       {
@@ -360,6 +450,7 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/settings/general-settings",
         icon: <BuildCircleOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
       },
       /* {
@@ -368,6 +459,7 @@ const data: DataMenuType[] = [
         depth: 0,
         url: "/settings/beginning-balance",
         icon: <PlayCircleFilledWhiteOutlined fontSize="small" />,
+        roles: [Role.SUPERADMIN],
         children: [],
       }, */
     ],

@@ -6,6 +6,8 @@ import type { IUnit } from "./unit";
 export declare interface IGeneralSetting {
   id: string;
   companyName: string;
+  leader?: string | null;
+  accountant?: string | null;
   recalculateMethod: RecalculateMethod;
   isStrictMode: boolean;
   createdAt: Date;
@@ -23,6 +25,8 @@ export declare interface IGeneralSetting {
 
 export declare type IGeneralSettingMutation = Pick<IGeneralSetting,
   | "companyName"
+  | "leader"
+  | "accountant"
   | "recalculateMethod"
   | "currentProfitAccountId"
   | "debitAccountId"

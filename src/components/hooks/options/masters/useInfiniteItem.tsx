@@ -32,8 +32,8 @@ const useInfiniteItem = ({
     (event?: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setSearch(event?.target.value ?? "");
     },
-    500,
-  ); // Menunda eksekusi selama 500ms
+    150,
+  );
 
   const renderOption = (
     props: React.HtmlHTMLAttributes<HTMLLIElement>,

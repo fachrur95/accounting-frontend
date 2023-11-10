@@ -9,6 +9,8 @@ import { useState, type PropsWithChildren } from "react";
 import ThemeChanger from "../displays/ThemeChanger";
 import DashboardHeader from "./Headers/DashboardHeader";
 import SidebarMenu from "./Navigations/SidebarMenu";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const drawerWidth = 240;
 
@@ -65,6 +67,8 @@ type DashboardProps = PropsWithChildren & {
 
 const DashboardLayout = (props: DashboardProps) => {
   const { window } = props;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [open, setOpen] = useState(false);
 
   const handleDrawerOpen = () => {
@@ -92,45 +96,47 @@ const DashboardLayout = (props: DashboardProps) => {
   return (
     <Box sx={{ display: "flex" }}>
       <DashboardHeader handleClick={handleDrawerOpen} />
-      <MuiDrawer
-        container={container}
-        variant="temporary"
-        open={open}
-        onClose={handleDrawerOpen}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
-        }}
-        sx={{
-          display: { xs: "block", sm: "none" },
-          // "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
-        }}
-      >
-        {drawer}
-      </MuiDrawer>
-      <Drawer
-        variant="permanent"
-        open={open}
-        sx={{
-          display: { xs: "none", sm: "block" },
-          // "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
-        }}
-      >
-        {drawer}
-      </Drawer>
+      {isMobile && (
+        <MuiDrawer
+          container={container}
+          variant="temporary"
+          open={open}
+          onClose={handleDrawerOpen}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: "block", sm: "none" },
+          }}
+        >
+          {drawer}
+        </MuiDrawer>
+      )}
+      {!isMobile && (
+        <Drawer
+          variant="permanent"
+          open={open}
+          sx={{
+            display: { xs: "none", sm: "block" },
+          }}
+        >
+          {drawer}
+        </Drawer>
+      )}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 3,
-          bgcolor: (theme) =>
+          /* bgcolor: (theme) =>
             theme.palette.mode === "light"
               ? theme.palette.grey.A200
-              : theme.palette.background.default,
+              : theme.palette.background.default, */
         }}
       >
         <Box className="flex flex-col">
           <DrawerHeader />
-          <Box className="min-h-[87.5vh] flex-grow">{props.children}</Box>
+          <Box className="min-h-[88vh] flex-grow">{props.children}</Box>
         </Box>
       </Box>
     </Box>

@@ -199,7 +199,6 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
           <div className="grid gap-4">
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -209,11 +208,11 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
                 InputProps={{
                   disabled: mode === "view",
                 }}
+                autoFocus
               />
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -227,7 +226,6 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextareaAutosizeElement

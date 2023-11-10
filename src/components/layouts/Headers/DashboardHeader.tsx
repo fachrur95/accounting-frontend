@@ -14,6 +14,14 @@ import React, { useState } from "react";
 import CoreHeader from "./CoreHeader";
 import useSessionData from "@/components/hooks/useSessionData";
 import DeletingProcess from "./DeletingProcess";
+import Avatar from "@mui/material/Avatar";
+import Divider from "@mui/material/Divider";
+import Settings from "@mui/icons-material/Settings";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import Logout from "@mui/icons-material/Logout";
+import AccountBalance from "@mui/icons-material/AccountBalance";
+import Store from "@mui/icons-material/Store";
+import Link from "next/link";
 
 interface HeaderProps {
   window?: () => Window;
@@ -50,22 +58,93 @@ const DashboardHeader = (props: HeaderProps) => {
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
       id={menuId}
       keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
       open={isMenuOpen}
       onClose={handleMenuClose}
+      transformOrigin={{ horizontal: "right", vertical: "top" }}
+      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+      slotProps={{
+        paper: {
+          elevation: 0,
+          sx: {
+            minWidth: 250,
+            overflow: "visible",
+            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+            mt: 1.5,
+            "& .MuiAvatar-root": {
+              width: 32,
+              height: 32,
+              ml: -0.5,
+              mr: 1,
+            },
+            "&:before": {
+              content: '""',
+              display: "block",
+              position: "absolute",
+              top: 0,
+              right: 14,
+              width: 10,
+              height: 10,
+              bgcolor: "background.paper",
+              transform: "translateY(-50%) rotate(45deg)",
+              zIndex: 0,
+            },
+          },
+        },
+      }}
     >
-      {/* <MenuItem onClick={handleMenuClose}>Profile</MenuItem> */}
-      {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
-      <MenuItem onClick={() => void signOut()}>Logout</MenuItem>
+      <Link
+        href="/profile"
+        className="text-[#202020] no-underline transition-all duration-300 dark:text-white"
+      >
+        <MenuItem onClick={handleMenuClose}>
+          <ListItemIcon>
+            <Avatar />
+          </ListItemIcon>
+          Akun Saya
+        </MenuItem>
+      </Link>
+      <Link
+        href="/credentials/institute"
+        className="text-[#202020] no-underline transition-all duration-300 dark:text-white"
+      >
+        <MenuItem onClick={handleMenuClose}>
+          <ListItemIcon>
+            <AccountBalance />
+          </ListItemIcon>
+          {sessionData?.session?.institute?.name ?? ""}
+        </MenuItem>
+      </Link>
+      <Link
+        href="/credentials/unit"
+        className="text-[#202020] no-underline transition-all duration-300 dark:text-white"
+      >
+        <MenuItem onClick={handleMenuClose}>
+          <ListItemIcon>
+            <Store />
+          </ListItemIcon>
+          {sessionData?.session?.unit?.name ?? ""}
+        </MenuItem>
+      </Link>
+      <Divider />
+      <Link
+        href="/settings/general-settings"
+        className="text-[#202020] no-underline transition-all duration-300 dark:text-white"
+      >
+        <MenuItem onClick={handleMenuClose}>
+          <ListItemIcon>
+            <Settings fontSize="small" />
+          </ListItemIcon>
+          Pengaturan
+        </MenuItem>
+      </Link>
+      <MenuItem onClick={() => void signOut()}>
+        <ListItemIcon>
+          <Logout fontSize="small" />
+        </ListItemIcon>
+        Keluar
+      </MenuItem>
     </Menu>
   );
 
@@ -140,6 +219,15 @@ const DashboardHeader = (props: HeaderProps) => {
           >
             <DeletingProcess />
             <div className="flex flex-row items-center gap-2">
+              <div className="flex flex-col items-end justify-center">
+                <Typography variant="subtitle2" className="capitalize">
+                  {sessionData?.session?.institute?.name ?? ""}
+                </Typography>
+                <Typography variant="body2">
+                  {sessionData?.session?.unit?.name ?? ""}
+                </Typography>
+              </div>
+              <Divider orientation="vertical" flexItem />
               <div className="flex flex-col items-end justify-center">
                 <Typography variant="subtitle2" className="capitalize">
                   {sessionData?.name ?? "-"}

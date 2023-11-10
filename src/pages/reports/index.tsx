@@ -4,9 +4,94 @@ import type { IJwtDecode } from "@/types/session";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
 import React from "react";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import ListSubheader from "@mui/material/ListSubheader";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Summarize from "@mui/icons-material/Summarize";
+import Head from "next/head";
+import Link from "next/link";
+import { Role } from "@/types/prisma-api/role.d";
+
+const title = "Laporan";
+
+const dataReports = [
+  {
+    icon: <Summarize />,
+    title: "Neraca",
+    url: "/reports/balance-sheet",
+  },
+  {
+    icon: <Summarize />,
+    title: "Laba Rugi",
+    url: "/reports/profit-loss",
+  },
+  {
+    icon: <Summarize />,
+    title: "Hutang",
+    url: "/reports/debt",
+  },
+  {
+    icon: <Summarize />,
+    title: "Piutang",
+    url: "/reports/receivable",
+  },
+  {
+    icon: <Summarize />,
+    title: "Arus Kas",
+    url: "/reports/cash-flow",
+  },
+  {
+    icon: <Summarize />,
+    title: "Rekening Bank",
+    url: "/reports/bank-summary",
+  },
+  {
+    icon: <Summarize />,
+    title: "Barang Terlaris",
+    url: "/reports/best-selling-product",
+  },
+];
 
 const ReportsPage: MyPage = () => {
-  return <div>ReportsPage</div>;
+  return (
+    <>
+      <Head>
+        <title>{`Bidang Usaha | ${title}`}</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      </Head>
+      <Box component={Paper} sx={{ width: "100%" }}>
+        <nav aria-label="main mailbox folders">
+          <List
+            subheader={
+              <ListSubheader component="div" id="nested-list-subheader">
+                Daftar Laporan
+              </ListSubheader>
+            }
+          >
+            {dataReports.map((report, index) => (
+              <Link
+                key={index}
+                href={report.url}
+                className="text-[#202020] no-underline transition-all duration-300 dark:text-white"
+              >
+                <ListItem disablePadding>
+                  <ListItemButton>
+                    <ListItemIcon>{report.icon}</ListItemIcon>
+                    <ListItemText primary={report.title} />
+                  </ListItemButton>
+                </ListItem>
+              </Link>
+            ))}
+          </List>
+        </nav>
+      </Box>
+    </>
+  );
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -34,6 +119,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       redirect: {
         destination: "/credentials/unit",
+        permanent: false,
+      },
+    };
+  }
+  if (session.user.role === Role.USER) {
+    return {
+      redirect: {
+        destination: "/not-found",
         permanent: false,
       },
     };

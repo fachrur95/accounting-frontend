@@ -76,22 +76,14 @@ const InstituteCredentialPage: MyPage = () => {
 
   const handleSetInstitute = async (event: React.MouseEvent, id: string) => {
     event.stopPropagation();
-    /* console.log({
-      typeof: typeof (event.target as HTMLElement).classList,
-      check: (event.target as HTMLElement).classList,
-    });
-    if ((event.target as HTMLElement).classList.contains("MuiSvgIcon-root")) {
-      return;
-    } */
 
     await mutation.mutateAsync(
       { id },
       {
         onError: (err) => console.log(err),
         onSuccess: async (data) => {
-          // console.log(data);
           if (!data) {
-            return void setOpenNotification("Error to set business");
+            return void setOpenNotification("Error to set institute");
           }
           await handleUpdateSession({
             accessToken: data.access.token,
@@ -167,23 +159,28 @@ const InstituteCredentialPage: MyPage = () => {
           <div>
             <SearchInput />
           </div>
-          <Link
-            href={{
-              pathname,
-              query: { slug: ["f"] },
-            }}
-            as={`${pathname}/f`}
-          >
-            <Button
-              variant="contained"
-              color="success"
-              startIcon={<Add />}
-              // onClick={() => setOpenAddNew(true)}
-              // onClick={() => void handleUpdateSession()}
+          <div>
+            <IconButton onClick={() => void refetch()}>
+              <Add />
+            </IconButton>
+            <Link
+              href={{
+                pathname,
+                query: { slug: ["f"] },
+              }}
+              as={`${pathname}/f`}
             >
-              Tambah
-            </Button>
-          </Link>
+              <Button
+                variant="contained"
+                color="success"
+                startIcon={<Add />}
+                // onClick={() => setOpenAddNew(true)}
+                // onClick={() => void handleUpdateSession()}
+              >
+                Tambah
+              </Button>
+            </Link>
+          </div>
         </Box>
         <TableContainer
           component={Paper}
@@ -194,8 +191,15 @@ const InstituteCredentialPage: MyPage = () => {
           <Table stickyHeader aria-label="customized table">
             <TableHead>
               <TableRow>
-                <TableCell>Lembaga</TableCell>
-                <TableCell align="center" width="10%">
+                <TableCell
+                  sx={{ width: "90%", minWidth: { xs: 250, md: "auto" } }}
+                >
+                  Lembaga
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{ width: "10%", minWidth: { xs: 100, md: "auto" } }}
+                >
                   Opsi
                 </TableCell>
               </TableRow>

@@ -4,6 +4,7 @@ import type { IJwtDecode } from "@/types/session";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
 import React from "react";
+import { Role } from "@/types/prisma-api/role.d";
 
 const SettingsPage: MyPage = () => {
   return <div>SettingsPage</div>;
@@ -34,6 +35,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       redirect: {
         destination: "/credentials/unit",
+        permanent: false,
+      },
+    };
+  }
+  if (session.user.role === Role.USER) {
+    return {
+      redirect: {
+        destination: "/not-found",
         permanent: false,
       },
     };

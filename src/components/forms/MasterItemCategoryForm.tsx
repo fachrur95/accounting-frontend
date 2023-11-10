@@ -254,7 +254,6 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
           <div className="grid gap-4">
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -264,11 +263,11 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
                 InputProps={{
                   disabled: mode === "view",
                 }}
+                autoFocus
               />
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <AutocompleteItemType
@@ -304,7 +303,6 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextareaAutosizeElement

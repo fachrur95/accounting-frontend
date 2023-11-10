@@ -10,3 +10,8 @@ export declare type FilterType = {
   linkOperator: "and" | "or",
   items: ItemFilter[]
 }
+
+export declare type FilterReportType = {
+  startDate: Date;
+  endDate: Date;
+}

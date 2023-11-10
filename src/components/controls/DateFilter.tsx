@@ -21,19 +21,9 @@ const DateFilter = ({
   return (
     <Box component={Paper} className="p-2">
       <FormContainer formContext={formContext}>
-        <div className="flex flex-col items-center gap-2 md:flex-row">
-          <DatePicker
-            name="startDate"
-            label="Mulai"
-            size="small"
-            maxDate={endDate}
-          />
-          <DatePicker
-            name="endDate"
-            label="Sampai"
-            size="small"
-            minDate={startDate}
-          />
+        <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
+          <DatePicker name="startDate" label="Mulai" maxDate={endDate} />
+          <DatePicker name="endDate" label="Sampai" minDate={startDate} />
         </div>
       </FormContainer>
     </Box>

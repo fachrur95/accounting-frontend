@@ -1,4 +1,3 @@
-
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -16,7 +15,9 @@ export const salesRouter = createTRPCRouter({
     z.object({
       transactionNumber: z.string(),
       peopleId: z.string(),
+      chartOfAccountId: z.string().nullish(),
       termId: z.string().nullish(),
+      paymentType: z.string().nullish(),
       paymentInput: z.number(),
       specialDiscount: z.number().nullish(),
       discountGroupInput: z.number().nullish(),
@@ -56,8 +57,10 @@ export const salesRouter = createTRPCRouter({
     z.object({
       id: z.string(),
       transactionNumber: z.string(),
+      chartOfAccountId: z.string().nullish(),
       peopleId: z.string(),
       termId: z.string().nullish(),
+      paymentType: z.string().nullish(),
       paymentInput: z.number(),
       specialDiscount: z.number().nullish(),
       discountGroupInput: z.number().nullish(),

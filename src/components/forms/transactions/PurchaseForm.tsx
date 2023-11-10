@@ -136,8 +136,6 @@ const PurchaseForm = (props: IPurchaseForm) => {
     transactionType: "PURCHASE_INVOICE",
   });
 
-  // console.log({ dataNumber });
-
   const mutationCreate = api.purchase.create.useMutation({
     onSuccess: () => void router.push(basePath),
     onError: (error) => {
@@ -418,7 +416,6 @@ const PurchaseForm = (props: IPurchaseForm) => {
           <div className="grid gap-4">
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -454,45 +451,95 @@ const PurchaseForm = (props: IPurchaseForm) => {
                   autocompleteProps={{
                     disabled: mode === "view",
                   }}
+                  type="cash-bank"
                   required={paymentInput > 0}
                 />
               )}
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer
-                  component={Paper}
-                  elevation={0}
-                  variant="outlined"
-                >
+                <TableContainer component={Paper} elevation={0}>
                   <Table
                     size="small"
                     sx={{ "& .MuiTableCell-root": { px: "6px" } }}
                   >
                     <TableHead>
                       <TableRow>
-                        <TableCell width="3%" align="right">
+                        <TableCell
+                          sx={{ width: "3%", minWidth: { xs: 80, md: "auto" } }}
+                          align="right"
+                        >
                           No
                         </TableCell>
-                        <TableCell width="26%">Produk</TableCell>
-                        <TableCell width="8%" align="right">
+                        <TableCell
+                          sx={{
+                            width: "26%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                        >
+                          Produk
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            width: "8%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Qty
                         </TableCell>
-                        <TableCell width="15%" align="right">
+                        <TableCell
+                          sx={{
+                            width: "15%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Satuan
                         </TableCell>
-                        <TableCell width="15%" align="right">
+                        <TableCell
+                          sx={{
+                            width: "15%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Harga Satuan
                         </TableCell>
-                        <TableCell width="10%" align="right">
+                        <TableCell
+                          sx={{
+                            width: "10%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Diskon
                         </TableCell>
-                        <TableCell width="10%" align="right">
+                        <TableCell
+                          sx={{
+                            width: "10%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Total
                         </TableCell>
-                        <TableCell width="10%">Catatan</TableCell>
+                        <TableCell
+                          sx={{
+                            width: "10%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                        >
+                          Catatan
+                        </TableCell>
                         {mode !== "view" && (
-                          <TableCell width="3%" align="center">
+                          <TableCell
+                            sx={{
+                              width: "3%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                            align="center"
+                          >
                             <Delete />
                           </TableCell>
                         )}
@@ -682,7 +729,6 @@ const PurchaseForm = (props: IPurchaseForm) => {
             </div>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextareaAutosizeElement

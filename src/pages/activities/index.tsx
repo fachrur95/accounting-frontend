@@ -4,7 +4,7 @@ import DataGridProAdv from "@/components/tables/datagrid/DataGridProAdv";
 import { getServerAuthSession } from "@/server/auth";
 import type { PaginationResponse } from "@/types/api-response";
 import { api } from "@/utils/api";
-import { convertOperator } from "@/utils/helpers";
+import { convertOperator, dateConvertID } from "@/utils/helpers";
 import { useAppStore } from "@/utils/store";
 import Refresh from "@mui/icons-material/Refresh";
 import Box from "@mui/material/Box";
@@ -17,6 +17,7 @@ import type {
   GridInputSelectionModel,
   GridSelectionModel,
   GridSortModel,
+  GridValueGetterParams,
 } from "@mui/x-data-grid-pro";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
@@ -80,6 +81,12 @@ const ActivitiesPage: MyPage = () => {
       headerName: "Tanggal",
       type: "date",
       flex: 1,
+      valueGetter: (params: GridValueGetterParams<unknown, ILogActivity>) => {
+        return dateConvertID(new Date(params.row.createdAt), {
+          dateStyle: "long",
+          timeStyle: "short",
+        });
+      },
     },
     {
       field: "message",

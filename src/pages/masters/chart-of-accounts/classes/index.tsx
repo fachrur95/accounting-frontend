@@ -41,6 +41,7 @@ import type { IAccountClass } from "@/types/prisma-api/account-class";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
 import dynamic from "next/dynamic";
+import { Role } from "@/types/prisma-api/role.d";
 
 const MasterAccountClassForm = dynamic(
   () => import("@/components/forms/MasterAccountClassForm"),
@@ -358,6 +359,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       redirect: {
         destination: "/credentials/unit",
+        permanent: false,
+      },
+    };
+  }
+  if (session.user.role === Role.USER) {
+    return {
+      redirect: {
+        destination: "/not-found",
         permanent: false,
       },
     };

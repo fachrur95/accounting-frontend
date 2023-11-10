@@ -29,3 +29,11 @@ export declare type IUserMutation = Pick<IUser,
 > & {
   userUnits: UserUnitType[],
 }
+
+export declare type IUserAccountUpdateMutation = Pick<IUser,
+  | "email"
+  | "name"
+  | "password"
+> & {
+  newPassword: string;
+}

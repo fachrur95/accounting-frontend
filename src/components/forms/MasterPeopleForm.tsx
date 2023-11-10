@@ -178,7 +178,13 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
                 <Close />
               </IconButton>
             </Link>
-            <Typography variant="h6">Kategori</Typography>
+            <Typography variant="h6">
+              {forType === "customer"
+                ? "Pelanggan"
+                : forType === "supplier"
+                ? "Pemasok"
+                : "Karyawan"}
+            </Typography>
           </div>
           <div>
             {mode === "view" && selectedId ? (
@@ -214,7 +220,6 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
           <div className="grid gap-4">
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -224,6 +229,7 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
                 InputProps={{
                   disabled: mode === "view",
                 }}
+                autoFocus
               />
               <TextFieldElement
                 name="name"
@@ -236,7 +242,6 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <AutocompletePeopleCategory
@@ -251,7 +256,6 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextareaAutosizeElement

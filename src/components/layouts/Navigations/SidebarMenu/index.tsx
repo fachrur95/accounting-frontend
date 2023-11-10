@@ -3,8 +3,10 @@ import SidebarCollapse from "./SidebarCollapse";
 import SidebarItem from "./SidebarItem";
 import menuData from "./data";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 const SidebarMenu = ({ openDrawer }: { openDrawer: boolean }) => {
+  const { data: session } = useSession();
   const [domLoaded, setDomLoaded] = useState(false);
 
   useEffect(() => {
@@ -28,21 +30,25 @@ const SidebarMenu = ({ openDrawer }: { openDrawer: boolean }) => {
         )
       } */
     >
-      {menuData.map((item, index) =>
-        item.children.length > 0 ? (
-          <SidebarCollapse
-            key={`list-col-${index}`}
-            openDrawer={openDrawer}
-            item={item}
-          />
-        ) : (
-          <SidebarItem
-            key={`list-item-${index}`}
-            openDrawer={openDrawer}
-            item={item}
-          />
-        ),
-      )}
+      {menuData
+        .filter((menu) =>
+          session ? menu.roles.includes(session.user.role) : false,
+        )
+        .map((item, index) =>
+          item.children.length > 0 ? (
+            <SidebarCollapse
+              key={`list-col-${index}`}
+              openDrawer={openDrawer}
+              item={item}
+            />
+          ) : (
+            <SidebarItem
+              key={`list-item-${index}`}
+              openDrawer={openDrawer}
+              item={item}
+            />
+          ),
+        )}
     </List>
   );
 };

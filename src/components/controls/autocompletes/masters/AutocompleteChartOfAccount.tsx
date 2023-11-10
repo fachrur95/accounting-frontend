@@ -16,29 +16,32 @@ const AutocompleteChartOfAccount = <TFieldValues extends FieldValues>(
       boolean | undefined
     >,
     "options"
-  >,
+  > & {
+    type?: "cash-bank" | "bank";
+  },
 ): JSX.Element => {
+  const { type, ...rest } = props;
   const {
     options: optionsItem,
     isFetching: isFetchingItem,
     renderOption: renderOptionItem,
     onSearch: onSearchItem,
-  } = useInfiniteChartOfAccount();
+  } = useInfiniteChartOfAccount({ type });
 
   return (
     <AutocompleteElement
-      {...props}
+      {...rest}
       options={optionsItem}
       loading={isFetchingItem}
       textFieldProps={{
-        ...props.textFieldProps,
+        ...rest.textFieldProps,
         onChange: onSearchItem,
       }}
       autocompleteProps={{
-        ...props.autocompleteProps,
+        ...rest.autocompleteProps,
         onClose: () => onSearchItem(),
         renderOption: renderOptionItem,
-        disableClearable: props.required,
+        disableClearable: rest.required,
       }}
     />
   );

@@ -32,6 +32,7 @@ import Divider from "@mui/material/Divider";
 import type { IDataOption } from "@/types/options";
 import {
   FormContainer,
+  RadioButtonGroup,
   TextFieldElement,
   TextareaAutosizeElement,
   useFieldArray,
@@ -45,6 +46,7 @@ import { formatNumber } from "@/utils/helpers";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useRouter } from "next/router";
+import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
 import AutocompleteItem from "../../controls/autocompletes/masters/AutocompleteItem";
 import AutocompleteMultipleUom from "../../controls/autocompletes/masters/AutocompleteMultipleUom";
 import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
@@ -52,6 +54,7 @@ import OpenCashRegisterForm from "../OpenCashRegister";
 import useSessionData from "@/components/hooks/useSessionData";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
+import { PaymentType } from "@/types/prisma-api/payment-type.d";
 
 interface ISalesForm {
   slug: FormSlugType;
@@ -77,6 +80,9 @@ const defaultValues: ISalesMutation = {
   people: null,
   termId: "",
   term: null,
+  chartOfAccountId: "",
+  chartOfAccount: null,
+  paymentType: "CASH",
   paymentInput: 0,
   specialDiscount: 0,
   discountGroupInput: 0,
@@ -131,6 +137,7 @@ const SalesForm = (props: ISalesForm) => {
     control,
     name: "transactionDetails",
   });
+  const paymentType: PaymentType = useWatch({ control, name: "paymentType" });
   const paymentInput: number = useWatch({ control, name: "paymentInput" });
   const specialDiscount: number =
     useWatch({
@@ -208,7 +215,10 @@ const SalesForm = (props: ISalesForm) => {
       specialDiscount: data.specialDiscount ?? 0,
       discountGroupInput: data.discountGroupInput ?? 0,
       note: data.note === "" || data.note === null ? undefined : data.note,
-      // chartOfAccountId: data.chartOfAccount?.id ?? undefined,
+      chartOfAccountId:
+        data.paymentType === PaymentType.CASHLESS
+          ? data.chartOfAccount?.id ?? ""
+          : undefined,
       termId: data.term?.id ?? undefined,
       peopleId: data.people?.id ?? "",
       transactionDetails: data.transactionDetails.map((detail) => ({
@@ -286,7 +296,6 @@ const SalesForm = (props: ISalesForm) => {
         (detail) => detail.multipleUom?.id === newRow.multipleUomId,
       );
       if (getIndex !== -1) {
-        console.log({ getIndex });
         setValue(
           `transactionDetails.${getIndex}.qtyInput`,
           (transactionDetails?.[getIndex]?.qtyInput ?? 1) + (qty ?? 1),
@@ -365,6 +374,16 @@ const SalesForm = (props: ISalesForm) => {
             }
             continue;
           }
+          if (key === "chartOfAccount") {
+            const selectedChartOfAccount = dataSelected[key]!;
+            if (selectedChartOfAccount) {
+              setValue("chartOfAccount", {
+                id: selectedChartOfAccount.id,
+                label: selectedChartOfAccount.name,
+              });
+            }
+            continue;
+          }
           if (key === "transactionDetails") {
             const transactionDetail = dataSelected[key]!;
 
@@ -421,9 +440,11 @@ const SalesForm = (props: ISalesForm) => {
             key === "transactionNumber" ||
             key === "peopleId" ||
             key === "termId" ||
+            key === "chartOfAccountId" ||
             key === "paymentInput" ||
             key === "specialDiscount" ||
             key === "discountGroupInput" ||
+            key === "paymentType" ||
             key === "note"
           ) {
             setValue(key, dataSelected[key]);
@@ -433,7 +454,7 @@ const SalesForm = (props: ISalesForm) => {
     }
   }, [dataSelected, setValue]);
 
-  if (!sessionData?.session?.cashRegister) {
+  if (!sessionData?.session?.cashRegister && mode === "create") {
     return (
       <>
         <Backdrop
@@ -545,7 +566,6 @@ const SalesForm = (props: ISalesForm) => {
           <div className="grid gap-4">
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -575,10 +595,45 @@ const SalesForm = (props: ISalesForm) => {
               />
               <DatePicker label="Tanggal" name="entryDate" disabled />
             </Box>
+            {paymentInput > 0 && (
+              <Box
+                component={Paper}
+                className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+              >
+                <RadioButtonGroup
+                  label="Tipe Pembayaran"
+                  name="paymentType"
+                  required
+                  options={[
+                    {
+                      id: "CASH",
+                      label: "TUNAI",
+                    },
+                    {
+                      id: "CASHLESS",
+                      label: "NON TUNAI",
+                    },
+                  ]}
+                  disabled={mode === "view"}
+                />
+                {paymentType === PaymentType.CASHLESS && (
+                  <AutocompleteChartOfAccount
+                    name="chartOfAccount"
+                    label="Akun Bank Pembayaran"
+                    autocompleteProps={{
+                      disabled: mode === "view",
+                    }}
+                    type="bank"
+                    required={
+                      paymentInput > 0 && paymentType === PaymentType.CASHLESS
+                    }
+                  />
+                )}
+              </Box>
+            )}
             {mode !== "view" && (
               <Box
                 component={Paper}
-                variant="outlined"
                 className="grid grid-cols-1 gap-4 p-4 md:grid-cols-5"
               >
                 <TextField
@@ -620,44 +675,86 @@ const SalesForm = (props: ISalesForm) => {
             )}
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer
-                  component={Paper}
-                  elevation={0}
-                  variant="outlined"
-                >
+                <TableContainer component={Paper} elevation={0}>
                   <Table
                     size="small"
                     sx={{ "& .MuiTableCell-root": { px: "6px" } }}
                   >
                     <TableHead>
                       <TableRow>
-                        <TableCell className="w-auto md:w-[3%]" align="right">
+                        <TableCell
+                          sx={{ width: "3%", minWidth: { xs: 80, md: "auto" } }}
+                          align="right"
+                        >
                           No
                         </TableCell>
-                        <TableCell className="w-auto md:w-[26%]">
+                        <TableCell
+                          sx={{
+                            width: "26%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                        >
                           Produk
                         </TableCell>
-                        <TableCell className="w-auto md:w-[8%]" align="right">
+                        <TableCell
+                          sx={{
+                            width: "8%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Qty
                         </TableCell>
-                        <TableCell className="w-auto md:w-[15%]" align="right">
+                        <TableCell
+                          sx={{
+                            width: "15%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Satuan
                         </TableCell>
-                        <TableCell className="w-auto md:w-[15%]" align="right">
+                        <TableCell
+                          sx={{
+                            width: "15%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Harga Satuan
                         </TableCell>
-                        <TableCell className="w-auto md:w-[10%]" align="right">
+                        <TableCell
+                          sx={{
+                            width: "10%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Diskon
                         </TableCell>
-                        <TableCell className="w-auto md:w-[10%]" align="right">
+                        <TableCell
+                          sx={{
+                            width: "10%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Total
                         </TableCell>
-                        <TableCell className="w-auto md:w-[10%]">
+                        <TableCell
+                          sx={{
+                            width: "10%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                        >
                           Catatan
                         </TableCell>
                         {mode !== "view" && (
                           <TableCell
-                            className="w-auto md:w-[3%]"
+                            sx={{
+                              width: "3%",
+                              minWidth: { xs: 100, md: "auto" },
+                            }}
                             align="center"
                           >
                             <Delete />
@@ -838,7 +935,6 @@ const SalesForm = (props: ISalesForm) => {
             </div>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextareaAutosizeElement

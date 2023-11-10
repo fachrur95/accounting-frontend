@@ -38,6 +38,7 @@ import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import { formatCurrency } from "@/utils/helpers";
 import useNotification from "@/components/hooks/useNotification";
+import { Vector } from "@/types/prisma-api/vector.d";
 
 interface IJournalEntryForm {
   slug: FormSlugType;
@@ -82,17 +83,6 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
 
   const transactionDetails = useWatch({ control, name: "transactionDetails" });
 
-  /* console.log({
-    test,
-    getValues: getValues(`transactionDetails[0]?.chartOfAccount?.name`),
-    watch: watch(`transactionDetails[0]?.chartOfAccount?.name`),
-  }); */
-
-  // const defaultUnit = watch("transactionDetails");
-  // const selectedCategory = watch("itemCategory");
-  // const currentVariantCategory = watch("variantCategories");
-  // const currentVariants = watch("variants");
-
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.globalTransaction.findOne.useQuery(
       { id: selectedId ?? "" },
@@ -102,8 +92,6 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
   const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
     transactionType: "JOURNAL_ENTRY",
   });
-
-  // console.log({ dataNumber });
 
   const mutationCreate = api.journalEntry.create.useMutation({
     onSuccess: () => void router.push(basePath),
@@ -218,8 +206,8 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
                 return {
                   id: row.id,
                   chartOfAccount: selectedAccount,
-                  debit: row.vector === "POSITIVE" ? row.priceInput : 0,
-                  credit: row.vector === "NEGATIVE" ? row.priceInput : 0,
+                  debit: row.vector === Vector.POSITIVE ? row.priceInput : 0,
+                  credit: row.vector === Vector.NEGATIVE ? row.priceInput : 0,
                   note: row.note,
                 };
               });
@@ -299,7 +287,6 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
           <div className="grid gap-4">
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -319,27 +306,58 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer
-                  component={Paper}
-                  elevation={0}
-                  variant="outlined"
-                >
+                <TableContainer component={Paper} elevation={0}>
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell width="5%" align="right">
+                        <TableCell
+                          sx={{ width: "5%", minWidth: { xs: 80, md: "auto" } }}
+                          align="right"
+                        >
                           No
                         </TableCell>
-                        <TableCell width="40%">Akun</TableCell>
-                        <TableCell width="20%" align="right">
+                        <TableCell
+                          sx={{
+                            width: "40%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                        >
+                          Akun
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            width: "20%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Debit
                         </TableCell>
-                        <TableCell width="20%" align="right">
+                        <TableCell
+                          sx={{
+                            width: "20%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                          align="right"
+                        >
                           Kredit
                         </TableCell>
-                        <TableCell width="10%">Catatan</TableCell>
+                        <TableCell
+                          sx={{
+                            width: "10%",
+                            minWidth: { xs: 250, md: "auto" },
+                          }}
+                        >
+                          Catatan
+                        </TableCell>
                         {mode !== "view" && (
-                          <TableCell width="5%" align="center">
+                          <TableCell
+                            sx={{
+                              width: "5%",
+                              minWidth: { xs: 100, md: "auto" },
+                            }}
+                            align="center"
+                          >
                             <Delete />
                           </TableCell>
                         )}
@@ -488,7 +506,6 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
             </div>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextareaAutosizeElement

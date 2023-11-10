@@ -45,6 +45,8 @@ import type { IPeople } from "@/types/prisma-api/people";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
 import dynamic from "next/dynamic";
+import { Role } from "@/types/prisma-api/role.d";
+import type { Session } from "next-auth";
 
 const MasterPeopleForm = dynamic(
   () => import("@/components/forms/MasterPeopleForm"),
@@ -57,7 +59,9 @@ const path: WorkerPathType = "people";
 
 const pathname = "/masters/contacts/customers";
 
-const CustomersPage: MyPage = () => {
+const CustomersPage: MyPage<{ userSession: Session["user"] }> = ({
+  userSession,
+}) => {
   const router = useRouter();
 
   const [rows, setRows] = useState<IPeople[]>([]);
@@ -190,11 +194,13 @@ const CustomersPage: MyPage = () => {
                     },
                     `${pathname}/f/${params}`,
                   ),
+                hidden: userSession.role === Role.USER,
               },
               {
                 icon: <DeleteForever />,
                 label: "Hapus",
                 onClick: (params) => params && setSelectedId(params),
+                hidden: userSession.role === Role.USER,
               },
             ]}
           />
@@ -309,7 +315,7 @@ const CustomersPage: MyPage = () => {
                 `${pathname}/v/${params.row.id}`,
               )
             }
-            checkboxSelection
+            checkboxSelection={userSession.role !== Role.USER}
             disableSelectionOnClick
           />
           {router.query.slug && (
@@ -375,6 +381,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       session,
+      userSession: session.user,
     },
   };
 };

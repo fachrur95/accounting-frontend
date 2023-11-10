@@ -83,7 +83,7 @@ const UnitCredentialPage: MyPage = () => {
         onError: (err) => console.log(err),
         onSuccess: async (data) => {
           if (!data) {
-            return void setOpenNotification("Error to set business");
+            return void setOpenNotification("Error to set unit");
           }
           await handleUpdateSession({
             accessToken: data.access.token,
@@ -189,8 +189,15 @@ const UnitCredentialPage: MyPage = () => {
           <Table stickyHeader aria-label="customized table">
             <TableHead>
               <TableRow>
-                <TableCell>Unit</TableCell>
-                <TableCell align="center" width="10%">
+                <TableCell
+                  sx={{ width: "90%", minWidth: { xs: 250, md: "auto" } }}
+                >
+                  Unit
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{ width: "10%", minWidth: { xs: 100, md: "auto" } }}
+                >
                   Opsi
                 </TableCell>
               </TableRow>

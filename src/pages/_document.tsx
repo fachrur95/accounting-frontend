@@ -11,16 +11,22 @@ export default class MyDocument extends Document {
         <Head>
           <link
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+            href="https://fonts.googleapis.com/css?family=Roboto:300,400,150,700&display=swap"
           />
-          <meta name="application-name" content="PWA App" />
+          <meta
+            name="application-name"
+            content="Accounting Bidang Usaha P2S2"
+          />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta
             name="apple-mobile-web-app-status-bar-style"
             content="default"
           />
-          <meta name="apple-mobile-web-app-title" content="PWA App" />
-          <meta name="description" content="Best PWA App in the world" />
+          <meta
+            name="apple-mobile-web-app-title"
+            content="Accounting Bidang Usaha P2S2"
+          />
+          <meta name="description" content="Accounting Bidang Usaha P2S2" />
           <meta name="format-detection" content="telephone=no" />
           <meta name="mobile-web-app-capable" content="yes" />
           <meta

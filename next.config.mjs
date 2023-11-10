@@ -49,7 +49,7 @@ const config = {
   }, */
   experimental: {
     webpackBuildWorker: true,
-    esmExternals: false,
+    // esmExternals: false,
   },
 };
 

@@ -239,7 +239,6 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
           <div className="grid gap-4">
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -249,11 +248,11 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
                 InputProps={{
                   disabled: mode === "view",
                 }}
+                autoFocus
               />
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <AutocompleteChartOfAccount
@@ -283,7 +282,6 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextareaAutosizeElement

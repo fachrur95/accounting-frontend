@@ -44,6 +44,7 @@ import type { IUnitOfMeasure } from "@/types/prisma-api/unit-of-measure";
 import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog";
 import type { WorkerPathType } from "@/types/worker";
 import dynamic from "next/dynamic";
+import { Role } from "@/types/prisma-api/role.d";
 
 const MasterUnitOfMeasureForm = dynamic(
   () => import("@/components/forms/MasterUnitOfMeasureForm"),
@@ -359,6 +360,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       redirect: {
         destination: "/credentials/unit",
+        permanent: false,
+      },
+    };
+  }
+  if (session.user.role === Role.USER) {
+    return {
+      redirect: {
+        destination: "/not-found",
         permanent: false,
       },
     };

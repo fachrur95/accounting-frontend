@@ -27,6 +27,9 @@ import { salesRouter } from "./routers/transactions/sales";
 import { purchaseRouter } from "./routers/transactions/purchase";
 import { generalSettingRouter } from "./routers/general-setting";
 import { logActivityRouter } from "./routers/log-activity";
+import { dashboardRouter } from "./routers/dashboard";
+import { financialClosingRouter } from "./routers/transactions/financial-closing";
+import { beginBalanceStockRouter } from "./routers/transactions/begin-balance-stock";
 
 /**
  * This is the primary router for your server.
@@ -62,6 +65,9 @@ export const appRouter = createTRPCRouter({
   purchase: purchaseRouter,
   generalSetting: generalSettingRouter,
   logActivity: logActivityRouter,
+  dashboard: dashboardRouter,
+  financialClosing: financialClosingRouter,
+  beginBalanceStock: beginBalanceStockRouter,
 });
 
 // export type definition of API

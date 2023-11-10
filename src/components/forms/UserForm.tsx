@@ -37,12 +37,13 @@ import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
 import AutocompleteUnit from "../controls/autocompletes/masters/AutocompleteUnit";
+import { Role } from "@/types/prisma-api/role.d";
 
 const defaultValues: IUserMutation = {
   email: "",
   name: "",
   password: "",
-  role: "USER",
+  role: Role.USER,
   userUnits: [],
 };
 
@@ -122,7 +123,7 @@ const UserForm = (props: IUserForm) => {
     const dataSave: IUserMutation = {
       ...data,
       userUnits:
-        data.role !== "SUPERADMIN"
+        data.role !== Role.SUPERADMIN
           ? data.userUnits.map((unit) => ({
               ...unit,
               unitId: unit.unit?.id ?? "",
@@ -244,11 +245,7 @@ const UserForm = (props: IUserForm) => {
       <DialogContent>
         <FormContainer formContext={formContext} onSuccess={onSubmit}>
           <div className="grid gap-4">
-            <Box
-              component={Paper}
-              variant="outlined"
-              className="grid grid-cols-1 gap-4 p-4"
-            >
+            <Box component={Paper} className="grid grid-cols-1 gap-4 p-4">
               <TextFieldElement
                 name="email"
                 label="Email"
@@ -256,6 +253,7 @@ const UserForm = (props: IUserForm) => {
                 InputProps={{
                   disabled: mode === "view",
                 }}
+                autoFocus
               />
               <TextFieldElement
                 name="name"
@@ -303,22 +301,37 @@ const UserForm = (props: IUserForm) => {
                 disabled={mode === "view"}
               />
             </Box>
-            {role !== "SUPERADMIN" && (
+            {role !== Role.SUPERADMIN && (
               <div className="overflow-auto">
                 <Box component={Paper} className="table w-full table-fixed">
-                  <TableContainer
-                    component={Paper}
-                    elevation={0}
-                    variant="outlined"
-                  >
+                  <TableContainer component={Paper} elevation={0}>
                     <Table size="small">
                       <TableHead>
                         <TableRow>
-                          <TableCell width="5%" align="right">
+                          <TableCell
+                            sx={{
+                              width: "5%",
+                              minWidth: { xs: 80, md: "auto" },
+                            }}
+                            align="right"
+                          >
                             No
                           </TableCell>
-                          <TableCell width="90%">Unit</TableCell>
-                          <TableCell width="5%" align="center">
+                          <TableCell
+                            sx={{
+                              width: "90%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                          >
+                            Unit
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              width: "5%",
+                              minWidth: { xs: 100, md: "auto" },
+                            }}
+                            align="center"
+                          >
                             <Delete />
                           </TableCell>
                         </TableRow>

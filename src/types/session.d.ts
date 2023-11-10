@@ -1,4 +1,5 @@
 import type { IInstitute } from "./prisma-api/institute";
+import type { Role } from "./prisma-api/role";
 import type { TokenType } from "./prisma-api/token-type";
 import type { IUnit } from "./prisma-api/unit";
 import type { IUser } from "./prisma-api/user";
@@ -30,6 +31,7 @@ export declare interface IJwtDecode {
   sub: string;
   name: string;
   email: string;
+  role: Role;
   iat: number;
   exp: number;
   type: TokenType;

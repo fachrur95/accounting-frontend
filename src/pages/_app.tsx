@@ -1,8 +1,13 @@
-import ConnectionProvider from "@/components/displays/ConnectionProvider";
+import RefreshTokenHandler from "@/components/RefreshTokenHandler";
 import { Layouts } from "@/components/layouts";
+import { LoadingPage } from "@/components/layouts/LoadingPage";
 import { type MyAppProps } from "@/components/layouts/layoutTypes";
 import { GlobalContextProvider } from "@/context/GlobalContext";
+import { WorkerContext } from "@/context/WorkerContext";
 import "@/styles/globals.css";
+import type { IEventDeleteWorker } from "@/types/worker";
+import { api } from "@/utils/api";
+import { useAppStore } from "@/utils/store";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
@@ -10,23 +15,18 @@ import "@fontsource/roboto/700.css";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider as TwProvider } from "next-themes";
-import { useEffect, useRef, useCallback, useState } from "react";
+import NextNProgress from "nextjs-progressbar";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import Router from "next/router";
-import NProgress from "nprogress"; //nprogress module
-import "nprogress/nprogress.css"; //styles of nprogress
+// import ConnectionProvider from "@/components/displays/ConnectionProvider";
+// import Router from "next/router";
+// import NProgress from "nprogress"; //nprogress module
+// import "nprogress/nprogress.css"; //styles of nprogress
 
-import { api } from "@/utils/api";
-import type { IEventDeleteWorker } from "@/types/worker";
-import { WorkerContext } from "@/context/WorkerContext";
-import { useAppStore } from "@/utils/store";
-import { LoadingPage } from "@/components/layouts/LoadingPage";
-import RefreshTokenHandler from "@/components/RefreshTokenHandler";
-
-//Route Events.
-Router.events.on("routeChangeStart", () => NProgress.start());
-Router.events.on("routeChangeComplete", () => NProgress.done());
-Router.events.on("routeChangeError", () => NProgress.done());
+// //Route Events.
+// Router.events.on("routeChangeStart", () => NProgress.start());
+// Router.events.on("routeChangeComplete", () => NProgress.done());
+// Router.events.on("routeChangeError", () => NProgress.done());
 
 const MyApp = ({
   Component,
@@ -79,12 +79,13 @@ const MyApp = ({
             session={session as Session}
             refetchInterval={interval}
           >
-            <ConnectionProvider>
-              <Layout>
-                <Component {...pageProps} />
-                <RefreshTokenHandler setInterval={setInterval} />
-              </Layout>
-            </ConnectionProvider>
+            {/* <ConnectionProvider> */}
+            <Layout>
+              <NextNProgress color="#fff" height={4} />
+              <Component {...pageProps} />
+              <RefreshTokenHandler setInterval={setInterval} />
+            </Layout>
+            {/* </ConnectionProvider> */}
           </SessionProvider>
         </WorkerContext.Provider>
       </GlobalContextProvider>

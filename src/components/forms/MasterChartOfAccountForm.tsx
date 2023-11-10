@@ -239,7 +239,6 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
           <div className="grid gap-4">
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <AutocompleteAccountClass
@@ -262,7 +261,6 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <TextFieldElement
@@ -272,6 +270,7 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
                 InputProps={{
                   disabled: mode === "view",
                 }}
+                autoFocus
               />
               <TextFieldElement
                 name="name"
@@ -291,7 +290,6 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
             </Box>
             <Box
               component={Paper}
-              variant="outlined"
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
               <SwitchElement

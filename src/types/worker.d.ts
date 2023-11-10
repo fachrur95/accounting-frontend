@@ -20,6 +20,7 @@ export declare type WorkerPathType =
   | "tax"
   | "term"
   | "unit-of-measure"
+  | "financial-closing"
   | "warehouse"
   | "user"
   | "transaction";
