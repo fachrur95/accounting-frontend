@@ -122,8 +122,8 @@ declare interface IBeginBalanceStockDetailMutation {
 declare interface IBeginBalanceDebtReceivableDetailMutation {
   id?: string;
   peopleId: string;
-  peopleName: string;
-  dueDate: Date;
+  people: IDataOption | IPeople | null;
+  entryDate: Date;
   priceInput: number;
   note?: string | null;
 }
@@ -221,6 +221,5 @@ export declare interface IBeginBalanceStockMutation {
 export declare interface IBeginBalanceDebtReceivableMutation {
   chartOfAccountId?: string | null;
   chartOfAccount?: IDataOption | IChartOfAccount | null;
-  entryDate: Date;
   transactionDetails: IBeginBalanceDebtReceivableDetailMutation[];
 }

@@ -30,6 +30,7 @@ import { logActivityRouter } from "./routers/log-activity";
 import { dashboardRouter } from "./routers/dashboard";
 import { financialClosingRouter } from "./routers/transactions/financial-closing";
 import { beginBalanceStockRouter } from "./routers/transactions/begin-balance-stock";
+import { beginBalanceDebtReceivableRouter } from "./routers/transactions/begin-balance-debt-receivable";
 
 /**
  * This is the primary router for your server.
@@ -68,6 +69,7 @@ export const appRouter = createTRPCRouter({
   dashboard: dashboardRouter,
   financialClosing: financialClosingRouter,
   beginBalanceStock: beginBalanceStockRouter,
+  beginBalanceDebtReceivable: beginBalanceDebtReceivableRouter,
 });
 
 // export type definition of API

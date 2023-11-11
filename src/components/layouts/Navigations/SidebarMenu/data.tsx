@@ -6,9 +6,9 @@ import ContactsOutlined from "@mui/icons-material/ContactsOutlined";
 // import Diversity2 from "@mui/icons-material/Diversity2";
 import Diversity3 from "@mui/icons-material/Diversity3";
 import FormatListNumberedOutlined from "@mui/icons-material/FormatListNumberedOutlined";
-import GroupAddOutlined from "@mui/icons-material/GroupAddOutlined";
+import ManageAccounts from "@mui/icons-material/ManageAccounts";
 import Groups from "@mui/icons-material/Groups";
-import Hiking from "@mui/icons-material/Hiking";
+import AccessibilityNew from "@mui/icons-material/AccessibilityNew";
 // import ImportExportOutlined from "@mui/icons-material/ImportExportOutlined";
 import InsertChartOutlined from "@mui/icons-material/InsertChartOutlined";
 import LocalAtmOutlined from "@mui/icons-material/LocalAtmOutlined";
@@ -423,7 +423,7 @@ const data: DataMenuType[] = [
     label: "aktivitas",
     depth: 0,
     url: "/activities",
-    icon: <Hiking fontSize="small" />,
+    icon: <AccessibilityNew fontSize="small" />,
     roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN, Role.USER],
     children: [],
   },
@@ -440,7 +440,7 @@ const data: DataMenuType[] = [
         label: "pengguna",
         depth: 1,
         url: "/settings/users",
-        icon: <GroupAddOutlined fontSize="small" />,
+        icon: <ManageAccounts fontSize="small" />,
         roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
       },
