@@ -23,7 +23,7 @@ if (!(argEnv in RUN_ENV_MAP)) {
 module.exports = {
   apps: [
     {
-      name: "accounting-p2s2",
+      name: "accounting-frontend",
       exec_mode: "cluster",
       instances: "max", // Or a number of instances
       script: "node_modules/next/dist/bin/next",
