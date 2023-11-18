@@ -35,9 +35,9 @@ const config = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  /* eslint: {
+  eslint: {
     ignoreDuringBuilds: true,
-  }, */
+  },
   /* modularizeImports: {
     "@mui/icons-material": {
       transform: "@mui/icons-material/{{member}}",
