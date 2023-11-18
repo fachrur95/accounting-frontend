@@ -169,9 +169,9 @@ const InstituteCredentialPage: MyPage = () => {
             <SearchInput />
           </div>
           <div>
-            <IconButton onClick={() => void refetch()}>
+            {/* <IconButton onClick={() => void refetch()}>
               <Add />
-            </IconButton>
+            </IconButton> */}
             <Link
               href={{
                 pathname,
