@@ -11,7 +11,7 @@ import React from "react";
 
 const title = "Lembaga";
 
-const ProductFormSlugPage: MyPage = () => {
+const InstituteFormSlugPage: MyPage = () => {
   const router = useRouter();
   const slug = router.query.slug;
 
@@ -63,5 +63,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default ProductFormSlugPage;
-ProductFormSlugPage.Layout = "Plain";
+export default InstituteFormSlugPage;
+InstituteFormSlugPage.Layout = "Plain";

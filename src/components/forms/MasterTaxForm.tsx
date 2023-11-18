@@ -58,7 +58,11 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.tax.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.tax.create.useMutation({
@@ -98,7 +102,7 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
   });
 
   const onSubmit = (data: ITaxMutation) => {
-    const dataSave: ITaxMutation = {
+    const dataSave = {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
     };
@@ -180,7 +184,6 @@ const MasterTaxForm = (props: IMasterTaxForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}

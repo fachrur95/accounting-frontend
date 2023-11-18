@@ -40,7 +40,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
+
   ...theme.mixins.toolbar,
 }));
 
@@ -78,9 +78,12 @@ const DashboardLayout = (props: DashboardProps) => {
   const drawer = (
     <>
       <DrawerHeader>
-        <IconButton onClick={handleDrawerOpen}>
-          {open === false ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-        </IconButton>
+        <div className="flex w-full flex-row items-center justify-between">
+          Bidang Usaha
+          <IconButton onClick={handleDrawerOpen}>
+            {open === false ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+          </IconButton>
+        </div>
       </DrawerHeader>
       <Divider />
       <div className="flex h-full flex-col justify-between">
@@ -103,7 +106,7 @@ const DashboardLayout = (props: DashboardProps) => {
           open={open}
           onClose={handleDrawerOpen}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true,
           }}
           sx={{
             display: { xs: "block", sm: "none" },
@@ -128,10 +131,6 @@ const DashboardLayout = (props: DashboardProps) => {
         sx={{
           flexGrow: 1,
           p: 3,
-          /* bgcolor: (theme) =>
-            theme.palette.mode === "light"
-              ? theme.palette.grey.A200
-              : theme.palette.background.default, */
         }}
       >
         <Box className="flex flex-col">
@@ -142,5 +141,5 @@ const DashboardLayout = (props: DashboardProps) => {
     </Box>
   );
 };
-// hovering on DashboardLayout will give you this definition: const DashboardLayout: (props: PropsWithChildren) => JSX.Element
+
 export default DashboardLayout;

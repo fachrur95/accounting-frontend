@@ -8,6 +8,7 @@ import { convertOperator, dateConvertID } from "@/utils/helpers";
 import { useAppStore } from "@/utils/store";
 import Refresh from "@mui/icons-material/Refresh";
 import EditIcon from "@mui/icons-material/Edit";
+import Print from "@mui/icons-material/Print";
 import Visibility from "@mui/icons-material/Visibility";
 import DeleteForever from "@mui/icons-material/DeleteForever";
 import Add from "@mui/icons-material/Add";
@@ -129,12 +130,14 @@ const SalesPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "No. Transaksi",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "people.name",
       headerName: "Pelanggan",
       type: "string",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, ITransaction>) => {
         return params.row.people?.name ?? "-";
       },
@@ -144,12 +147,14 @@ const SalesPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Total",
       type: "number",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "entryDate",
       headerName: "Tanggal",
       type: "date",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, ITransaction>) => {
         return dateConvertID(new Date(params.row.entryDate), {
           dateStyle: "long",
@@ -162,6 +167,7 @@ const SalesPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Catatan",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {
@@ -169,6 +175,7 @@ const SalesPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {
@@ -183,6 +190,12 @@ const SalesPage: MyPage<{ userSession: Session["user"] }> = ({
           <CustomMenu
             id={id}
             menus={[
+              {
+                icon: <Print />,
+                label: "Cetak",
+                onClick: (params) =>
+                  params && router.push(`${pathname}/invoice/${params}`),
+              },
               {
                 icon: <Visibility />,
                 label: "Lihat",

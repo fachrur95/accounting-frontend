@@ -82,7 +82,11 @@ const LiabilityForm = (props: ILiabilityForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.globalTransaction.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
@@ -126,7 +130,7 @@ const LiabilityForm = (props: ILiabilityForm) => {
   });
 
   const onSubmit = (data: ILiabilityMutation) => {
-    const dataSave: ILiabilityMutation = {
+    const dataSave = {
       ...data,
       entryDate: new Date(data.entryDate),
       note: data.note === "" || data.note === null ? undefined : data.note,
@@ -233,7 +237,6 @@ const LiabilityForm = (props: ILiabilityForm) => {
           if (key === "files") {
             continue;
           }
-          // "itemCategory" | "transactionDetails" | "tax" | "files" | "id"
 
           if (
             key === "transactionNumber" ||
@@ -289,7 +292,6 @@ const LiabilityForm = (props: ILiabilityForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}
@@ -330,7 +332,12 @@ const LiabilityForm = (props: ILiabilityForm) => {
                 label="Tanggal"
                 name="entryDate"
                 required
-                disabled={mode === "view"}
+                inputProps={{
+                  disabled: mode === "view",
+                }}
+                slotProps={{
+                  openPickerButton: { disabled: mode === "view" },
+                }}
               />
               <AutocompletePeople
                 name="people"
@@ -345,8 +352,12 @@ const LiabilityForm = (props: ILiabilityForm) => {
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer component={Paper} elevation={0}>
-                  <Table size="small">
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  sx={{ maxHeight: 440 }}
+                >
+                  <Table stickyHeader size="small">
                     <TableHead>
                       <TableRow>
                         <TableCell
@@ -411,14 +422,6 @@ const LiabilityForm = (props: ILiabilityForm) => {
                               autocompleteProps={{
                                 size: "small",
                                 disabled: mode === "view",
-                                /* onChange: (_, data) => {
-                                  if (index === 0) {
-                                    setDefaultUnit(
-                                      (data as IDataOption | null)?.label ??
-                                        null,
-                                    );
-                                  }
-                                }, */
                               }}
                               textFieldProps={{
                                 hiddenLabel: true,

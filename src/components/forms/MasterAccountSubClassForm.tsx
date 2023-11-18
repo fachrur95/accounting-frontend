@@ -4,12 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
-import {
-  FormContainer,
-  TextFieldElement,
-  // RadioButtonGroup,
-  useForm,
-} from "react-hook-form-mui";
+import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
 import Close from "@mui/icons-material/Close";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
@@ -24,13 +19,14 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
+import { Vector } from "@/types/prisma-api/vector.d";
 
 const defaultValues: IAccountSubClassMutation = {
   accountClassId: "",
   code: "",
   group: "",
   name: "",
-  balanceSheetPosition: "POSITIVE",
+  balanceSheetPosition: Vector.POSITIVE,
   accountClass: null,
 };
 
@@ -59,7 +55,11 @@ const MasterAccountSubClassForm = (props: IMasterAccountSubClassForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.accountSubClass.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.accountSubClass.create.useMutation({
@@ -99,7 +99,7 @@ const MasterAccountSubClassForm = (props: IMasterAccountSubClassForm) => {
   });
 
   const onSubmit = (data: IAccountSubClassMutation) => {
-    const dataSave: IAccountSubClassMutation = {
+    const dataSave = {
       ...data,
       group: data.group === "" || data.group === null ? undefined : data.group,
       accountClassId: data.accountClass?.id ?? "",
@@ -193,7 +193,6 @@ const MasterAccountSubClassForm = (props: IMasterAccountSubClassForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}

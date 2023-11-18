@@ -129,8 +129,7 @@ export const convertOperator = ({ items }: { items: GridFilterItem[] }) => {
   return items.map((el) => {
     if (
       el.operatorValue === "equals" ||
-      el.operatorValue === "=" ||
-      el.operatorValue === "is"
+      el.operatorValue === "="
     ) {
       return { ...el, operatorValue: "equals" };
     }
@@ -161,6 +160,7 @@ export const convertOperator = ({ items }: { items: GridFilterItem[] }) => {
       return { ...el, operatorValue: "gt" };
     }
     if (
+      el.operatorValue === "is" ||
       el.operatorValue === "isOnOrAfter" ||
       el.operatorValue === "onOrAfter" ||
       el.operatorValue === ">="
@@ -254,4 +254,13 @@ export const abbreviateNumberLib = (value: number): string => {
     notation: "compact",
     maximumFractionDigits: 1
   }).format(value)
+}
+
+export const toTitleCase = (str: string): string => {
+  return str.replace(
+    /\w\S*/g,
+    function (txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    }
+  );
 }

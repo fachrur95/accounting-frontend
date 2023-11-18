@@ -28,6 +28,9 @@ import EditNote from "@mui/icons-material/EditNote";
 import Book from "@mui/icons-material/Book";
 import Widgets from "@mui/icons-material/Widgets";
 import Category from "@mui/icons-material/Category";
+import AssignmentReturn from "@mui/icons-material/AssignmentReturn";
+import AssignmentTurnedInOutlined from "@mui/icons-material/AssignmentTurnedInOutlined";
+import Tune from "@mui/icons-material/Tune";
 import { Role } from "@/types/prisma-api/role.d";
 
 export type DataMenuType = {
@@ -43,7 +46,7 @@ export type DataMenuType = {
 const data: DataMenuType[] = [
   {
     id: "dashboard",
-    label: "dasbor",
+    label: "Halaman Utama",
     depth: 0,
     url: "/",
     icon: <InsertChartOutlined fontSize="small" />,
@@ -93,25 +96,25 @@ const data: DataMenuType[] = [
         icon: <LocalShippingOutlined fontSize="small" />,
         roles: [Role.SUPERADMIN],
         children: [],
-      },
+      }, */
       {
         id: "sales-invoice",
         label: "penjualan",
         depth: 1,
-        url: "/sales/sales-invoices",
+        url: "/sales",
         icon: <AssignmentTurnedInOutlined fontSize="small" />,
-        roles: [Role.SUPERADMIN],
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN, Role.USER],
         children: [],
       },
       {
         id: "sales-return",
         label: "return",
         depth: 1,
-        url: "/sales/sales-returns",
+        url: "/sales/returns",
         icon: <AssignmentReturn fontSize="small" />,
-        roles: [Role.SUPERADMIN],
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
-      }, */
+      },
     ],
   },
   {
@@ -148,25 +151,25 @@ const data: DataMenuType[] = [
         icon: <LocalShippingOutlined fontSize="small" />,
         roles: [Role.SUPERADMIN],
         children: [],
-      },
+      }, */
       {
         id: "purchase-invoice",
         label: "pembelian",
         depth: 1,
-        url: "/purchase/purchase-invoices",
+        url: "/purchase",
         icon: <AssignmentTurnedInOutlined fontSize="small" />,
-        roles: [Role.SUPERADMIN],
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
       },
       {
         id: "purchase-return",
         label: "return",
         depth: 1,
-        url: "/purchase/purchase-returns",
-        icon: <Undo fontSize="small" />,
-        roles: [Role.SUPERADMIN],
+        url: "/purchase/returns",
+        icon: <AssignmentReturn fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
-      }, */
+      },
     ],
   },
   {
@@ -257,6 +260,15 @@ const data: DataMenuType[] = [
         depth: 1,
         url: "/other-transactions/stock-opname",
         icon: <ProductionQuantityLimits fontSize="small" />,
+        roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
+        children: [],
+      },
+      {
+        id: "stock-adjustment",
+        label: "penyesuaian stock",
+        depth: 1,
+        url: "/other-transactions/stock-adjustments",
+        icon: <Tune fontSize="small" />,
         roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
         children: [],
       },

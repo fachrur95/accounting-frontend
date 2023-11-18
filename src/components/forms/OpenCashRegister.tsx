@@ -9,7 +9,6 @@ import Close from "@mui/icons-material/Close";
 import Save from "@mui/icons-material/Save";
 import { api } from "@/utils/api";
 import Link from "next/link";
-// import type { FormSlugType } from "@/types/global";
 import type { IOpenCashRegisterMutation } from "@/types/prisma-api/cash-register";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -109,10 +108,7 @@ const OpenCashRegisterForm = (props: IOpenCashRegisterForm) => {
       >
         {/* component={showIn === "page" ? Paper : undefined} */}
         <DialogTitle>
-          <Box
-            // component={showIn === "page" ? Paper : undefined}
-            className={`flex items-center justify-between`}
-          >
+          <Box className={`flex items-center justify-between`}>
             <div className="mb-2 flex items-center gap-2">
               <Link href={basePath}>
                 <IconButton color="error">
@@ -124,7 +120,6 @@ const OpenCashRegisterForm = (props: IOpenCashRegisterForm) => {
             <div>
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}

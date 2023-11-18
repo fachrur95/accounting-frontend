@@ -10,7 +10,7 @@ import { Role } from "@/types/prisma-api/role.d";
 
 const title = "Saldo Awal Hutang";
 
-const ProductFormSlugPage: MyPage = () => {
+const BeginBalanceDebtBatchFormSlugPage: MyPage = () => {
   return (
     <>
       <Head>
@@ -71,5 +71,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default ProductFormSlugPage;
-ProductFormSlugPage.Layout = "Dashboard";
+export default BeginBalanceDebtBatchFormSlugPage;
+BeginBalanceDebtBatchFormSlugPage.Layout = "Dashboard";

@@ -48,7 +48,11 @@ const InstituteForm = (props: IInstituteForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.instituteCredentials.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.instituteCredentials.create.useMutation({
@@ -88,7 +92,7 @@ const InstituteForm = (props: IInstituteForm) => {
   });
 
   const onSubmit = (data: IInstituteMutation) => {
-    const dataSave: IInstituteMutation = {
+    const dataSave = {
       ...data,
     };
     if (selectedId) {
@@ -164,7 +168,6 @@ const InstituteForm = (props: IInstituteForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}

@@ -76,6 +76,46 @@ export declare interface ISalesPurchaseDetailMutation {
   note?: string | null;
 }
 
+export declare interface ISalesPurchaseDetailReturnMutation {
+  id?: string;
+  transactionDetailParentId: string;
+  multipleUomId?: string | null;
+  multipleUom?: IDataOption | IMultipleUom | null;
+  itemId?: string | null;
+  item?: IDataOption | IItem | null;
+  taxId?: string | null;
+  tax?: IDataOption | ITax | null;
+  qtyInput: number;
+  conversionQty: number;
+  priceInput: number;
+  note?: string | null;
+}
+
+export declare interface IStockOpnameDetailMutation {
+  id?: string;
+  multipleUomId?: string | null;
+  multipleUom?: IDataOption | IMultipleUom | null;
+  itemId?: string | null;
+  item?: IDataOption | IItem | null;
+  qtyInput: number;
+  conversionQty: number;
+  note?: string | null;
+}
+
+export declare interface IStockAdjustmentDetailMutation {
+  id?: string;
+  transactionDetailParentId?: string;
+  multipleUomId?: string | null;
+  multipleUom?: IDataOption | IMultipleUom | null;
+  itemId?: string | null;
+  item?: IDataOption | IItem | null;
+  qtyCount?: number;
+  qtyActual?: number;
+  qtyInput: number;
+  conversionQty: number;
+  note?: string | null;
+}
+
 declare interface IPaymentDetailMutation {
   id?: string;
   transactionPaymentId: string;
@@ -222,4 +262,46 @@ export declare interface IBeginBalanceDebtReceivableMutation {
   chartOfAccountId?: string | null;
   chartOfAccount?: IDataOption | IChartOfAccount | null;
   transactionDetails: IBeginBalanceDebtReceivableDetailMutation[];
+}
+
+export declare interface IBeginBalanceDebtReceivableDetailFormMutation {
+  id?: string;
+  transactionNumber: string;
+  chartOfAccountId?: string | null;
+  chartOfAccount?: IDataOption | IChartOfAccount | null;
+  peopleId: string;
+  people: IDataOption | IPeople | null;
+  entryDate: Date;
+  underPayment: number;
+  note?: string | null;
+}
+
+export declare interface ISalesPurchaseReturnMutation {
+  transactionNumber: string;
+  transactionParentId: string;
+  transactionParent: IDataOption | ITransaction | null;
+  peopleId: string;
+  people: IDataOption | IPeople | null;
+  chartOfAccountId?: string | null;
+  chartOfAccount?: IDataOption | IChartOfAccount | null;
+  entryDate?: Date;
+  paymentInput: number;
+  note?: string;
+  transactionDetails: ISalesPurchaseDetailReturnMutation[];
+}
+
+export declare interface IStockOpnameMutation {
+  transactionNumber: string;
+  entryDate?: Date;
+  note?: string;
+  transactionDetails: IStockOpnameDetailMutation[];
+}
+
+export declare interface IStockAdjustmentMutation {
+  transactionNumber: string;
+  transactionParentId?: string;
+  transactionParent: IDataOption | ITransaction | null;
+  entryDate?: Date;
+  note?: string;
+  transactionDetails: IStockAdjustmentDetailMutation[];
 }

@@ -4,15 +4,14 @@ import type { IJwtDecode } from "@/types/session";
 import { useRouter } from "next/router";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
-import BeginningBalanceDebtReceivableForm from "@/components/forms/begin-balances/BeginningBalanceDebtReceivableForm";
+import ReturnForm from "@/components/forms/transactions/ReturnForm";
 import type { FormSlugType } from "@/types/global";
 import Head from "next/head";
 import React from "react";
-import { Role } from "@/types/prisma-api/role.d";
 
-const title = "Saldo Awal Hutang";
+const title = "Return Penjualan";
 
-const ProductFormSlugPage: MyPage = () => {
+const SalesReturnFormSlugPage: MyPage = () => {
   const router = useRouter();
   const slug = router.query.slug;
 
@@ -22,11 +21,7 @@ const ProductFormSlugPage: MyPage = () => {
         <title>{`Bidang Usaha | ${title}`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <BeginningBalanceDebtReceivableForm
-        slug={slug as FormSlugType}
-        showIn="page"
-        type="debt"
-      />
+      <ReturnForm slug={slug as FormSlugType} showIn="page" type="sales" />
     </>
   );
 };
@@ -60,14 +55,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     };
   }
-  if (session.user.role === Role.USER) {
-    return {
-      redirect: {
-        destination: "/not-found",
-        permanent: false,
-      },
-    };
-  }
 
   return {
     props: {
@@ -76,5 +63,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default ProductFormSlugPage;
-ProductFormSlugPage.Layout = "Dashboard";
+export default SalesReturnFormSlugPage;
+SalesReturnFormSlugPage.Layout = "Dashboard";

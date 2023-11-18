@@ -1,10 +1,31 @@
+import DatePicker from "@/components/controls/DatePicker";
+import useNotification from "@/components/hooks/useNotification";
+import type { FormSlugType } from "@/types/global";
+import type { IPaymentMutation } from "@/types/prisma-api/transaction";
+import { api } from "@/utils/api";
+import { dateID, formatNumber } from "@/utils/helpers";
+import Close from "@mui/icons-material/Close";
+import Delete from "@mui/icons-material/Delete";
+import Edit from "@mui/icons-material/Edit";
+import Save from "@mui/icons-material/Save";
+import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
-import DatePicker from "@/components/controls/DatePicker";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
-import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import {
   FormContainer,
   TextFieldElement,
@@ -13,30 +34,9 @@ import {
   useForm,
   useWatch,
 } from "react-hook-form-mui";
-import Close from "@mui/icons-material/Close";
-import { dateID, formatNumber } from "@/utils/helpers";
-import Delete from "@mui/icons-material/Delete";
-import Edit from "@mui/icons-material/Edit";
-import Save from "@mui/icons-material/Save";
-import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
 import NumericFormatCustom from "../../controls/NumericFormatCustom";
-import { api } from "@/utils/api";
-import Link from "next/link";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import type { FormSlugType } from "@/types/global";
-import type { IPaymentMutation } from "@/types/prisma-api/transaction";
 import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import { useRouter } from "next/router";
-import useNotification from "@/components/hooks/useNotification";
+import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
 
 interface IPaymentForm {
   slug: FormSlugType;
@@ -86,7 +86,11 @@ const PaymentForm = (props: IPaymentForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.globalTransaction.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const { data: dataDraft } = api.payment.draft.useQuery(
@@ -94,6 +98,7 @@ const PaymentForm = (props: IPaymentForm) => {
     {
       enabled: !!peopleSelected && mode === "create",
       refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     },
   );
 
@@ -262,7 +267,6 @@ const PaymentForm = (props: IPaymentForm) => {
           if (key === "files") {
             continue;
           }
-          // "itemCategory" | "transactionDetails" | "tax" | "files" | "id"
 
           if (
             key === "transactionNumber" ||
@@ -318,7 +322,6 @@ const PaymentForm = (props: IPaymentForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}
@@ -360,7 +363,12 @@ const PaymentForm = (props: IPaymentForm) => {
                 label="Tanggal"
                 name="entryDate"
                 required
-                disabled={mode === "view"}
+                inputProps={{
+                  disabled: mode === "view",
+                }}
+                slotProps={{
+                  openPickerButton: { disabled: mode === "view" },
+                }}
               />
               <AutocompleteChartOfAccount
                 name="chartOfAccount"
@@ -374,8 +382,12 @@ const PaymentForm = (props: IPaymentForm) => {
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer component={Paper} elevation={0}>
-                  <Table size="small">
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  sx={{ maxHeight: 440 }}
+                >
+                  <Table stickyHeader size="small">
                     <TableHead>
                       <TableRow>
                         <TableCell

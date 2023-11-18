@@ -115,12 +115,14 @@ const TaxesPage: MyPage = () => {
       headerName: "Nama",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "rate",
       headerName: "Nilai",
       type: "number",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "isActive",
@@ -128,6 +130,7 @@ const TaxesPage: MyPage = () => {
       type: "boolean",
       filterable: false,
       flex: 1,
+      minWidth: 200,
       renderCell: (params: GridRenderCellParams<unknown, ITax, unknown>) => (
         <Chip
           icon={params.row.isActive ? <Done /> : <Close />}
@@ -141,6 +144,7 @@ const TaxesPage: MyPage = () => {
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {

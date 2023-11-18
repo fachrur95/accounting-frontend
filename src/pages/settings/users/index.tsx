@@ -113,18 +113,21 @@ const UsersPage: MyPage = () => {
       headerName: "Email",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "name",
       headerName: "Nama",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "role",
       headerName: "Peran",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "isEmailVerified",
@@ -132,6 +135,7 @@ const UsersPage: MyPage = () => {
       type: "boolean",
       filterable: false,
       flex: 1,
+      minWidth: 200,
       renderCell: (params: GridRenderCellParams<unknown, IUser, unknown>) => (
         <Chip
           icon={params.row.isEmailVerified ? <Done /> : <Close />}

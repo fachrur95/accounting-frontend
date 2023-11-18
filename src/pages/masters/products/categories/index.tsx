@@ -118,12 +118,14 @@ const ItemCategoriesPage: MyPage = () => {
       headerName: "Nama",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "itemType.name",
       headerName: "Tipe",
       type: "string",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, IItemCategory>) => {
         return params.row.itemType?.name ?? "-";
       },
@@ -134,6 +136,7 @@ const ItemCategoriesPage: MyPage = () => {
       type: "boolean",
       filterable: false,
       flex: 1,
+      minWidth: 200,
       renderCell: (
         params: GridRenderCellParams<unknown, IItemCategory, unknown>,
       ) => (
@@ -149,6 +152,7 @@ const ItemCategoriesPage: MyPage = () => {
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {

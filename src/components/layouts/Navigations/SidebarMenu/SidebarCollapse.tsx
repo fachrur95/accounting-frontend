@@ -11,6 +11,8 @@ import React, { useEffect, useState } from "react";
 import SidebarItem from "./SidebarItem";
 import { type DataMenuType } from "./data";
 import { useSession } from "next-auth/react";
+import Tooltip from "@mui/material/Tooltip";
+import { toTitleCase } from "@/utils/helpers";
 
 interface ISidebarCollapse {
   openDrawer: boolean;
@@ -40,14 +42,16 @@ const SidebarCollapse = ({ openDrawer, item }: ISidebarCollapse) => {
 
   return (
     <>
-      <ListItemButton
-        sx={{ pl: openDrawer ? (item.depth + 1) * 2 : 2 }}
-        onClick={() => setOpenMenu(item.url)}
-      >
-        <ListItemIcon>{item.icon}</ListItemIcon>
-        <ListItemText primary={item.label} className="capitalize" />
-        {open[item.url] ? <ExpandLess /> : <ExpandMore />}
-      </ListItemButton>
+      <Tooltip title={toTitleCase(item.label)} arrow placement="right">
+        <ListItemButton
+          sx={{ pl: openDrawer ? (item.depth + 1) * 2 : 2 }}
+          onClick={() => setOpenMenu(item.url)}
+        >
+          <ListItemIcon>{item.icon}</ListItemIcon>
+          <ListItemText primary={item.label} className="capitalize" />
+          {open[item.url] ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+      </Tooltip>
       <Collapse in={open[item.url]} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {item.children.length > 0 &&

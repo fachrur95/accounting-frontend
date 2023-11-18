@@ -8,7 +8,6 @@ import { convertOperator, dateConvertID } from "@/utils/helpers";
 import { useAppStore } from "@/utils/store";
 import Refresh from "@mui/icons-material/Refresh";
 import EditIcon from "@mui/icons-material/Edit";
-import Visibility from "@mui/icons-material/Visibility";
 import DeleteForever from "@mui/icons-material/DeleteForever";
 import Add from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
@@ -47,6 +46,13 @@ const BeginningBalanceDebtReceivableForm = dynamic(
   () =>
     import(
       "@/components/forms/begin-balances/BeginningBalanceDebtReceivableForm"
+    ),
+);
+
+const BeginningBalanceDebtReceivableDetailForm = dynamic(
+  () =>
+    import(
+      "@/components/forms/begin-balances/BeginningBalanceDebtReceivableDetailForm"
     ),
 );
 
@@ -120,12 +126,14 @@ const BeginBalanceDebtsPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "No. Transaksi",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "people.name",
       headerName: "Pemasok",
       type: "string",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, ITransaction>) => {
         return params.row.people?.name ?? "-";
       },
@@ -135,6 +143,7 @@ const BeginBalanceDebtsPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Tanggal",
       type: "date",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, ITransaction>) => {
         return dateConvertID(new Date(params.row.entryDate), {
           dateStyle: "long",
@@ -147,12 +156,14 @@ const BeginBalanceDebtsPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Hutang",
       type: "number",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "note",
       headerName: "Catatan",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {
@@ -160,6 +171,7 @@ const BeginBalanceDebtsPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {
@@ -175,19 +187,6 @@ const BeginBalanceDebtsPage: MyPage<{ userSession: Session["user"] }> = ({
             id={id}
             menus={[
               {
-                icon: <Visibility />,
-                label: "Lihat",
-                onClick: (params) =>
-                  params &&
-                  router.push(
-                    {
-                      pathname,
-                      query: { slug: ["v", params] },
-                    },
-                    `${pathname}/v/${params}`,
-                  ),
-              },
-              {
                 icon: <EditIcon />,
                 label: "Sunting",
                 onClick: (params) =>
@@ -195,9 +194,9 @@ const BeginBalanceDebtsPage: MyPage<{ userSession: Session["user"] }> = ({
                   router.push(
                     {
                       pathname,
-                      query: { slug: ["f", params] },
+                      query: { slug: params },
                     },
-                    `${pathname}/f/${params}`,
+                    `${pathname}/${params}`,
                   ),
                 hidden: userSession.role === Role.USER,
               },
@@ -286,7 +285,7 @@ const BeginBalanceDebtsPage: MyPage<{ userSession: Session["user"] }> = ({
               <Link
                 href={{
                   pathname,
-                  query: { slug: ["batch"] },
+                  query: { slug: "batch" },
                 }}
                 as={`${pathname}/batch`}
               >
@@ -314,9 +313,9 @@ const BeginBalanceDebtsPage: MyPage<{ userSession: Session["user"] }> = ({
               router.push(
                 {
                   pathname,
-                  query: { slug: ["v", params.row.id] },
+                  query: { slug: params.row.id as string },
                 },
-                `${pathname}/v/${params.row.id}`,
+                `${pathname}/${params.row.id}`,
               )
             }
             /* onRowDoubleClick={(params: GridCellParams<unknown, ITransaction, unknown>) =>
@@ -331,7 +330,7 @@ const BeginBalanceDebtsPage: MyPage<{ userSession: Session["user"] }> = ({
             checkboxSelection={userSession.role !== Role.USER}
             disableSelectionOnClick
           />
-          {router.query.slug && (
+          {router.query.slug === "batch" && (
             <ModalTransition
               open
               handleClose={router.back}
@@ -340,7 +339,22 @@ const BeginBalanceDebtsPage: MyPage<{ userSession: Session["user"] }> = ({
               scroll="paper"
             >
               <BeginningBalanceDebtReceivableForm
-                slug={router.query.slug as FormSlugType}
+                slug={router.query.slug as unknown as FormSlugType}
+                showIn="popup"
+                type="debt"
+              />
+            </ModalTransition>
+          )}
+          {router.query.slug && router.query.slug !== "batch" && (
+            <ModalTransition
+              open
+              handleClose={router.back}
+              maxWidth="lg"
+              fullWidth
+              scroll="paper"
+            >
+              <BeginningBalanceDebtReceivableDetailForm
+                id={router.query.slug as string}
                 showIn="popup"
                 type="debt"
               />

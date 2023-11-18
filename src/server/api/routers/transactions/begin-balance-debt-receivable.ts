@@ -46,16 +46,12 @@ export const beginBalanceDebtReceivableRouter = createTRPCRouter({
   update: protectedProcedure.input(
     z.object({
       id: z.string(),
+      transactionNumber: z.string(),
       chartOfAccountId: z.string(),
-      transactionDetails: z.array(
-        z.object({
-          id: z.string().nullish(),
-          peopleId: z.string(),
-          entryDate: z.date(),
-          priceInput: z.number(),
-          note: z.string().nullish(),
-        })
-      ).min(1),
+      peopleId: z.string(),
+      entryDate: z.date(),
+      underPayment: z.number(),
+      note: z.string().nullish(),
       type: z.enum(["debt", "receivable"]),
     }),
   ).mutation(async ({ ctx, input }) => {

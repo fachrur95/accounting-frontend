@@ -12,7 +12,7 @@ import { Role } from "@/types/prisma-api/role.d";
 
 const title = "Pajak";
 
-const ProductFormSlugPage: MyPage = () => {
+const TaxFormSlugPage: MyPage = () => {
   const router = useRouter();
   const slug = router.query.slug;
 
@@ -72,5 +72,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default ProductFormSlugPage;
-ProductFormSlugPage.Layout = "Dashboard";
+export default TaxFormSlugPage;
+TaxFormSlugPage.Layout = "Dashboard";

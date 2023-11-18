@@ -11,7 +11,7 @@ import React from "react";
 
 const title = "Penerimaan Piutang";
 
-const ProductFormSlugPage: MyPage = () => {
+const ReceivableFormSlugPage: MyPage = () => {
   const router = useRouter();
   const slug = router.query.slug;
 
@@ -67,5 +67,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default ProductFormSlugPage;
-ProductFormSlugPage.Layout = "Dashboard";
+export default ReceivableFormSlugPage;
+ReceivableFormSlugPage.Layout = "Dashboard";

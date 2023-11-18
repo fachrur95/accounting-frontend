@@ -3,6 +3,9 @@ import type { MyPage } from "@/components/layouts/layoutTypes";
 import DataGridProAdv from "@/components/tables/datagrid/DataGridProAdv";
 import { getServerAuthSession } from "@/server/auth";
 import type { PaginationResponse } from "@/types/api-response";
+import type { ILogActivity } from "@/types/prisma-api/log-activity";
+import type { IJwtDecode } from "@/types/session";
+import type { WorkerPathType } from "@/types/worker";
 import { api } from "@/utils/api";
 import { convertOperator, dateConvertID } from "@/utils/helpers";
 import { useAppStore } from "@/utils/store";
@@ -22,11 +25,8 @@ import type {
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import type { IJwtDecode } from "@/types/session";
-import type { ILogActivity } from "@/types/prisma-api/log-activity";
-import type { WorkerPathType } from "@/types/worker";
+import { useEffect, useState } from "react";
 
 const sortDefault: GridSortModel = [{ field: "createdAt", sort: "desc" }];
 
@@ -81,6 +81,7 @@ const ActivitiesPage: MyPage = () => {
       headerName: "Tanggal",
       type: "date",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, ILogActivity>) => {
         return dateConvertID(new Date(params.row.createdAt), {
           dateStyle: "long",
@@ -93,24 +94,21 @@ const ActivitiesPage: MyPage = () => {
       headerName: "Aktivitas",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
-    /* {
-      field: "activityType",
-      headerName: "Tipe",
-      type: "string",
-      flex: 1,
-    }, */
     {
       field: "createdBy",
       headerName: "Catatan",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "createdBy",
       headerName: "Dilakukan Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
   ];
 
@@ -208,16 +206,6 @@ const ActivitiesPage: MyPage = () => {
                 `${pathname}/v/${params.row.id}`,
               )
             }
-            /* onRowDoubleClick={(params: GridCellParams<unknown, ILogActivity, unknown>) =>
-              router.push(
-                {
-                  pathname,
-                  query: { slug: ["f", params.row.id] },
-                },
-                `${pathname}/f/${params.row.id}`,
-              )
-            } */
-            // checkboxSelection
             disableSelectionOnClick
           />
         </Box>

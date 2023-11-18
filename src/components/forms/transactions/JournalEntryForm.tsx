@@ -1,11 +1,34 @@
+import DatePicker from "@/components/controls/DatePicker";
+import useNotification from "@/components/hooks/useNotification";
+import type { FormSlugType } from "@/types/global";
+import type { IJournalEntryMutation } from "@/types/prisma-api/transaction";
+import { Vector } from "@/types/prisma-api/vector.d";
+import { api } from "@/utils/api";
+import { formatCurrency } from "@/utils/helpers";
+import Add from "@mui/icons-material/Add";
+import Close from "@mui/icons-material/Close";
+import Delete from "@mui/icons-material/Delete";
+import Edit from "@mui/icons-material/Edit";
+import Save from "@mui/icons-material/Save";
+import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import DatePicker from "@/components/controls/DatePicker";
+import CircularProgress from "@mui/material/CircularProgress";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
 import TableFooter from "@mui/material/TableFooter";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
-import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import {
   FormContainer,
   TextFieldElement,
@@ -14,31 +37,8 @@ import {
   useForm,
   useWatch,
 } from "react-hook-form-mui";
-import Close from "@mui/icons-material/Close";
-import Add from "@mui/icons-material/Add";
-import Delete from "@mui/icons-material/Delete";
-import Edit from "@mui/icons-material/Edit";
-import Save from "@mui/icons-material/Save";
 import NumericFormatCustom from "../../controls/NumericFormatCustom";
-import { api } from "@/utils/api";
-import Link from "next/link";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import type { FormSlugType } from "@/types/global";
-import type { IJournalEntryMutation } from "@/types/prisma-api/transaction";
 import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import { useRouter } from "next/router";
-import { formatCurrency } from "@/utils/helpers";
-import useNotification from "@/components/hooks/useNotification";
-import { Vector } from "@/types/prisma-api/vector.d";
 
 interface IJournalEntryForm {
   slug: FormSlugType;
@@ -86,7 +86,11 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.globalTransaction.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
@@ -130,7 +134,7 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
   });
 
   const onSubmit = (data: IJournalEntryMutation) => {
-    const dataSave: IJournalEntryMutation = {
+    const dataSave = {
       ...data,
       entryDate: new Date(data.entryDate),
       note: data.note === "" || data.note === null ? undefined : data.note,
@@ -301,13 +305,22 @@ const JournalEntryForm = (props: IJournalEntryForm) => {
                 label="Tanggal"
                 name="entryDate"
                 required
-                disabled={mode === "view"}
+                inputProps={{
+                  disabled: mode === "view",
+                }}
+                slotProps={{
+                  openPickerButton: { disabled: mode === "view" },
+                }}
               />
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer component={Paper} elevation={0}>
-                  <Table size="small">
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  sx={{ maxHeight: 440 }}
+                >
+                  <Table stickyHeader size="small">
                     <TableHead>
                       <TableRow>
                         <TableCell

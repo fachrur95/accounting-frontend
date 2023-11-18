@@ -57,7 +57,11 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.unitOfMeasure.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.unitOfMeasure.create.useMutation({
@@ -97,7 +101,7 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
   });
 
   const onSubmit = (data: IUnitOfMeasureMutation) => {
-    const dataSave: IUnitOfMeasureMutation = {
+    const dataSave = {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
     };
@@ -179,7 +183,6 @@ const MasterUnitOfMeasureForm = (props: IMasterUnitOfMeasureForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}

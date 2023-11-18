@@ -120,18 +120,21 @@ const ProductsPage: MyPage<{ userSession: Session["user"] }> = ({
       field: "code",
       headerName: "Kode",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "name",
       headerName: "Nama",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "itemCategory.name",
       headerName: "Kategori",
       type: "string",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, IItem>) => {
         return params.row.itemCategory?.name ?? "-";
       },
@@ -140,6 +143,7 @@ const ProductsPage: MyPage<{ userSession: Session["user"] }> = ({
       field: "multipleUoms",
       headerName: "Unit",
       flex: 1,
+      minWidth: 200,
       type: "string",
       valueGetter: (params: GridValueGetterParams<unknown, IItem>) => {
         return params.row.multipleUoms?.[0]?.unitOfMeasure?.name ?? "-";
@@ -149,6 +153,7 @@ const ProductsPage: MyPage<{ userSession: Session["user"] }> = ({
       field: "tax.name",
       headerName: "Pajak",
       flex: 1,
+      minWidth: 200,
       type: "string",
       valueGetter: (params: GridValueGetterParams<unknown, IItem>) => {
         return params.row.tax?.name;
@@ -160,6 +165,7 @@ const ProductsPage: MyPage<{ userSession: Session["user"] }> = ({
       type: "boolean",
       filterable: false,
       flex: 1,
+      minWidth: 200,
       renderCell: (params: GridRenderCellParams<unknown, IItem, unknown>) => (
         <Chip
           icon={params.row.isActive ? <Done /> : <Close />}
@@ -173,6 +179,7 @@ const ProductsPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {

@@ -48,7 +48,11 @@ const UnitForm = (props: IUnitForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.unitCredentials.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.unitCredentials.create.useMutation({
@@ -88,7 +92,7 @@ const UnitForm = (props: IUnitForm) => {
   });
 
   const onSubmit = (data: IUnitMutation) => {
-    const dataSave: IUnitMutation = {
+    const dataSave = {
       ...data,
     };
     if (selectedId) {
@@ -164,7 +168,6 @@ const UnitForm = (props: IUnitForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}

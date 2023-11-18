@@ -1,5 +1,6 @@
 import DatePicker from "@/components/controls/DatePicker";
 import type { FormSlugType } from "@/types/global";
+import type { IDataOption } from "@/types/options";
 import type {
   ISalesMutation,
   ISalesPurchaseDetailMutation,
@@ -8,14 +9,15 @@ import { api } from "@/utils/api";
 import Add from "@mui/icons-material/Add";
 import Close from "@mui/icons-material/Close";
 import Delete from "@mui/icons-material/Delete";
+import DocumentScanner from "@mui/icons-material/DocumentScanner";
 import Edit from "@mui/icons-material/Edit";
 import PointOfSale from "@mui/icons-material/PointOfSale";
 import Save from "@mui/icons-material/Save";
-import DocumentScanner from "@mui/icons-material/DocumentScanner";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
+import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -28,8 +30,6 @@ import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import Divider from "@mui/material/Divider";
-import type { IDataOption } from "@/types/options";
 import {
   FormContainer,
   RadioButtonGroup,
@@ -40,21 +40,21 @@ import {
   useWatch,
 } from "react-hook-form-mui";
 import NumericFormatCustom from "../../controls/NumericFormatCustom";
-// import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
+
 import useNotification from "@/components/hooks/useNotification";
+import useSessionData from "@/components/hooks/useSessionData";
+import { PaymentType } from "@/types/prisma-api/payment-type.d";
 import { formatNumber } from "@/utils/helpers";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import InputAdornment from "@mui/material/InputAdornment";
+import TextField from "@mui/material/TextField";
 import { useRouter } from "next/router";
 import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
 import AutocompleteItem from "../../controls/autocompletes/masters/AutocompleteItem";
 import AutocompleteMultipleUom from "../../controls/autocompletes/masters/AutocompleteMultipleUom";
 import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
 import OpenCashRegisterForm from "../OpenCashRegister";
-import useSessionData from "@/components/hooks/useSessionData";
-import TextField from "@mui/material/TextField";
-import InputAdornment from "@mui/material/InputAdornment";
-import { PaymentType } from "@/types/prisma-api/payment-type.d";
 
 interface ISalesForm {
   slug: FormSlugType;
@@ -153,12 +153,20 @@ const SalesForm = (props: ISalesForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.globalTransaction.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const { data: dataScanned } = api.item.scanBarcode.useQuery(
     { barcode: enteredBarcode ?? "" },
-    { enabled: !!enteredBarcode, refetchOnWindowFocus: false },
+    {
+      enabled: !!enteredBarcode,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    },
   );
 
   const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
@@ -168,13 +176,13 @@ const SalesForm = (props: ISalesForm) => {
   const handleBarcodeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      // Di sini Anda dapat menambahkan logika pemindaian barcode Anda
+
       setEnteredBarcode(barcode.code);
     }
   };
 
   const mutationCreate = api.sales.create.useMutation({
-    onSuccess: () => void router.push(basePath),
+    onSuccess: (data) => void router.push(`${basePath}/invoice/${data.id}`),
     onError: (error) => {
       if (error.message) {
         setOpenNotification(error.message, { variant: "error" });
@@ -210,7 +218,7 @@ const SalesForm = (props: ISalesForm) => {
   });
 
   const onSubmit = (data: ISalesMutation) => {
-    const dataSave: ISalesMutation = {
+    const dataSave = {
       ...data,
       specialDiscount: data.specialDiscount ?? 0,
       discountGroupInput: data.discountGroupInput ?? 0,
@@ -434,7 +442,6 @@ const SalesForm = (props: ISalesForm) => {
 
             continue;
           }
-          // "itemCategory" | "transactionDetails" | "tax" | "files" | "id"
 
           if (
             key === "transactionNumber" ||
@@ -547,7 +554,6 @@ const SalesForm = (props: ISalesForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}
@@ -593,7 +599,16 @@ const SalesForm = (props: ISalesForm) => {
                 }}
                 type="customer"
               />
-              <DatePicker label="Tanggal" name="entryDate" disabled />
+              <DatePicker
+                label="Tanggal"
+                name="entryDate"
+                inputProps={{
+                  disabled: true,
+                }}
+                slotProps={{
+                  openPickerButton: { disabled: true },
+                }}
+              />
             </Box>
             {paymentInput > 0 && (
               <Box
@@ -652,7 +667,6 @@ const SalesForm = (props: ISalesForm) => {
                         <DocumentScanner />
                       </InputAdornment>
                     ),
-                    // disabled: mode === "view",
                   }}
                   onKeyDown={handleBarcodeKeyDown}
                 />
@@ -660,7 +674,6 @@ const SalesForm = (props: ISalesForm) => {
                   label="Qty"
                   InputProps={{
                     inputComponent: NumericFormatCustom as never,
-                    // disabled: mode === "view",
                   }}
                   value={barcode.qty}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -675,8 +688,13 @@ const SalesForm = (props: ISalesForm) => {
             )}
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer component={Paper} elevation={0}>
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  sx={{ maxHeight: 440 }}
+                >
                   <Table
+                    stickyHeader
                     size="small"
                     sx={{ "& .MuiTableCell-root": { px: "6px" } }}
                   >
@@ -780,14 +798,6 @@ const SalesForm = (props: ISalesForm) => {
                               autocompleteProps={{
                                 size: "small",
                                 disabled: mode === "view",
-                                /* onChange: (_, data) => {
-                                  if (!transactionDetails[index]?.priceInput) {
-                                    setValue(
-                                      `transactionDetails.${index}.priceInput`,
-                                      (data as IDataOption | null)?.price ?? 0,
-                                    );
-                                  }
-                                }, */
                               }}
                               textFieldProps={{
                                 hiddenLabel: true,

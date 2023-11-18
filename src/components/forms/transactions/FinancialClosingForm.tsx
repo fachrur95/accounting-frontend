@@ -51,7 +51,11 @@ const FinancialClosingForm = (props: IFinancialClosingForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.globalTransaction.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.financialClosing.create.useMutation({
@@ -91,7 +95,7 @@ const FinancialClosingForm = (props: IFinancialClosingForm) => {
   });
 
   const onSubmit = (data: IFinancialClosingMutation) => {
-    const dataSave: IFinancialClosingMutation = {
+    const dataSave = {
       ...data,
       entryDate: new Date(data.entryDate),
     };
@@ -172,7 +176,6 @@ const FinancialClosingForm = (props: IFinancialClosingForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}
@@ -202,7 +205,12 @@ const FinancialClosingForm = (props: IFinancialClosingForm) => {
                 label="Per Tanggal"
                 name="entryDate"
                 required
-                disabled={mode === "view"}
+                inputProps={{
+                  disabled: mode === "view",
+                }}
+                slotProps={{
+                  openPickerButton: { disabled: mode === "view" },
+                }}
                 className="w-full"
               />
             </Box>

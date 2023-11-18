@@ -4,12 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
-import {
-  FormContainer,
-  TextFieldElement,
-  // RadioButtonGroup,
-  useForm,
-} from "react-hook-form-mui";
+import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
 import Close from "@mui/icons-material/Close";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
@@ -18,6 +13,8 @@ import Link from "next/link";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import type { FormSlugType } from "@/types/global";
+import { BalanceSheet } from "@/types/prisma-api/balance-sheet.d";
+import { Vector } from "@/types/prisma-api/vector.d";
 import type { IAccountClassMutation } from "@/types/prisma-api/account-class";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -28,8 +25,8 @@ const defaultValues: IAccountClassMutation = {
   code: "",
   group: "",
   name: "",
-  type: "AKTIVA",
-  balanceSheetPosition: "POSITIVE",
+  type: BalanceSheet.AKTIVA,
+  balanceSheetPosition: Vector.POSITIVE,
 };
 
 interface IMasterAccountClassForm {
@@ -57,7 +54,11 @@ const MasterAccountClassForm = (props: IMasterAccountClassForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.accountClass.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.accountClass.create.useMutation({
@@ -97,7 +98,7 @@ const MasterAccountClassForm = (props: IMasterAccountClassForm) => {
   });
 
   const onSubmit = (data: IAccountClassMutation) => {
-    const dataSave: IAccountClassMutation = {
+    const dataSave = {
       ...data,
       group: data.group === "" || data.group === null ? undefined : data.group,
     };
@@ -180,7 +181,6 @@ const MasterAccountClassForm = (props: IMasterAccountClassForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}
@@ -225,44 +225,6 @@ const MasterAccountClassForm = (props: IMasterAccountClassForm) => {
                 }}
               />
             </Box>
-            {/* <Box
-              component={Paper}
-              
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <RadioButtonGroup
-                label="Posisi Akun"
-                name="type"
-                options={[
-                  {
-                    id: "AKTIVA",
-                    label: "Aktiva",
-                  },
-                  {
-                    id: "PASIVA",
-                    label: "Pasiva",
-                  },
-                ]}
-                row
-                required
-              />
-              <RadioButtonGroup
-                label="Posisi dalam Neraca"
-                name="balanceSheetPosition"
-                options={[
-                  {
-                    id: "POSITIVE",
-                    label: "POSITIVE",
-                  },
-                  {
-                    id: "NEGATIVE",
-                    label: "NEGATIVE",
-                  },
-                ]}
-                row
-                required
-              />
-            </Box> */}
             <Button type="submit" disabled={isSubmitting} className="hidden">
               Simpan
             </Button>

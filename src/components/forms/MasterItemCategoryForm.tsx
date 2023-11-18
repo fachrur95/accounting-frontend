@@ -66,7 +66,11 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.itemCategory.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.itemCategory.create.useMutation({
@@ -106,7 +110,7 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
   });
 
   const onSubmit = (data: IItemCategoryMutation) => {
-    const dataSave: IItemCategoryMutation = {
+    const dataSave = {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
       itemTypeId: data.itemType?.id ?? "",
@@ -235,7 +239,6 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}

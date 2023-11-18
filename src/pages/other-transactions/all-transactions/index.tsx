@@ -106,12 +106,14 @@ const AllTransactionsPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "No. Transaksi",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "people.name",
       headerName: "Pelanggan/ Pemasok",
       type: "string",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, ITransaction>) => {
         return params.row.people?.name ?? "-";
       },
@@ -121,12 +123,14 @@ const AllTransactionsPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Total",
       type: "number",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "entryDate",
       headerName: "Tanggal",
       type: "date",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, ITransaction>) => {
         return dateConvertID(new Date(params.row.entryDate), {
           dateStyle: "long",
@@ -139,6 +143,7 @@ const AllTransactionsPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Catatan",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {
@@ -146,6 +151,7 @@ const AllTransactionsPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {

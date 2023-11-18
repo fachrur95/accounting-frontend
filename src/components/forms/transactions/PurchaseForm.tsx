@@ -1,10 +1,13 @@
 import DatePicker from "@/components/controls/DatePicker";
+import useNotification from "@/components/hooks/useNotification";
 import type { FormSlugType } from "@/types/global";
+import type { IDataOption } from "@/types/options";
 import type {
   IPurchaseMutation,
   ISalesPurchaseDetailMutation,
 } from "@/types/prisma-api/transaction";
 import { api } from "@/utils/api";
+import { formatNumber } from "@/utils/helpers";
 import Add from "@mui/icons-material/Add";
 import Close from "@mui/icons-material/Close";
 import Delete from "@mui/icons-material/Delete";
@@ -14,6 +17,9 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -25,9 +31,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import Divider from "@mui/material/Divider";
-import type { IDataOption } from "@/types/options";
 import {
   FormContainer,
   TextFieldElement,
@@ -38,11 +43,6 @@ import {
 } from "react-hook-form-mui";
 import NumericFormatCustom from "../../controls/NumericFormatCustom";
 import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
-import useNotification from "@/components/hooks/useNotification";
-import { formatNumber } from "@/utils/helpers";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import { useRouter } from "next/router";
 import AutocompleteItem from "../../controls/autocompletes/masters/AutocompleteItem";
 import AutocompleteMultipleUom from "../../controls/autocompletes/masters/AutocompleteMultipleUom";
 import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
@@ -129,7 +129,11 @@ const PurchaseForm = (props: IPurchaseForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.globalTransaction.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const { data: dataNumber } = api.globalTransaction.generateNumber.useQuery({
@@ -173,7 +177,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
   });
 
   const onSubmit = (data: IPurchaseMutation) => {
-    const dataSave: IPurchaseMutation = {
+    const dataSave = {
       ...data,
       specialDiscount: data.specialDiscount ?? 0,
       discountGroupInput: data.discountGroupInput ?? 0,
@@ -339,7 +343,6 @@ const PurchaseForm = (props: IPurchaseForm) => {
 
             continue;
           }
-          // "itemCategory" | "transactionDetails" | "tax" | "files" | "id"
 
           if (
             key === "transactionNumber" ||
@@ -397,7 +400,6 @@ const PurchaseForm = (props: IPurchaseForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}
@@ -443,7 +445,16 @@ const PurchaseForm = (props: IPurchaseForm) => {
                 }}
                 type="supplier"
               />
-              <DatePicker label="Tanggal" name="entryDate" disabled />
+              <DatePicker
+                label="Tanggal"
+                name="entryDate"
+                inputProps={{
+                  disabled: true,
+                }}
+                slotProps={{
+                  openPickerButton: { disabled: true },
+                }}
+              />
               {paymentInput > 0 && (
                 <AutocompleteChartOfAccount
                   name="chartOfAccount"
@@ -458,8 +469,13 @@ const PurchaseForm = (props: IPurchaseForm) => {
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer component={Paper} elevation={0}>
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  sx={{ maxHeight: 440 }}
+                >
                   <Table
+                    stickyHeader
                     size="small"
                     sx={{ "& .MuiTableCell-root": { px: "6px" } }}
                   >
@@ -563,14 +579,6 @@ const PurchaseForm = (props: IPurchaseForm) => {
                               autocompleteProps={{
                                 size: "small",
                                 disabled: mode === "view",
-                                /* onChange: (_, data) => {
-                                  if (!transactionDetails[index]?.priceInput) {
-                                    setValue(
-                                      `transactionDetails.${index}.priceInput`,
-                                      (data as IDataOption | null)?.price ?? 0,
-                                    );
-                                  }
-                                }, */
                               }}
                               textFieldProps={{
                                 hiddenLabel: true,

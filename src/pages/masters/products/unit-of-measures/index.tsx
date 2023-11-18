@@ -117,12 +117,14 @@ const UnitOfMeasuresPage: MyPage = () => {
       headerName: "Kode",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "name",
       headerName: "Nama",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "isActive",
@@ -130,6 +132,7 @@ const UnitOfMeasuresPage: MyPage = () => {
       type: "boolean",
       filterable: false,
       flex: 1,
+      minWidth: 200,
       renderCell: (
         params: GridRenderCellParams<unknown, IUnitOfMeasure, unknown>,
       ) => (
@@ -145,6 +148,7 @@ const UnitOfMeasuresPage: MyPage = () => {
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {

@@ -1,9 +1,24 @@
+import useNotification from "@/components/hooks/useNotification";
+import type { FormSlugType } from "@/types/global";
+import type { IDataOption } from "@/types/options";
+import type { IAccountClass } from "@/types/prisma-api/account-class";
+import type { IChartOfAccountMutation } from "@/types/prisma-api/chart-of-account";
+import { api } from "@/utils/api";
+import Close from "@mui/icons-material/Close";
+import Edit from "@mui/icons-material/Edit";
+import Save from "@mui/icons-material/Save";
+import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import {
   FormContainer,
   SwitchElement,
@@ -11,23 +26,8 @@ import {
   useForm,
   useWatch,
 } from "react-hook-form-mui";
-import Close from "@mui/icons-material/Close";
-import Edit from "@mui/icons-material/Edit";
-import Save from "@mui/icons-material/Save";
 import AutocompleteAccountClass from "../controls/autocompletes/masters/AutocompleteAccountClass";
 import AutocompleteAccountSubClass from "../controls/autocompletes/masters/AutocompleteAccountSubClass";
-import { api } from "@/utils/api";
-import Link from "next/link";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
-import type { FormSlugType } from "@/types/global";
-import type { IChartOfAccountMutation } from "@/types/prisma-api/chart-of-account";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import { useRouter } from "next/router";
-import type { IDataOption } from "@/types/options";
-import type { IAccountClass } from "@/types/prisma-api/account-class";
-import useNotification from "@/components/hooks/useNotification";
 
 interface IChartOfAccountMutationWithAccountClass
   extends IChartOfAccountMutation {
@@ -72,7 +72,11 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.chartOfAccount.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.chartOfAccount.create.useMutation({
@@ -120,7 +124,7 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
   const selectedAccountClass = useWatch({ control, name: "accountClass" });
 
   const onSubmit = (data: IChartOfAccountMutationWithAccountClass) => {
-    const dataSave: IChartOfAccountMutationWithAccountClass = {
+    const dataSave = {
       ...data,
       group: data.group === "" || data.group === null ? undefined : data.group,
       accountSubClassId: data.accountSubClass?.id ?? "",
@@ -220,7 +224,6 @@ const MasterChartOfAccountForm = (props: IMasterChartOfAccountForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}

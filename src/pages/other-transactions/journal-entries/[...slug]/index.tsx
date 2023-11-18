@@ -12,7 +12,7 @@ import { Role } from "@/types/prisma-api/role.d";
 
 const title = "Jurnal Umum";
 
-const ProductFormSlugPage: MyPage = () => {
+const JournalEntryFormSlugPage: MyPage = () => {
   const router = useRouter();
   const slug = router.query.slug;
 
@@ -72,5 +72,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default ProductFormSlugPage;
-ProductFormSlugPage.Layout = "Dashboard";
+export default JournalEntryFormSlugPage;
+JournalEntryFormSlugPage.Layout = "Dashboard";

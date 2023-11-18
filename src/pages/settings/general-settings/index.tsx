@@ -79,7 +79,7 @@ const GeneralSettingsPage: MyPage = () => {
   });
 
   const onSubmit = (data: IGeneralSettingMutation) => {
-    const dataSave: IGeneralSettingMutation = {
+    const dataSave = {
       ...data,
       leader: data.leader ?? undefined,
       accountant: data.accountant ?? undefined,

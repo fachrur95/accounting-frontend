@@ -118,12 +118,14 @@ const CashRegistersPage: MyPage = () => {
       headerName: "Nama",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "mainAccount.name",
       headerName: "Akun Utama",
       type: "string",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, ICashRegister>) => {
         return params.row.mainAccount?.name ?? "-";
       },
@@ -133,6 +135,7 @@ const CashRegistersPage: MyPage = () => {
       headerName: "Akun Setor",
       type: "string",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, ICashRegister>) => {
         return params.row.depositAccount?.name ?? "-";
       },
@@ -142,6 +145,7 @@ const CashRegistersPage: MyPage = () => {
       headerName: "Akun Saldo Awal",
       type: "string",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, ICashRegister>) => {
         return params.row.beginBalanceAccount?.name ?? "-";
       },
@@ -152,6 +156,7 @@ const CashRegistersPage: MyPage = () => {
       type: "boolean",
       filterable: false,
       flex: 1,
+      minWidth: 200,
       renderCell: (
         params: GridRenderCellParams<unknown, ICashRegister, unknown>,
       ) => (
@@ -167,6 +172,7 @@ const CashRegistersPage: MyPage = () => {
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {

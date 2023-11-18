@@ -114,12 +114,12 @@ export const otherTabs: IDataTab[] = [
     url: "/masters/other/cash-registers",
     roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
   },
-  {
+  /* {
     id: "term",
     label: "Termin",
     url: "/masters/other/terms",
     roles: [Role.SUPERADMIN, Role.AUDITOR, Role.ADMIN],
-  },
+  }, */
   /* {
     id: "tax",
     label: "Pajak",

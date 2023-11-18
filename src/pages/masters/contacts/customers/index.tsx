@@ -122,18 +122,21 @@ const CustomersPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Kode",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "name",
       headerName: "Nama",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "peopleCategory.name",
       headerName: "Kategori",
       type: "string",
       flex: 1,
+      minWidth: 200,
       valueGetter: (params: GridValueGetterParams<unknown, IPeople>) => {
         return params.row.peopleCategory?.name ?? "-";
       },
@@ -144,6 +147,7 @@ const CustomersPage: MyPage<{ userSession: Session["user"] }> = ({
       type: "boolean",
       filterable: false,
       flex: 1,
+      minWidth: 200,
       renderCell: (params: GridRenderCellParams<unknown, IPeople, unknown>) => (
         <Chip
           icon={params.row.isActive ? <Done /> : <Close />}
@@ -157,6 +161,7 @@ const CustomersPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {

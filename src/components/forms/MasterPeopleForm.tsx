@@ -61,7 +61,11 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.people.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.people.create.useMutation({
@@ -101,7 +105,7 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
   });
 
   const onSubmit = (data: IPeopleMutation) => {
-    const dataSave: IPeopleMutation = {
+    const dataSave = {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
       peopleCategoryId: data.peopleCategory?.id ?? "",
@@ -201,7 +205,6 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}

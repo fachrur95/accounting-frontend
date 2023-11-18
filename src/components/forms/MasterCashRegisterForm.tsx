@@ -63,7 +63,11 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.cashRegister.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.cashRegister.create.useMutation({
@@ -103,7 +107,7 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
   });
 
   const onSubmit = (data: ICashRegisterMutation) => {
-    const dataSave: ICashRegisterMutation = {
+    const dataSave = {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
       mainAccountId: data.mainAccount?.id ?? "",
@@ -220,7 +224,6 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}

@@ -34,6 +34,8 @@ import IconButton from "@mui/material/IconButton";
 import Link from "next/link";
 import Add from "@mui/icons-material/Add";
 // import UnitForm from "@/components/forms/UnitForm";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 import dynamic from "next/dynamic";
 
 const UnitForm = dynamic(() => import("@/components/forms/UnitForm"));
@@ -76,7 +78,9 @@ const UnitCredentialPage: MyPage = () => {
     setSelectedId(null);
   };
 
-  const handleSetUnit = async (id: string) => {
+  const handleSetUnit = async (event: React.MouseEvent, id: string) => {
+    event.stopPropagation();
+    if (mutation.isLoading) return;
     await mutation.mutateAsync(
       { id },
       {
@@ -132,6 +136,12 @@ const UnitCredentialPage: MyPage = () => {
         <title>{`Bidang Usaha | Pilih Unit`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={mutation.isLoading ?? false}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Container maxWidth="md" component={Paper} sx={{ py: 3, my: 2 }}>
         <Box>
           <Button
@@ -207,7 +217,7 @@ const UnitCredentialPage: MyPage = () => {
                 <TableRow
                   hover
                   key={index}
-                  onClick={() => void handleSetUnit(row.id ?? "")}
+                  onClick={(event) => void handleSetUnit(event, row.id ?? "")}
                   className="cursor-pointer"
                 >
                   <TableCell component="th" scope="row">

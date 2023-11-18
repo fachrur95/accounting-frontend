@@ -115,6 +115,7 @@ const AccountSubClassesPage: MyPage = () => {
       headerName: "Akun Utama",
       type: "string",
       flex: 1,
+      minWidth: 200,
       valueGetter: (
         params: GridValueGetterParams<unknown, IAccountSubClass>,
       ) => {
@@ -126,24 +127,28 @@ const AccountSubClassesPage: MyPage = () => {
       headerName: "Kode",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "name",
       headerName: "Nama",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "group",
       headerName: "Label",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "createdBy",
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {

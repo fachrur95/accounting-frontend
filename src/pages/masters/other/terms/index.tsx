@@ -117,12 +117,14 @@ const TermsPage: MyPage = () => {
       headerName: "Nama",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "period",
       headerName: "Periode",
       type: "number",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "isActive",
@@ -130,6 +132,7 @@ const TermsPage: MyPage = () => {
       type: "boolean",
       filterable: false,
       flex: 1,
+      minWidth: 200,
       renderCell: (params: GridRenderCellParams<unknown, ITerm, unknown>) => (
         <Chip
           icon={params.row.isActive ? <Done /> : <Close />}
@@ -143,6 +146,7 @@ const TermsPage: MyPage = () => {
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {

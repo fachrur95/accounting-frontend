@@ -118,6 +118,7 @@ const ChartOfAccountsPage: MyPage = () => {
       headerName: "Akun Utama",
       type: "string",
       flex: 1,
+      minWidth: 200,
       valueGetter: (
         params: GridValueGetterParams<unknown, IChartOfAccount>,
       ) => {
@@ -129,6 +130,7 @@ const ChartOfAccountsPage: MyPage = () => {
       headerName: "Sub Akun",
       type: "string",
       flex: 1,
+      minWidth: 200,
       valueGetter: (
         params: GridValueGetterParams<unknown, IChartOfAccount>,
       ) => {
@@ -140,18 +142,21 @@ const ChartOfAccountsPage: MyPage = () => {
       headerName: "Kode",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "name",
       headerName: "Nama",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "group",
       headerName: "Label",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "isActive",
@@ -159,6 +164,7 @@ const ChartOfAccountsPage: MyPage = () => {
       type: "boolean",
       filterable: false,
       flex: 1,
+      minWidth: 200,
       renderCell: (
         params: GridRenderCellParams<unknown, IChartOfAccount, unknown>,
       ) => (
@@ -174,6 +180,7 @@ const ChartOfAccountsPage: MyPage = () => {
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {

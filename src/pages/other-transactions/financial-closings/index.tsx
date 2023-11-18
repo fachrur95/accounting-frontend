@@ -116,6 +116,7 @@ const FinancialClosingsPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Tanggal",
       type: "date",
       flex: 1,
+      minWidth: 200,
       valueGetter: (
         params: GridValueGetterParams<unknown, IFinancialClosing>,
       ) => {
@@ -130,6 +131,7 @@ const FinancialClosingsPage: MyPage<{ userSession: Session["user"] }> = ({
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {

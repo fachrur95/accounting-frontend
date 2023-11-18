@@ -32,6 +32,8 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useInView } from "react-intersection-observer";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 import dynamic from "next/dynamic";
 
 const InstituteForm = dynamic(() => import("@/components/forms/InstituteForm"));
@@ -76,6 +78,7 @@ const InstituteCredentialPage: MyPage = () => {
 
   const handleSetInstitute = async (event: React.MouseEvent, id: string) => {
     event.stopPropagation();
+    if (mutation.isLoading) return;
 
     await mutation.mutateAsync(
       { id },
@@ -132,6 +135,12 @@ const InstituteCredentialPage: MyPage = () => {
         <title>{`Bidang Usaha | Pilih Lembaga`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={mutation.isLoading ?? false}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Container maxWidth="md" component={Paper} sx={{ py: 3, my: 2 }}>
         <Box>
           <Button

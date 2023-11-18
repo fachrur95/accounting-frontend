@@ -117,6 +117,7 @@ const ItemTypesPage: MyPage = () => {
       headerName: "Nama",
       type: "string",
       flex: 1,
+      minWidth: 200,
     },
     {
       field: "isActive",
@@ -124,6 +125,7 @@ const ItemTypesPage: MyPage = () => {
       type: "boolean",
       filterable: false,
       flex: 1,
+      minWidth: 200,
       renderCell: (
         params: GridRenderCellParams<unknown, IItemType, unknown>,
       ) => (
@@ -139,6 +141,7 @@ const ItemTypesPage: MyPage = () => {
       headerName: "Dibuat Oleh",
       type: "string",
       flex: 1,
+      minWidth: 200,
       hide: true,
     },
     {

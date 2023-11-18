@@ -8,21 +8,26 @@ import Close from "@mui/icons-material/Close";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
 import TableFooter from "@mui/material/TableFooter";
+import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import {
   FormContainer,
@@ -33,9 +38,6 @@ import {
 } from "react-hook-form-mui";
 import NumericFormatCustom from "../../controls/NumericFormatCustom";
 import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import { useRouter } from "next/router";
 import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
 
 interface IBeginBalanceDebtReceivableForm {
@@ -114,9 +116,9 @@ const BeginningBalanceDebtReceivableForm = (
   });
 
   const onSubmit = (data: IBeginBalanceDebtReceivableMutation) => {
-    const dataSave: IBeginBalanceDebtReceivableMutation = {
+    const dataSave = {
       ...data,
-      chartOfAccountId: data.chartOfAccount?.id ?? undefined,
+      chartOfAccountId: data.chartOfAccount?.id ?? "",
       transactionDetails: data.transactionDetails.map((detail) => ({
         ...detail,
         peopleId: detail.people?.id ?? "",
@@ -188,7 +190,6 @@ const BeginningBalanceDebtReceivableForm = (
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}
@@ -205,6 +206,18 @@ const BeginningBalanceDebtReceivableForm = (
       <DialogContent>
         <FormContainer formContext={formContext} onSuccess={onSubmit}>
           <div className="grid gap-4">
+            <Box component={Paper}>
+              <Alert severity="info">
+                <AlertTitle>Informasi</AlertTitle>
+                {`Transaksi ini akan dibuat secara terpisah sesuai dengan ${
+                  type === "debt" ? '"pemasok"' : '"pelanggan"'
+                } yang telah dipilih agar dapat dibayar secara terpisah di ${
+                  type === "debt"
+                    ? '"pembayaran hutang"'
+                    : '"penerimaan piutang"'
+                }`}
+              </Alert>
+            </Box>
             <Box
               component={Paper}
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
@@ -265,7 +278,7 @@ const BeginningBalanceDebtReceivableForm = (
                         </TableCell>
                         <TableCell
                           sx={{
-                            width: "10%",
+                            width: "15%",
                             minWidth: { xs: 250, md: "auto" },
                           }}
                         >
@@ -311,14 +324,15 @@ const BeginningBalanceDebtReceivableForm = (
                           </TableCell>
                           <TableCell>
                             <DatePicker
-                              label="Tanggal"
                               name={`transactionDetails.${index}.entryDate`}
                               required
-                              disabled={mode === "view"}
-                              /* textFieldProps={{
-                                hiddenLabel: true,
-                              }} */
-                              size="small"
+                              inputProps={{
+                                disabled: mode === "view",
+                                size: "small",
+                              }}
+                              slotProps={{
+                                openPickerButton: { disabled: mode === "view" },
+                              }}
                             />
                           </TableCell>
                           <TableCell align="right">

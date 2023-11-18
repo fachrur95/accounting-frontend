@@ -28,6 +28,9 @@ import { purchaseRouter } from "./routers/transactions/purchase";
 import { generalSettingRouter } from "./routers/general-setting";
 import { logActivityRouter } from "./routers/log-activity";
 import { dashboardRouter } from "./routers/dashboard";
+import { returnRouter } from "./routers/transactions/return";
+import { stockOpnameRouter } from "./routers/transactions/stock-opname";
+import { stockAdjustmentRouter } from "./routers/transactions/stock-adjustment";
 import { financialClosingRouter } from "./routers/transactions/financial-closing";
 import { beginBalanceStockRouter } from "./routers/transactions/begin-balance-stock";
 import { beginBalanceDebtReceivableRouter } from "./routers/transactions/begin-balance-debt-receivable";
@@ -67,6 +70,9 @@ export const appRouter = createTRPCRouter({
   generalSetting: generalSettingRouter,
   logActivity: logActivityRouter,
   dashboard: dashboardRouter,
+  return: returnRouter,
+  stockOpname: stockOpnameRouter,
+  stockAdjustment: stockAdjustmentRouter,
   financialClosing: financialClosingRouter,
   beginBalanceStock: beginBalanceStockRouter,
   beginBalanceDebtReceivable: beginBalanceDebtReceivableRouter,

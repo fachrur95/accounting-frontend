@@ -22,6 +22,29 @@ export const defaultUndefinedResult: PaginationResponse<IItem> = {
 
 const GLOBAL_URL = `${env.BACKEND_URL}/v1/items`;
 
+type ItemStockType = {
+  id: string;
+  name: string;
+  qty: number;
+}
+
+export const getStock = async (token: string, itemId: string): Promise<ItemStockType | null> => {
+  const result = await axios.get<ItemStockType>(
+    `${GLOBAL_URL}/stock/${itemId}`,
+    {
+      withCredentials: true,
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  ).then((response) => {
+    return response.data;
+  }).catch((err) => {
+    console.log(err)
+    return null;
+  });
+
+  return result;
+}
+
 export const itemRouter = createTRPCRouter({
   findAll: protectedProcedure.input(
     z.object({

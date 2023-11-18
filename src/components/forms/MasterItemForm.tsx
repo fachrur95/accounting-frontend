@@ -31,7 +31,6 @@ import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import Image from "next/image";
 import { useDropzone } from "react-dropzone";
-// import { CldImage } from "next-cloudinary";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { resizeFile } from "@/utils/helpersWithLibs";
@@ -107,7 +106,11 @@ const MasterItemForm = (props: IMasterItemForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.item.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const { getInputProps } = useDropzone({
@@ -222,7 +225,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
       const blobed = await resizeFile(file);
       fileBlob.push(JSON.stringify(blobed));
     }
-    const dataSave: IItemMutation = {
+    const dataSave = {
       ...data,
       description:
         data.description === "" || data.description === null
@@ -520,8 +523,12 @@ const MasterItemForm = (props: IMasterItemForm) => {
             </Box>
             <div className="overflow-auto">
               <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer component={Paper} elevation={0}>
-                  <Table size="small">
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  sx={{ maxHeight: 440 }}
+                >
+                  <Table stickyHeader size="small">
                     <TableHead>
                       <TableRow>
                         <TableCell

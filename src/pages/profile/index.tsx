@@ -71,7 +71,7 @@ const ProfilePage: MyPage = () => {
   });
 
   const onSubmit = (data: IUserAccountUpdateMutation) => {
-    const dataSave: IUserAccountUpdateMutation = {
+    const dataSave = {
       ...data,
     };
     console.log({ dataSave });

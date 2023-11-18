@@ -38,7 +38,6 @@ import {
 import { useInView } from "react-intersection-observer";
 import NumericFormatCustom from "../../controls/NumericFormatCustom";
 import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
-// import SearchIcon from "@mui/icons-material/Search";
 
 interface IBeginBalanceStockForm {
   slug: FormSlugType;
@@ -81,14 +80,14 @@ const BeginningBalanceStockForm = (props: IBeginBalanceStockForm) => {
     name: "transactionDetails",
   });
 
-  // const test = useWatch({ control, name: "transactionDetails" });
-
-  // console.log({ test });
-
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.globalTransaction.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const onSearch = debounce(
@@ -106,8 +105,6 @@ const BeginningBalanceStockForm = (props: IBeginBalanceStockForm) => {
     data: dataItems,
     fetchNextPage,
     hasNextPage,
-    // refetch,
-    // isFetching,
   } = api.item.findAll.useInfiniteQuery(
     {
       limit: 100,
@@ -119,6 +116,7 @@ const BeginningBalanceStockForm = (props: IBeginBalanceStockForm) => {
           : undefined,
       enabled: mode === "create",
       refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     },
   );
 
@@ -159,10 +157,10 @@ const BeginningBalanceStockForm = (props: IBeginBalanceStockForm) => {
   });
 
   const onSubmit = (data: IBeginBalanceStockMutation) => {
-    const dataSave: IBeginBalanceStockMutation = {
+    const dataSave = {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
-      chartOfAccountId: data.chartOfAccount?.id ?? undefined,
+      chartOfAccountId: data.chartOfAccount?.id ?? "",
       transactionDetails: data.transactionDetails.map((detail) => ({
         ...detail,
         note:
@@ -278,7 +276,6 @@ const BeginningBalanceStockForm = (props: IBeginBalanceStockForm) => {
 
             continue;
           }
-          // "itemCategory" | "transactionDetails" | "tax" | "files" | "id"
 
           if (
             key === "transactionNumber" ||
@@ -331,7 +328,6 @@ const BeginningBalanceStockForm = (props: IBeginBalanceStockForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}
@@ -372,7 +368,12 @@ const BeginningBalanceStockForm = (props: IBeginBalanceStockForm) => {
                 label="Tanggal"
                 name="entryDate"
                 required
-                disabled={mode === "view"}
+                inputProps={{
+                  disabled: mode === "view",
+                }}
+                slotProps={{
+                  openPickerButton: { disabled: mode === "view" },
+                }}
               />
             </Box>
             {/* <Box
@@ -456,7 +457,9 @@ const BeginningBalanceStockForm = (props: IBeginBalanceStockForm) => {
                           search !== "" &&
                           search !== undefined &&
                           search !== null
-                            ? field.itemName.toLowerCase().includes(search)
+                            ? field.itemName
+                                .toLowerCase()
+                                .includes(search.toLowerCase())
                             : true,
                         )
                         .map((row, index) => (

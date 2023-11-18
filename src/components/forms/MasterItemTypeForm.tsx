@@ -1,9 +1,22 @@
+import useNotification from "@/components/hooks/useNotification";
+import type { FormSlugType } from "@/types/global";
+import type { IItemTypeMutation } from "@/types/prisma-api/item-type";
+import { api } from "@/utils/api";
+import Close from "@mui/icons-material/Close";
+import Edit from "@mui/icons-material/Edit";
+import Save from "@mui/icons-material/Save";
+import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import {
   FormContainer,
   SwitchElement,
@@ -11,19 +24,6 @@ import {
   TextareaAutosizeElement,
   useForm,
 } from "react-hook-form-mui";
-import Close from "@mui/icons-material/Close";
-import Edit from "@mui/icons-material/Edit";
-import Save from "@mui/icons-material/Save";
-import { api } from "@/utils/api";
-import Link from "next/link";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
-import type { FormSlugType } from "@/types/global";
-import type { IItemTypeMutation } from "@/types/prisma-api/item-type";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import { useRouter } from "next/router";
-import useNotification from "@/components/hooks/useNotification";
 
 const defaultValues: IItemTypeMutation = {
   name: "",
@@ -61,7 +61,11 @@ const MasterItemTypeForm = (props: IMasterItemTypeForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.itemType.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.itemType.create.useMutation({
@@ -101,7 +105,7 @@ const MasterItemTypeForm = (props: IMasterItemTypeForm) => {
   });
 
   const onSubmit = (data: IItemTypeMutation) => {
-    const dataSave: IItemTypeMutation = {
+    const dataSave = {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
     };
@@ -187,7 +191,6 @@ const MasterItemTypeForm = (props: IMasterItemTypeForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}

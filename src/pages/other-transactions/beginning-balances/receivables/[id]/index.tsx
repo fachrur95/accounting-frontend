@@ -1,29 +1,26 @@
 import type { MyPage } from "@/components/layouts/layoutTypes";
 import { getServerAuthSession } from "@/server/auth";
 import type { IJwtDecode } from "@/types/session";
-import { useRouter } from "next/router";
 import jwtDecode from "jwt-decode";
 import { type GetServerSideProps } from "next";
-import BeginningBalanceDebtReceivableForm from "@/components/forms/begin-balances/BeginningBalanceDebtReceivableForm";
-import type { FormSlugType } from "@/types/global";
+import BeginningBalanceDebtReceivableDetailForm from "@/components/forms/begin-balances/BeginningBalanceDebtReceivableDetailForm";
 import Head from "next/head";
 import React from "react";
 import { Role } from "@/types/prisma-api/role.d";
 
 const title = "Saldo Awal Piutang";
 
-const ProductFormSlugPage: MyPage = () => {
-  const router = useRouter();
-  const slug = router.query.slug;
-
+const BeginBalanceReceiveDetailFormSlugPage: MyPage<{
+  id: string | string[];
+}> = ({ id }) => {
   return (
     <>
       <Head>
         <title>{`Bidang Usaha | ${title}`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <BeginningBalanceDebtReceivableForm
-        slug={slug as FormSlugType}
+      <BeginningBalanceDebtReceivableDetailForm
+        id={id as string}
         showIn="page"
         type="receivable"
       />
@@ -33,6 +30,19 @@ const ProductFormSlugPage: MyPage = () => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getServerAuthSession(ctx);
+  const id = ctx.params?.id;
+
+  if (!id) {
+    return {
+      props: {
+        session,
+      },
+      redirect: {
+        destination: "/other-transactions/beginning-balances/receivables",
+        permanent: false,
+      },
+    };
+  }
 
   if (!session) {
     return {
@@ -72,9 +82,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       session,
+      id,
     },
   };
 };
 
-export default ProductFormSlugPage;
-ProductFormSlugPage.Layout = "Dashboard";
+export default BeginBalanceReceiveDetailFormSlugPage;
+BeginBalanceReceiveDetailFormSlugPage.Layout = "Dashboard";

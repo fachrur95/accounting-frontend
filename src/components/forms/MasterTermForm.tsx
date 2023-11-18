@@ -58,7 +58,11 @@ const MasterTermForm = (props: IMasterTermForm) => {
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.term.findOne.useQuery(
       { id: selectedId ?? "" },
-      { enabled: !!selectedId, refetchOnWindowFocus: false },
+      {
+        enabled: !!selectedId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
     );
 
   const mutationCreate = api.term.create.useMutation({
@@ -98,7 +102,7 @@ const MasterTermForm = (props: IMasterTermForm) => {
   });
 
   const onSubmit = (data: ITermMutation) => {
-    const dataSave: ITermMutation = {
+    const dataSave = {
       ...data,
       note: data.note === "" || data.note === null ? undefined : data.note,
     };
@@ -180,7 +184,6 @@ const MasterTermForm = (props: IMasterTermForm) => {
             ) : (
               <Button
                 variant="contained"
-                // type="submit"
                 color="success"
                 size="large"
                 disabled={isSubmitting}

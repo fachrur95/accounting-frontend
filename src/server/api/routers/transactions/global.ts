@@ -9,6 +9,7 @@ import type { ApiCatchError, PaginationResponse } from "@/types/api-response";
 import { convertFilterToURL, convertSortToURL } from "@/utils/helpers";
 import type { GridFilterModel, GridSortModel } from "@mui/x-data-grid-pro";
 import type { ITransaction } from "@/types/prisma-api/transaction";
+import { getStock } from "@/server/api/routers/masters/item";
 
 const transactionType = z.enum([
   "SALE_QUOTATION",
@@ -27,6 +28,7 @@ const transactionType = z.enum([
   "TRANSFER_ITEM_SEND",
   "TRANSFER_ITEM_RECEIVE",
   "STOCK_OPNAME",
+  "STOCK_ADJUSTMENT",
   "JOURNAL_ENTRY",
   "BEGINNING_BALANCE_STOCK",
   "BEGINNING_BALANCE_DEBT",
@@ -129,6 +131,7 @@ export const globalTransactionRouter = createTRPCRouter({
   findOne: protectedProcedure.input(
     z.object({
       id: z.string(),
+      withCurrentStock: z.boolean().nullish(),
     }),
   ).query(async ({ ctx, input }) => {
     const result = await axios.get<ITransaction>(
@@ -137,7 +140,22 @@ export const globalTransactionRouter = createTRPCRouter({
         withCredentials: true,
         headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
       }
-    ).then((response) => {
+    ).then(async (response) => {
+      if (input.withCurrentStock === true) {
+        const data = response.data;
+        const details = data.transactionDetails;
+        if (details) {
+          const itemIds: string[] = details.map((detail) => detail.multipleUom?.item?.id);
+
+          const fetchStock = []
+          for (const itemId of itemIds) {
+            fetchStock.push(getStock(ctx.session.accessToken, itemId))
+          }
+          const itemStocks = await Promise.all(fetchStock);
+          const newDetails = details.map(detail => ({ ...detail, qty: itemStocks.find(stock => stock.id === detail.multipleUom?.item?.id ?? "")?.qty ?? 0 }));
+          return { ...data, transactionDetails: newDetails }
+        }
+      }
       return response.data;
     }).catch((err) => {
       console.log(err)

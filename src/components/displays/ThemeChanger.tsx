@@ -19,12 +19,12 @@ const themeList = [
   },
   {
     id: "light",
-    label: "Light",
+    label: "Terang",
     icon: <LightMode />,
   },
   {
     id: "dark",
-    label: "Dark",
+    label: "Gelap",
     icon: <DarkMode />,
   },
 ];
@@ -73,7 +73,7 @@ const ThemeChanger = () => {
               <SettingsBrightness />
             )}
           </ListItemIcon>
-          <ListItemText primary="Theme Mode" secondary={theme ?? "system"} />
+          <ListItemText primary="Mode Tema" secondary={theme ?? "system"} />
         </ListItemButton>
       </List>
       <Menu
