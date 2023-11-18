@@ -27,17 +27,14 @@ module.exports = {
       exec_mode: "cluster",
       instances: "max", // Or a number of instances
       script: "node_modules/next/dist/bin/next",
-      args: "start",
+      args: "start -p 3001",
       env_local: {
-        NODE_PORT: 3001,
         APP_ENV: "local", // APP_ENV=local
       },
       env_development: {
-        NODE_PORT: 3001,
         APP_ENV: "dev", // APP_ENV=dev
       },
       env_production: {
-        NODE_PORT: 3001,
         APP_ENV: "prod", // APP_ENV=prod
       },
     },
