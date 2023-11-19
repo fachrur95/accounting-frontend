@@ -37,12 +37,16 @@ import Add from "@mui/icons-material/Add";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import dynamic from "next/dynamic";
+import { Role } from "@/types/prisma-api/role.d";
+import type { Session } from "next-auth";
 
 const UnitForm = dynamic(() => import("@/components/forms/UnitForm"));
 
 const pathname = "/credentials/unit";
 
-const UnitCredentialPage: MyPage = () => {
+const UnitCredentialPage: MyPage<{ userSession: Session["user"] }> = ({
+  userSession,
+}) => {
   const router = useRouter();
   const { ref, inView } = useInView();
   const { search } = useAppStore();
@@ -172,23 +176,25 @@ const UnitCredentialPage: MyPage = () => {
           <div>
             <SearchInput />
           </div>
-          <Link
-            href={{
-              pathname,
-              query: { slug: ["f"] },
-            }}
-            as={`${pathname}/f`}
-          >
-            <Button
-              variant="contained"
-              color="success"
-              startIcon={<Add />}
-              // onClick={() => setOpenAddNew(true)}
-              // onClick={() => void handleUpdateSession()}
+          {userSession.role !== Role.USER && (
+            <Link
+              href={{
+                pathname,
+                query: { slug: ["f"] },
+              }}
+              as={`${pathname}/f`}
             >
-              Tambah
-            </Button>
-          </Link>
+              <Button
+                variant="contained"
+                color="success"
+                startIcon={<Add />}
+                // onClick={() => setOpenAddNew(true)}
+                // onClick={() => void handleUpdateSession()}
+              >
+                Tambah
+              </Button>
+            </Link>
+          )}
         </Box>
         <TableContainer
           component={Paper}
@@ -213,6 +219,18 @@ const UnitCredentialPage: MyPage = () => {
               </TableRow>
             </TableHead>
             <TableBody>
+              {rows.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    colSpan={2}
+                    align="center"
+                  >
+                    Anda tidak memiliki akses unit di dalam lembaga ini
+                  </TableCell>
+                </TableRow>
+              )}
               {rows.map((row, index) => (
                 <TableRow
                   hover
@@ -227,23 +245,25 @@ const UnitCredentialPage: MyPage = () => {
                     )}
                   </TableCell>
                   <TableCell align="center">
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={(event) => {
-                        event.stopPropagation();
+                    {userSession.role !== Role.USER && (
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={(event) => {
+                          event.stopPropagation();
 
-                        void router.push(
-                          {
-                            pathname,
-                            query: { slug: ["f", row.id] },
-                          },
-                          `${pathname}/f/${row.id}`,
-                        );
-                      }}
-                    >
-                      <Edit />
-                    </IconButton>
+                          void router.push(
+                            {
+                              pathname,
+                              query: { slug: ["f", row.id] },
+                            },
+                            `${pathname}/f/${row.id}`,
+                          );
+                        }}
+                      >
+                        <Edit />
+                      </IconButton>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -300,6 +320,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       session,
+      userSession: session.user,
     },
   };
 };

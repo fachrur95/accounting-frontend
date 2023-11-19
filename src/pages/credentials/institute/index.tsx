@@ -35,12 +35,17 @@ import { useInView } from "react-intersection-observer";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import dynamic from "next/dynamic";
+import { Role } from "@/types/prisma-api/role.d";
+import type { Session } from "next-auth";
+// import Refresh from "@mui/icons-material/Refresh";
 
 const InstituteForm = dynamic(() => import("@/components/forms/InstituteForm"));
 
 const pathname = "/credentials/institute";
 
-const InstituteCredentialPage: MyPage = () => {
+const InstituteCredentialPage: MyPage<{ userSession: Session["user"] }> = ({
+  userSession,
+}) => {
   const router = useRouter();
   const { ref, inView } = useInView();
   const { search } = useAppStore();
@@ -170,25 +175,28 @@ const InstituteCredentialPage: MyPage = () => {
           </div>
           <div>
             {/* <IconButton onClick={() => void refetch()}>
-              <Add />
+              <Refresh />
             </IconButton> */}
-            <Link
-              href={{
-                pathname,
-                query: { slug: ["f"] },
-              }}
-              as={`${pathname}/f`}
-            >
-              <Button
-                variant="contained"
-                color="success"
-                startIcon={<Add />}
-                // onClick={() => setOpenAddNew(true)}
-                // onClick={() => void handleUpdateSession()}
+            {(userSession.role === Role.SUPERADMIN ||
+              userSession.role === Role.AUDITOR) && (
+              <Link
+                href={{
+                  pathname,
+                  query: { slug: ["f"] },
+                }}
+                as={`${pathname}/f`}
               >
-                Tambah
-              </Button>
-            </Link>
+                <Button
+                  variant="contained"
+                  color="success"
+                  startIcon={<Add />}
+                  // onClick={() => setOpenAddNew(true)}
+                  // onClick={() => void handleUpdateSession()}
+                >
+                  Tambah
+                </Button>
+              </Link>
+            )}
           </div>
         </Box>
         <TableContainer
@@ -214,6 +222,18 @@ const InstituteCredentialPage: MyPage = () => {
               </TableRow>
             </TableHead>
             <TableBody>
+              {rows.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    colSpan={2}
+                    align="center"
+                  >
+                    Anda tidak memiliki akses lembaga
+                  </TableCell>
+                </TableRow>
+              )}
               {rows.map((row, index) => (
                 <TableRow
                   hover
@@ -228,23 +248,26 @@ const InstituteCredentialPage: MyPage = () => {
                     )}
                   </TableCell>
                   <TableCell align="center">
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={(event) => {
-                        event.stopPropagation();
+                    {(userSession.role === Role.SUPERADMIN ||
+                      userSession.role === Role.AUDITOR) && (
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={(event) => {
+                          event.stopPropagation();
 
-                        void router.push(
-                          {
-                            pathname,
-                            query: { slug: ["f", row.id] },
-                          },
-                          `${pathname}/f/${row.id}`,
-                        );
-                      }}
-                    >
-                      <Edit />
-                    </IconButton>
+                          void router.push(
+                            {
+                              pathname,
+                              query: { slug: ["f", row.id] },
+                            },
+                            `${pathname}/f/${row.id}`,
+                          );
+                        }}
+                      >
+                        <Edit />
+                      </IconButton>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -294,6 +317,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       session,
+      userSession: session.user,
     },
   };
 };

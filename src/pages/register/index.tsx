@@ -10,6 +10,7 @@ import Image from "next/image";
 import {
   FormContainer,
   PasswordElement,
+  PasswordRepeatElement,
   TextFieldElement,
   useForm,
 } from "react-hook-form-mui";
@@ -23,50 +24,55 @@ import MuiLink from "@mui/material/Link";
 import Link from "next/link";
 import Grid from "@mui/material/Grid";
 
-type SignInFormType = {
+type SignUpFormType = {
   email: string;
+  name: string;
   password: string;
 };
 
-const defaultValues: SignInFormType = {
+const defaultValues: SignUpFormType = {
   email: "",
+  name: "",
   password: "",
 };
 
-const AuthPage: MyPage = () => {
+const RegistrationPage: MyPage = () => {
   const router = useRouter();
   const { setOpenNotification } = useNotification();
-  const formContext = useForm<SignInFormType>({ defaultValues });
+  const formContext = useForm<SignUpFormType>({ defaultValues });
 
   const {
     formState: { isSubmitting },
   } = formContext;
 
-  const onSubmit = async (data: SignInFormType) => {
+  const onSubmit = async (data: SignUpFormType) => {
     // console.log({ data });
-    const login = await signIn("next-auth", {
+    const register = await signIn("register", {
       ...data,
       redirect: false,
       callbackUrl: "/credentials/institute",
     });
-    console.log({ login });
-    if (!login) {
-      return setOpenNotification("Login bermasalah, mohon diulang kembali", {
-        variant: "error",
-      });
+    console.log({ register });
+    if (!register) {
+      return setOpenNotification(
+        "Registrasi bermasalah, harap diulang kembali",
+        {
+          variant: "error",
+        },
+      );
     }
-    if (login.ok) {
-      return router.push(login.url ?? "/");
+    if (register.ok) {
+      return router.push(register.url ?? "/");
     }
-    if (login.error) {
-      setOpenNotification(login.error, { variant: "error" });
+    if (register.error) {
+      setOpenNotification(register.error, { variant: "error" });
     }
   };
 
   return (
     <React.Fragment>
       <Head>
-        <title>{`Bidang Usaha | Masuk`}</title>
+        <title>{`Bidang Usaha | Pendaftaran`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <Container component="main" maxWidth={false}>
@@ -111,17 +117,17 @@ const AuthPage: MyPage = () => {
               }}
             >
               <Typography
-                className="text-lg font-semibold md:text-3xl 2xl:text-6xl"
+                className="text-lg font-semibold md:text-3xl 2xl:text-3xl"
                 gutterBottom
               >
-                Bidang Usaha
+                Pendaftaran Akun Baru
               </Typography>
               <Typography
                 variant="subtitle2"
                 className="font-light"
                 color="gray"
               >
-                Masuk dengan Akun Bidang Usaha
+                Masukan data untuk pendaftaran
               </Typography>
               {/* {Object.values(providers).map(
                 (provider: Record<string, string>) => (
@@ -133,9 +139,16 @@ const AuthPage: MyPage = () => {
                   <Box className="grid grid-cols-1 gap-4">
                     <TextFieldElement
                       name="email"
+                      type="email"
                       label="Alamat Surel"
                       required
                       autoFocus
+                      fullWidth
+                    />
+                    <TextFieldElement
+                      name="name"
+                      label="Nama Lengkap"
+                      required
                       fullWidth
                     />
                     <PasswordElement
@@ -145,6 +158,12 @@ const AuthPage: MyPage = () => {
                       required
                       fullWidth
                     />
+                    <PasswordRepeatElement
+                      passwordFieldName="password"
+                      name="password-repeat"
+                      label="Konfirmasi Kata Sandi"
+                      required
+                    />
                     <LoadingButton
                       type="submit"
                       fullWidth
@@ -152,18 +171,13 @@ const AuthPage: MyPage = () => {
                       loading={isSubmitting}
                       size="large"
                     >
-                      Masuk
+                      Daftar
                     </LoadingButton>
-                    <Grid container>
-                      <Grid item xs>
-                        <Link href="/forgot-password" passHref>
-                          <MuiLink variant="body2">Lupa Kata Sandi?</MuiLink>
-                        </Link>
-                      </Grid>
+                    <Grid container justifyContent="flex-end">
                       <Grid item>
-                        <Link href="/register" passHref>
+                        <Link href="/auth" passHref>
                           <MuiLink variant="body2">
-                            {"Belum memiliki akun? Daftar"}
+                            {"Telah memiliki akun? Masuk"}
                           </MuiLink>
                         </Link>
                       </Grid>
@@ -199,5 +213,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default AuthPage;
-AuthPage.Layout = "Image";
+export default RegistrationPage;
+RegistrationPage.Layout = "Image";

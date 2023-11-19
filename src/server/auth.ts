@@ -202,6 +202,63 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
+    CredentialsProvider({
+      id: "register",
+      name: "Registration",
+      credentials: {
+        email: {
+          label: "Email",
+          type: "email",
+          placeholder: "example@domain.com",
+        },
+        name: {
+          label: "Full Name",
+          type: "text",
+          placeholder: "Ahmad Fulan",
+        },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.name || !credentials.password) {
+          throw new Error("Lengkapi data terlebih dahulu");
+        }
+
+        const user = await axios.post<ITokenLoginResponse>(
+          `${env.BACKEND_URL}/v1/auth/register`,
+          {
+            email: credentials.email,
+            name: credentials.name,
+            password: credentials.password,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+          },
+        )
+          .then((response) => response.data)
+          .catch((error) => {
+            throw new Error((error as ApiCatchError).response?.data?.message ?? (error as ApiCatchError).message ?? "An error occurred");
+          });
+
+        if (!user) {
+          throw new Error("An error occurred");
+        }
+
+        const session = jwtDecode<IJwtDecode>(user.tokens.access.token);
+
+        return {
+          id: session.sub,
+          name: session.name,
+          email: session.email,
+          role: session.role,
+          image: null,
+          accessToken: user.tokens.access.token,
+          refreshToken: user.tokens.refresh.token,
+        };
+      },
+    }),
     /**
      * ...add more providers here.
      *

@@ -4,13 +4,12 @@ import { type GetServerSideProps } from "next";
 import React from "react";
 import CopyrightInfo from "@/components/displays/CopyrightInfo";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { signIn } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import {
   FormContainer,
   PasswordElement,
-  TextFieldElement,
+  PasswordRepeatElement,
   useForm,
 } from "react-hook-form-mui";
 import Box from "@mui/material/Box";
@@ -19,54 +18,45 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
-import MuiLink from "@mui/material/Link";
-import Link from "next/link";
-import Grid from "@mui/material/Grid";
+import { api } from "@/utils/api";
 
-type SignInFormType = {
-  email: string;
+type ResetPasswordFormType = {
   password: string;
 };
 
-const defaultValues: SignInFormType = {
-  email: "",
+const defaultValues: ResetPasswordFormType = {
   password: "",
 };
 
-const AuthPage: MyPage = () => {
+const RegistrationPage: MyPage<{ token: string }> = ({ token }) => {
   const router = useRouter();
   const { setOpenNotification } = useNotification();
-  const formContext = useForm<SignInFormType>({ defaultValues });
+  const formContext = useForm<ResetPasswordFormType>({ defaultValues });
 
   const {
     formState: { isSubmitting },
   } = formContext;
 
-  const onSubmit = async (data: SignInFormType) => {
+  const mutation = api.email.resetPassword.useMutation();
+
+  const onSubmit = async (data: ResetPasswordFormType) => {
     // console.log({ data });
-    const login = await signIn("next-auth", {
-      ...data,
-      redirect: false,
-      callbackUrl: "/credentials/institute",
-    });
-    console.log({ login });
-    if (!login) {
-      return setOpenNotification("Login bermasalah, mohon diulang kembali", {
-        variant: "error",
-      });
-    }
-    if (login.ok) {
-      return router.push(login.url ?? "/");
-    }
-    if (login.error) {
-      setOpenNotification(login.error, { variant: "error" });
-    }
+    await mutation.mutateAsync(
+      { ...data, token },
+      {
+        onError: (err) => console.log(err),
+        onSuccess: (response) => {
+          setOpenNotification(response.message ?? "No Message Receive");
+          void router.push("/auth");
+        },
+      },
+    );
   };
 
   return (
     <React.Fragment>
       <Head>
-        <title>{`Bidang Usaha | Masuk`}</title>
+        <title>{`Bidang Usaha | Reset Kata Sandi`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <Container component="main" maxWidth={false}>
@@ -111,39 +101,33 @@ const AuthPage: MyPage = () => {
               }}
             >
               <Typography
-                className="text-lg font-semibold md:text-3xl 2xl:text-6xl"
+                className="text-lg font-semibold md:text-3xl 2xl:text-3xl"
                 gutterBottom
               >
-                Bidang Usaha
+                Reset Kata Sandi
               </Typography>
               <Typography
                 variant="subtitle2"
                 className="font-light"
                 color="gray"
               >
-                Masuk dengan Akun Bidang Usaha
+                Masukan kata sandi baru
               </Typography>
-              {/* {Object.values(providers).map(
-                (provider: Record<string, string>) => (
-                  <div key={provider.id}>{JSON.stringify(provider)}</div>
-                )
-              )} */}
               <Box className="w-full">
                 <FormContainer formContext={formContext} onSuccess={onSubmit}>
                   <Box className="grid grid-cols-1 gap-4">
-                    <TextFieldElement
-                      name="email"
-                      label="Alamat Surel"
-                      required
-                      autoFocus
-                      fullWidth
-                    />
                     <PasswordElement
                       name="password"
                       label="Kata Sandi"
                       type="password"
                       required
                       fullWidth
+                    />
+                    <PasswordRepeatElement
+                      passwordFieldName="password"
+                      name="password-repeat"
+                      label="Konfirmasi Kata Sandi"
+                      required
                     />
                     <LoadingButton
                       type="submit"
@@ -152,22 +136,8 @@ const AuthPage: MyPage = () => {
                       loading={isSubmitting}
                       size="large"
                     >
-                      Masuk
+                      Reset
                     </LoadingButton>
-                    <Grid container>
-                      <Grid item xs>
-                        <Link href="/forgot-password" passHref>
-                          <MuiLink variant="body2">Lupa Kata Sandi?</MuiLink>
-                        </Link>
-                      </Grid>
-                      <Grid item>
-                        <Link href="/register" passHref>
-                          <MuiLink variant="body2">
-                            {"Belum memiliki akun? Daftar"}
-                          </MuiLink>
-                        </Link>
-                      </Grid>
-                    </Grid>
                   </Box>
                 </FormContainer>
               </Box>
@@ -182,6 +152,16 @@ const AuthPage: MyPage = () => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getServerAuthSession(ctx);
+  const token = ctx.params?.token;
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/auth",
+        permanent: false,
+      },
+    };
+  }
 
   if (session) {
     return {
@@ -195,9 +175,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       session,
+      token,
     },
   };
 };
 
-export default AuthPage;
-AuthPage.Layout = "Image";
+export default RegistrationPage;
+RegistrationPage.Layout = "Image";

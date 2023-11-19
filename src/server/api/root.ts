@@ -34,6 +34,7 @@ import { stockAdjustmentRouter } from "./routers/transactions/stock-adjustment";
 import { financialClosingRouter } from "./routers/transactions/financial-closing";
 import { beginBalanceStockRouter } from "./routers/transactions/begin-balance-stock";
 import { beginBalanceDebtReceivableRouter } from "./routers/transactions/begin-balance-debt-receivable";
+import { emailRouter } from "./routers/auth/email";
 
 /**
  * This is the primary router for your server.
@@ -44,6 +45,7 @@ export const appRouter = createTRPCRouter({
   example: exampleRouter,
   session: sessionRouter,
   user: userRouter,
+  email: emailRouter,
   instituteCredentials: instituteCredentialsRouter,
   unitCredentials: unitCredentialsRouter,
   accountClass: accountClassRouter,

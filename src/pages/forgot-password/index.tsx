@@ -4,37 +4,30 @@ import { type GetServerSideProps } from "next";
 import React from "react";
 import CopyrightInfo from "@/components/displays/CopyrightInfo";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { signIn } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
-import {
-  FormContainer,
-  PasswordElement,
-  TextFieldElement,
-  useForm,
-} from "react-hook-form-mui";
+import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
 import MuiLink from "@mui/material/Link";
 import Link from "next/link";
 import Grid from "@mui/material/Grid";
+import { api } from "@/utils/api";
 
 type SignInFormType = {
   email: string;
-  password: string;
 };
 
 const defaultValues: SignInFormType = {
   email: "",
-  password: "",
 };
 
-const AuthPage: MyPage = () => {
-  const router = useRouter();
+const ForgotPasswordPage: MyPage = () => {
+  // const router = useRouter();
   const { setOpenNotification } = useNotification();
   const formContext = useForm<SignInFormType>({ defaultValues });
 
@@ -42,31 +35,43 @@ const AuthPage: MyPage = () => {
     formState: { isSubmitting },
   } = formContext;
 
+  const mutation = api.email.forgotPassword.useMutation();
+
   const onSubmit = async (data: SignInFormType) => {
-    // console.log({ data });
-    const login = await signIn("next-auth", {
+    await mutation.mutateAsync(data, {
+      onError: (err) => console.log(err),
+      onSuccess: (response: { message: string }) => {
+        if (response.message) {
+          return void setOpenNotification(response.message);
+        }
+        // if (!response) {
+        // }
+        // void router.push("/forgot-password/sent");
+      },
+    });
+    /* const register = await signIn("register", {
       ...data,
       redirect: false,
       callbackUrl: "/credentials/institute",
     });
-    console.log({ login });
-    if (!login) {
-      return setOpenNotification("Login bermasalah, mohon diulang kembali", {
+    console.log({ register });
+    if (!register) {
+      return setOpenNotification("Register bermasalah, harap diulang kembali", {
         variant: "error",
       });
     }
-    if (login.ok) {
-      return router.push(login.url ?? "/");
+    if (register.ok) {
+      return router.push(register.url ?? "/");
     }
-    if (login.error) {
-      setOpenNotification(login.error, { variant: "error" });
-    }
+    if (register.error) {
+      setOpenNotification(register.error, { variant: "error" });
+    } */
   };
 
   return (
     <React.Fragment>
       <Head>
-        <title>{`Bidang Usaha | Masuk`}</title>
+        <title>{`Bidang Usaha | Pendaftaran`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <Container component="main" maxWidth={false}>
@@ -111,17 +116,17 @@ const AuthPage: MyPage = () => {
               }}
             >
               <Typography
-                className="text-lg font-semibold md:text-3xl 2xl:text-6xl"
+                className="text-lg font-semibold md:text-3xl 2xl:text-3xl"
                 gutterBottom
               >
-                Bidang Usaha
+                Lupa Kata Sandi
               </Typography>
               <Typography
                 variant="subtitle2"
                 className="font-light"
                 color="gray"
               >
-                Masuk dengan Akun Bidang Usaha
+                Masukan alamat surel yang terdaftar
               </Typography>
               {/* {Object.values(providers).map(
                 (provider: Record<string, string>) => (
@@ -133,16 +138,10 @@ const AuthPage: MyPage = () => {
                   <Box className="grid grid-cols-1 gap-4">
                     <TextFieldElement
                       name="email"
+                      type="email"
                       label="Alamat Surel"
                       required
                       autoFocus
-                      fullWidth
-                    />
-                    <PasswordElement
-                      name="password"
-                      label="Kata Sandi"
-                      type="password"
-                      required
                       fullWidth
                     />
                     <LoadingButton
@@ -152,18 +151,13 @@ const AuthPage: MyPage = () => {
                       loading={isSubmitting}
                       size="large"
                     >
-                      Masuk
+                      Kirim Permintaan
                     </LoadingButton>
-                    <Grid container>
-                      <Grid item xs>
-                        <Link href="/forgot-password" passHref>
-                          <MuiLink variant="body2">Lupa Kata Sandi?</MuiLink>
-                        </Link>
-                      </Grid>
+                    <Grid container justifyContent="flex-end">
                       <Grid item>
-                        <Link href="/register" passHref>
+                        <Link href="/auth" passHref>
                           <MuiLink variant="body2">
-                            {"Belum memiliki akun? Daftar"}
+                            {"Telah mengingat kata sandi? Masuk"}
                           </MuiLink>
                         </Link>
                       </Grid>
@@ -199,5 +193,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default AuthPage;
-AuthPage.Layout = "Image";
+export default ForgotPasswordPage;
+ForgotPasswordPage.Layout = "Image";
