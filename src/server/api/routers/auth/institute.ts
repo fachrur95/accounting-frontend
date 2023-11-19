@@ -55,25 +55,25 @@ export const instituteCredentialsRouter = createTRPCRouter({
     }),
   ).mutation(async ({ ctx, input }) => {
     const { id } = input;
+    try {
+      const result = await axios.post<ITokenData>(
+        `${env.BACKEND_URL}/v1/auth/set-institute`,
+        {
+          instituteId: id,
+          refreshToken: ctx.session.refreshToken,
+        },
+        {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
+        }
+      ).then((response) => {
+        return response.data;
+      });
 
-    const result = await axios.post<ITokenData>(
-      `${env.BACKEND_URL}/v1/auth/set-institute`,
-      {
-        instituteId: id,
-        refreshToken: ctx.session.refreshToken,
-      },
-      {
-        withCredentials: true,
-        headers: { Authorization: `Bearer ${ctx.session.accessToken}` },
-      }
-    ).then((response) => {
-      return response.data;
-    }).catch((err) => {
-      console.log(err)
-      return null
-    });
-
-    return result;
+      return result;
+    } catch (error) {
+      throw new Error((error as ApiCatchError).response?.data?.message ?? (error as ApiCatchError).message ?? "An error occurred");
+    }
   }),
   findOne: protectedProcedure.input(
     z.object({

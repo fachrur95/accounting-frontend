@@ -39,6 +39,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import dynamic from "next/dynamic";
 import { Role } from "@/types/prisma-api/role.d";
 import type { Session } from "next-auth";
+import Refresh from "@mui/icons-material/Refresh";
 
 const UnitForm = dynamic(() => import("@/components/forms/UnitForm"));
 
@@ -51,6 +52,7 @@ const UnitCredentialPage: MyPage<{ userSession: Session["user"] }> = ({
   const { ref, inView } = useInView();
   const { search } = useAppStore();
   const { data: session, update: updateSession } = useSession();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [rows, setRows] = useState<IUnit[]>([]);
   const [countAll, setCountAll] = useState<number>(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -85,14 +87,18 @@ const UnitCredentialPage: MyPage<{ userSession: Session["user"] }> = ({
   const handleSetUnit = async (event: React.MouseEvent, id: string) => {
     event.stopPropagation();
     if (mutation.isLoading) return;
+    setIsLoading(true);
     await mutation.mutateAsync(
       { id },
       {
-        onError: (err) => console.log(err),
+        onError: (err) => {
+          console.log(err);
+          setIsLoading(false);
+          return void setOpenNotification(
+            err?.message ?? "Error to set institute",
+          );
+        },
         onSuccess: async (data) => {
-          if (!data) {
-            return void setOpenNotification("Error to set unit");
-          }
           await handleUpdateSession({
             accessToken: data.access.token,
             refreshToken: data.refresh.token,
@@ -142,7 +148,7 @@ const UnitCredentialPage: MyPage<{ userSession: Session["user"] }> = ({
       </Head>
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={mutation.isLoading ?? false}
+        open={isLoading || (mutation.isLoading ?? false)}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -172,29 +178,34 @@ const UnitCredentialPage: MyPage<{ userSession: Session["user"] }> = ({
             </Typography> */}
           </div>
         </Box>
-        <Box className="flex flex-row items-center justify-between py-2">
+        <Box className="flex flex-col items-center justify-center py-2 md:flex-row md:justify-between">
           <div>
             <SearchInput />
           </div>
-          {userSession.role !== Role.USER && (
-            <Link
-              href={{
-                pathname,
-                query: { slug: ["f"] },
-              }}
-              as={`${pathname}/f`}
-            >
-              <Button
-                variant="contained"
-                color="success"
-                startIcon={<Add />}
-                // onClick={() => setOpenAddNew(true)}
-                // onClick={() => void handleUpdateSession()}
+          <div className="flex flex-row gap-2">
+            <IconButton onClick={() => void refetch()}>
+              <Refresh />
+            </IconButton>
+            {userSession.role !== Role.USER && (
+              <Link
+                href={{
+                  pathname,
+                  query: { slug: ["f"] },
+                }}
+                as={`${pathname}/f`}
               >
-                Tambah
-              </Button>
-            </Link>
-          )}
+                <Button
+                  variant="contained"
+                  color="success"
+                  startIcon={<Add />}
+                  // onClick={() => setOpenAddNew(true)}
+                  // onClick={() => void handleUpdateSession()}
+                >
+                  Tambah
+                </Button>
+              </Link>
+            )}
+          </div>
         </Box>
         <TableContainer
           component={Paper}
