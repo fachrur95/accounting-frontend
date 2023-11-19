@@ -82,7 +82,7 @@ const defaultValues: ISalesMutation = {
   term: null,
   chartOfAccountId: "",
   chartOfAccount: null,
-  paymentType: "CASH",
+  paymentType: PaymentType.CASH,
   paymentInput: 0,
   specialDiscount: 0,
   discountGroupInput: 0,

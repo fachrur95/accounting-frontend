@@ -586,7 +586,6 @@ const StockAdjustmentForm = (props: IStockAdjustmentForm) => {
                                 size: "small",
                                 disabled:
                                   mode === "view" ||
-                                  transactionParentSelected !== undefined ||
                                   transactionParentSelected !== null,
                               }}
                               textFieldProps={{
