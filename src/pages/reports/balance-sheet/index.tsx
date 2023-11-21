@@ -22,6 +22,11 @@ import IconButton from "@mui/material/IconButton";
 import Close from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import { Role } from "@/types/prisma-api/role.d";
+/* import dynamic from "next/dynamic";
+
+const PdfViewer = dynamic(() => import("@/components/displays/PdfViewer"), {
+  ssr: false,
+}); */
 
 const title = "Laporan Neraca";
 
@@ -123,12 +128,13 @@ const BalanceSheetReportPage: MyPage = () => {
           </object>
         )} */}
         {pdfBlob && (
-          <iframe
+          <embed
             src={pdfBlob}
             width="100%"
             className="flex-grow border-0"
-          ></iframe>
+          ></embed>
         )}
+        {/* {pdfBlob && <PdfViewer pathURL={pdfBlob}></PdfViewer>} */}
       </Box>
     </>
   );

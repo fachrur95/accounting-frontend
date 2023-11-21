@@ -123,11 +123,11 @@ const BalanceSheetReportPage: MyPage = () => {
           </object>
         )} */}
         {pdfBlob && (
-          <iframe
+          <embed
             src={pdfBlob}
             width="100%"
             className="flex-grow border-0"
-          ></iframe>
+          ></embed>
         )}
       </Box>
     </>
