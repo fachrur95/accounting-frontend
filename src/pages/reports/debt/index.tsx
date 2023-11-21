@@ -112,7 +112,7 @@ const BalanceSheetReportPage: MyPage = () => {
             </Button>
           </Box>
         </FormContainer>
-        {pdfBlob && (
+        {/* {pdfBlob && (
           <object
             data={pdfBlob}
             type="application/pdf"
@@ -121,6 +121,13 @@ const BalanceSheetReportPage: MyPage = () => {
           >
             PDF Viewer
           </object>
+        )} */}
+        {pdfBlob && (
+          <iframe
+            src={pdfBlob}
+            width="100%"
+            className="flex-grow border-0"
+          ></iframe>
         )}
       </Box>
     </>
