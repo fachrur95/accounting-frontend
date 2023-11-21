@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+/* import React, { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import pdfWorker from "@/utils/workers/pdf.worker";
 import Box from "@mui/material/Box";
@@ -50,3 +50,4 @@ const PdfViewer = ({ pathURL }: PdfViewer) => {
 };
 
 export default PdfViewer;
+ */
