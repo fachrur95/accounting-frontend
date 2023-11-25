@@ -35,12 +35,12 @@ interface IMasterPeopleForm {
 const MasterPeopleForm = (props: IMasterPeopleForm) => {
   const { slug, showIn, forType } = props;
   const router = useRouter();
-  const initialName = router.query?.name;
+  const query = router.query as { name?: string };
 
   const defaultValues: IPeopleMutation = {
     peopleCategoryId: "",
     code: "",
-    name: initialName ?? "",
+    name: query.name ?? "",
     note: "",
     isActive: true,
     peopleCategory: null,

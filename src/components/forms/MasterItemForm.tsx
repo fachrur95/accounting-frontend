@@ -62,7 +62,7 @@ interface IMasterItemForm {
 const MasterItemForm = (props: IMasterItemForm) => {
   const { slug, showIn } = props;
   const router = useRouter();
-  const initialName = router.query?.name;
+  const query = router.query as { name?: string };
 
   const defaultValues: IItemMutation = {
     itemCategory: null,
@@ -70,7 +70,7 @@ const MasterItemForm = (props: IMasterItemForm) => {
     itemCategoryId: "",
     taxId: "",
     code: "",
-    name: initialName ?? "",
+    name: query.name ?? "",
     description: "",
     minQty: 0,
     maxQty: 0,
