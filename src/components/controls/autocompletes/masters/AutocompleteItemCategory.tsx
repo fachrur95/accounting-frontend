@@ -16,7 +16,7 @@ const AutocompleteItemCategory = <TFieldValues extends FieldValues>(
       boolean | undefined
     >,
     "options"
-  >
+  >,
 ): JSX.Element => {
   const {
     options: optionsItemCategory,
@@ -39,6 +39,8 @@ const AutocompleteItemCategory = <TFieldValues extends FieldValues>(
         onClose: () => onSearchItemCategory(),
         renderOption: renderOptionItemCategory,
         disableClearable: props.required,
+        autoHighlight: true,
+        openOnFocus: true,
       }}
     />
   );

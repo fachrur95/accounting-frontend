@@ -324,7 +324,9 @@ const StockAdjustmentForm = (props: IStockAdjustmentForm) => {
                 if (row.multipleUom) {
                   selectedItem = {
                     id: row.multipleUom.item?.id ?? "",
-                    label: row.multipleUom.item?.name ?? "",
+                    label:
+                      `${row.multipleUom.item?.code} - ${row.multipleUom.item?.name}` ??
+                      "",
                   };
                   selectedUnit = {
                     id: row.multipleUom.id,

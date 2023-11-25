@@ -10,8 +10,10 @@ import type { IItem } from "@/types/prisma-api/item";
 
 const useInfiniteItem = ({
   type,
+  addNew,
 }: {
   type?: "sale" | "purchase" | "stock" | "adjustment";
+  addNew?: boolean;
 }) => {
   const { ref, inView } = useInView();
   const [search, setSearch] = useState<string>("");
@@ -74,10 +76,21 @@ const useInfiniteItem = ({
         )
         .flat();
       const dataCountAll: number = data.pages[0]?.countAll ?? 0;
+      if (addNew) {
+        const isExisting = dataOptions.some(
+          (opt) => opt.label.toLowerCase() === search.toLowerCase(),
+        );
+        if (search !== "" && !isExisting) {
+          dataOptions.push({
+            label: `Tambah "${search}"`,
+            inputValue: search,
+          });
+        }
+      }
       setOptions(dataOptions);
       setCountAll(dataCountAll);
     }
-  }, [data]);
+  }, [data, search, addNew]);
 
   useEffect(() => {
     if (inView && hasNextPage) {

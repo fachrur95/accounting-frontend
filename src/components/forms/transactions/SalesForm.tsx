@@ -126,6 +126,7 @@ const SalesForm = (props: ISalesForm) => {
     formState: { isSubmitting },
     handleSubmit,
     setError,
+    setFocus,
   } = formContext;
 
   const { fields, append, remove } = useFieldArray({
@@ -247,6 +248,38 @@ const SalesForm = (props: ISalesForm) => {
   };
 
   useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (mode === "view") return;
+      if (event.key === "F8") {
+        append({
+          itemId: "",
+          item: null,
+          multipleUomId: "",
+          multipleUom: null,
+          chartOfAccountId: "",
+          chartOfAccount: null,
+          qtyInput: 0,
+          conversionQty: 0,
+          priceInput: 0,
+          discountInput: 0,
+          note: "",
+        });
+      }
+      if (event.key === "F9") {
+        setFocus("paymentInput");
+      }
+    };
+
+    // Tambahkan event listener pada elemen document
+    document.addEventListener("keydown", handleKeyPress);
+
+    // Membersihkan event listener saat komponen unmount
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [append, setFocus, mode]);
+
+  useEffect(() => {
     const [path, id] = slug;
     if ((path === "f" || path === "v") && typeof id === "string") {
       setSelectedId(id);
@@ -280,7 +313,7 @@ const SalesForm = (props: ISalesForm) => {
         itemId: dataScanned.itemId,
         item: {
           id: dataScanned.itemId,
-          label: dataScanned.item?.name ?? "",
+          label: `${dataScanned.item?.code} - ${dataScanned.item?.name}` ?? "",
           price: dataScanned.item?.price ?? 0,
         },
         multipleUomId: dataScanned.id,
@@ -404,7 +437,9 @@ const SalesForm = (props: ISalesForm) => {
                 if (row.multipleUom) {
                   selectedItem = {
                     id: row.multipleUom.item?.id ?? "",
-                    label: row.multipleUom.item?.name ?? "",
+                    label:
+                      `${row.multipleUom.item?.code} - ${row.multipleUom.item?.name}` ??
+                      "",
                   };
                   selectedUnit = {
                     id: row.multipleUom.id,
@@ -569,481 +604,530 @@ const SalesForm = (props: ISalesForm) => {
       </DialogTitle>
       <DialogContent>
         <FormContainer formContext={formContext} onSuccess={onSubmit}>
-          <div className="grid gap-4">
-            <Box
-              component={Paper}
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <TextFieldElement
-                name="transactionNumber"
-                label="No. Transaksi"
-                required
-                InputProps={{
-                  disabled: mode === "view",
-                }}
-              />
-              <AutocompletePeople
-                name="people"
-                label="Pelanggan"
-                required
-                autocompleteProps={{
-                  disabled: mode === "view",
-                  onChange: (_, data) => {
-                    if (mode === "create") {
-                      setValue(
-                        "specialDiscount",
-                        (data as IDataOption | null)?.specialDiscount ?? 0,
-                      );
-                    }
-                  },
-                }}
-                type="customer"
-              />
-              <DatePicker
-                label="Tanggal"
-                name="entryDate"
-                inputProps={{
-                  disabled: true,
-                }}
-                slotProps={{
-                  openPickerButton: { disabled: true },
-                }}
-              />
+          <div className="flex flex-col gap-4 md:flex-row">
+            <Box className="flex flex-col gap-4 md:min-w-[250px] xl:min-w-[400px]">
+              <Box component={Paper} className="flex flex-col gap-4 p-4">
+                <Divider textAlign="left">
+                  <Typography variant="subtitle2">Informasi Nota</Typography>
+                </Divider>
+                <TextFieldElement
+                  name="transactionNumber"
+                  label="No. Transaksi"
+                  required
+                  InputProps={{
+                    disabled: mode === "view",
+                  }}
+                />
+                <DatePicker
+                  label="Tanggal"
+                  name="entryDate"
+                  inputProps={{
+                    disabled: true,
+                  }}
+                  slotProps={{
+                    openPickerButton: { disabled: true },
+                  }}
+                />
+              </Box>
+              <Box component={Paper} className="flex flex-col gap-4 p-4">
+                <Divider textAlign="left">
+                  <Typography variant="subtitle2">
+                    Informasi Pelanggan
+                  </Typography>
+                </Divider>
+                <AutocompletePeople
+                  name="people"
+                  label="Pelanggan"
+                  required
+                  autocompleteProps={{
+                    disabled: mode === "view",
+                    onChange: (_, data) => {
+                      if (
+                        typeof (data as IDataOption | null)?.inputValue ===
+                        "string"
+                      ) {
+                        setValue("people", null);
+                        return window.open(
+                          `/masters/contacts/customers/f?name=${(
+                            data as IDataOption | null
+                          )?.inputValue}`,
+                          "_ blank",
+                        );
+                      }
+                      if (mode === "create") {
+                        setValue(
+                          "specialDiscount",
+                          (data as IDataOption | null)?.specialDiscount ?? 0,
+                        );
+                      }
+                    },
+                  }}
+                  type="customer"
+                  addNew
+                />
+                {paymentInput > 0 && (
+                  <>
+                    <RadioButtonGroup
+                      label="Tipe Pembayaran"
+                      name="paymentType"
+                      required
+                      options={[
+                        {
+                          id: "CASH",
+                          label: "TUNAI",
+                        },
+                        {
+                          id: "CASHLESS",
+                          label: "NON TUNAI",
+                        },
+                      ]}
+                      disabled={mode === "view"}
+                    />
+                    {paymentType === PaymentType.CASHLESS && (
+                      <AutocompleteChartOfAccount
+                        name="chartOfAccount"
+                        label="Akun Bank Pembayaran"
+                        autocompleteProps={{
+                          disabled: mode === "view",
+                        }}
+                        type="bank"
+                        required={
+                          paymentInput > 0 &&
+                          paymentType === PaymentType.CASHLESS
+                        }
+                      />
+                    )}
+                  </>
+                )}
+              </Box>
             </Box>
-            {paymentInput > 0 && (
+            <Box className="flex flex-col gap-4 md:flex-grow">
+              {mode !== "view" && (
+                <Box
+                  component={Paper}
+                  className="grid grid-cols-1 gap-4 p-4 md:grid-cols-5"
+                >
+                  <TextField
+                    label="Pindai Barcode"
+                    value={barcode.code}
+                    className="col-span-2"
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      setBarcode((prev) => ({
+                        ...prev,
+                        code: event.target.value,
+                      }));
+                    }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <DocumentScanner />
+                        </InputAdornment>
+                      ),
+                    }}
+                    onKeyDown={handleBarcodeKeyDown}
+                  />
+                  <TextField
+                    label="Qty"
+                    InputProps={{
+                      inputComponent: NumericFormatCustom as never,
+                    }}
+                    value={barcode.qty}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      setBarcode((prev) => ({
+                        ...prev,
+                        qty: parseFloat(event.target.value) ?? 1,
+                      }));
+                    }}
+                    fullWidth
+                  />
+                </Box>
+              )}
+              <div className="overflow-auto">
+                <Box component={Paper} className="table w-full table-fixed">
+                  <TableContainer
+                    component={Paper}
+                    elevation={0}
+                    sx={{ maxHeight: 390 }}
+                  >
+                    <Table
+                      stickyHeader
+                      size="small"
+                      sx={{ "& .MuiTableCell-root": { px: "6px" } }}
+                    >
+                      <TableHead>
+                        <TableRow>
+                          <TableCell
+                            sx={{
+                              width: "3%",
+                              minWidth: { xs: 80, md: "auto" },
+                            }}
+                            align="right"
+                          >
+                            No
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              width: "26%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                          >
+                            Produk
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              width: "8%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                            align="right"
+                          >
+                            Qty
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              width: "15%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                            align="right"
+                          >
+                            Satuan
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              width: "15%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                            align="right"
+                          >
+                            Harga Satuan
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              width: "10%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                            align="right"
+                          >
+                            Diskon
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              width: "10%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                            align="right"
+                          >
+                            Total
+                          </TableCell>
+                          {/* <TableCell
+                            sx={{
+                              width: "10%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                          >
+                            Catatan
+                          </TableCell> */}
+                          {mode !== "view" && (
+                            <TableCell
+                              sx={{
+                                width: "3%",
+                                minWidth: { xs: 100, md: "auto" },
+                              }}
+                              align="center"
+                            >
+                              <Delete />
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {fields.map((row, index) => (
+                          <TableRow
+                            key={row.id}
+                            sx={{
+                              "&:last-child td, &:last-child th": { border: 0 },
+                            }}
+                          >
+                            <TableCell component="th" scope="row" align="right">
+                              {index + 1}
+                            </TableCell>
+                            <TableCell align="right">
+                              <AutocompleteItem
+                                name={`transactionDetails.${index}.item`}
+                                required
+                                autocompleteProps={{
+                                  size: "small",
+                                  disabled: mode === "view",
+                                  onChange: (_, data) => {
+                                    if (
+                                      typeof (data as IDataOption | null)
+                                        ?.inputValue === "string"
+                                    ) {
+                                      setValue(
+                                        `transactionDetails.${index}.item`,
+                                        null,
+                                      );
+                                      return window.open(
+                                        `/masters/products/f?name=${(
+                                          data as IDataOption | null
+                                        )?.inputValue}`,
+                                        "_ blank",
+                                      );
+                                    }
+                                  },
+                                }}
+                                textFieldProps={{
+                                  hiddenLabel: true,
+                                }}
+                                type="sale"
+                                addNew
+                              />
+                            </TableCell>
+                            <TableCell align="right">
+                              <TextFieldElement
+                                name={`transactionDetails.${index}.qtyInput`}
+                                hiddenLabel
+                                InputProps={{
+                                  inputComponent: NumericFormatCustom as never,
+                                  disabled: mode === "view",
+                                }}
+                                fullWidth
+                                size="small"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <AutocompleteMultipleUom
+                                name={`transactionDetails.${index}.multipleUom`}
+                                required
+                                autocompleteProps={{
+                                  size: "small",
+                                  disabled: mode === "view",
+                                }}
+                                textFieldProps={{
+                                  hiddenLabel: true,
+                                }}
+                                itemId={
+                                  transactionDetails[index]?.item?.id ?? ""
+                                }
+                                setDefault={(value) => {
+                                  if (!transactionDetails[index]?.multipleUom) {
+                                    setValue(
+                                      `transactionDetails.${index}.multipleUom`,
+                                      value,
+                                    );
+                                  }
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell align="right">
+                              <TextFieldElement
+                                name={`transactionDetails.${index}.priceInput`}
+                                hiddenLabel
+                                InputProps={{
+                                  inputComponent: NumericFormatCustom as never,
+                                  disabled: mode === "view",
+                                }}
+                                fullWidth
+                                size="small"
+                              />
+                            </TableCell>
+                            <TableCell align="right">
+                              <TextFieldElement
+                                name={`transactionDetails.${index}.discountInput`}
+                                hiddenLabel
+                                InputProps={{
+                                  inputComponent: NumericFormatCustom as never,
+                                  disabled: mode === "view",
+                                  inputProps: {
+                                    isAllowed: (values: {
+                                      floatValue: number;
+                                    }) => {
+                                      const { floatValue } = values;
+                                      return (
+                                        (floatValue ?? 0) <=
+                                        (transactionDetails[index]
+                                          ?.priceInput ?? 0)
+                                      );
+                                    },
+                                  },
+                                }}
+                                fullWidth
+                                size="small"
+                              />
+                            </TableCell>
+                            <TableCell align="right">
+                              {formatNumber(
+                                (transactionDetails[index]?.qtyInput ?? 0) *
+                                  (transactionDetails[index]?.multipleUom
+                                    ?.conversionQty ?? 0) *
+                                  ((transactionDetails[index]?.priceInput ??
+                                    0) -
+                                    (transactionDetails[index]?.discountInput ??
+                                      0)),
+                              )}
+                            </TableCell>
+                            {/* <TableCell>
+                              <TextFieldElement
+                                name={`transactionDetails.${index}.note`}
+                                hiddenLabel
+                                InputProps={{
+                                  disabled: mode === "view",
+                                }}
+                                fullWidth
+                                size="small"
+                              />
+                            </TableCell> */}
+                            {mode !== "view" && (
+                              <TableCell align="center">
+                                <IconButton
+                                  onClick={() => void remove(index)}
+                                  color="error"
+                                  size="small"
+                                >
+                                  <Close />
+                                </IconButton>
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                      <TableFooter>
+                        {mode !== "view" && (
+                          <TableRow>
+                            <TableCell colSpan={8}>
+                              <Button
+                                startIcon={<Add />}
+                                onClick={() =>
+                                  void append({
+                                    itemId: "",
+                                    item: null,
+                                    multipleUomId: "",
+                                    multipleUom: null,
+                                    chartOfAccountId: "",
+                                    chartOfAccount: null,
+                                    qtyInput: 0,
+                                    conversionQty: 0,
+                                    priceInput: 0,
+                                    discountInput: 0,
+                                    note: "",
+                                  })
+                                }
+                                size="large"
+                                fullWidth
+                              >
+                                Tambah
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableFooter>
+                    </Table>
+                  </TableContainer>
+                </Box>
+              </div>
               <Box
                 component={Paper}
                 className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
               >
-                <RadioButtonGroup
-                  label="Tipe Pembayaran"
-                  name="paymentType"
-                  required
-                  options={[
-                    {
-                      id: "CASH",
-                      label: "TUNAI",
-                    },
-                    {
-                      id: "CASHLESS",
-                      label: "NON TUNAI",
-                    },
-                  ]}
+                <TextareaAutosizeElement
+                  name="note"
+                  label="Catatan"
+                  rows={3}
+                  className="col-start-1"
                   disabled={mode === "view"}
                 />
-                {paymentType === PaymentType.CASHLESS && (
-                  <AutocompleteChartOfAccount
-                    name="chartOfAccount"
-                    label="Akun Bank Pembayaran"
-                    autocompleteProps={{
-                      disabled: mode === "view",
-                    }}
-                    type="bank"
-                    required={
-                      paymentInput > 0 && paymentType === PaymentType.CASHLESS
-                    }
-                  />
-                )}
-              </Box>
-            )}
-            {mode !== "view" && (
-              <Box
-                component={Paper}
-                className="grid grid-cols-1 gap-4 p-4 md:grid-cols-5"
-              >
-                <TextField
-                  label="Pindai Barcode"
-                  value={barcode.code}
-                  className="col-span-2"
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setBarcode((prev) => ({
-                      ...prev,
-                      code: event.target.value,
-                    }));
-                  }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <DocumentScanner />
-                      </InputAdornment>
-                    ),
-                  }}
-                  onKeyDown={handleBarcodeKeyDown}
-                />
-                <TextField
-                  label="Qty"
-                  InputProps={{
-                    inputComponent: NumericFormatCustom as never,
-                  }}
-                  value={barcode.qty}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setBarcode((prev) => ({
-                      ...prev,
-                      qty: parseFloat(event.target.value) ?? 1,
-                    }));
-                  }}
-                  fullWidth
-                />
-              </Box>
-            )}
-            <div className="overflow-auto">
-              <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer
-                  component={Paper}
-                  elevation={0}
-                  sx={{ maxHeight: 440 }}
-                >
-                  <Table
-                    stickyHeader
-                    size="small"
-                    sx={{ "& .MuiTableCell-root": { px: "6px" } }}
-                  >
-                    <TableHead>
-                      <TableRow>
-                        <TableCell
-                          sx={{ width: "3%", minWidth: { xs: 80, md: "auto" } }}
-                          align="right"
-                        >
-                          No
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            width: "26%",
-                            minWidth: { xs: 250, md: "auto" },
-                          }}
-                        >
-                          Produk
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            width: "8%",
-                            minWidth: { xs: 250, md: "auto" },
-                          }}
-                          align="right"
-                        >
-                          Qty
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            width: "15%",
-                            minWidth: { xs: 250, md: "auto" },
-                          }}
-                          align="right"
-                        >
-                          Satuan
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            width: "15%",
-                            minWidth: { xs: 250, md: "auto" },
-                          }}
-                          align="right"
-                        >
-                          Harga Satuan
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            width: "10%",
-                            minWidth: { xs: 250, md: "auto" },
-                          }}
-                          align="right"
-                        >
-                          Diskon
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            width: "10%",
-                            minWidth: { xs: 250, md: "auto" },
-                          }}
-                          align="right"
-                        >
-                          Total
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            width: "10%",
-                            minWidth: { xs: 250, md: "auto" },
-                          }}
-                        >
-                          Catatan
-                        </TableCell>
-                        {mode !== "view" && (
-                          <TableCell
-                            sx={{
-                              width: "3%",
-                              minWidth: { xs: 100, md: "auto" },
-                            }}
-                            align="center"
-                          >
-                            <Delete />
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {fields.map((row, index) => (
-                        <TableRow
-                          key={row.id}
-                          sx={{
-                            "&:last-child td, &:last-child th": { border: 0 },
-                          }}
-                        >
-                          <TableCell component="th" scope="row" align="right">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell align="right">
-                            <AutocompleteItem
-                              name={`transactionDetails.${index}.item`}
-                              required
-                              autocompleteProps={{
-                                size: "small",
-                                disabled: mode === "view",
-                              }}
-                              textFieldProps={{
-                                hiddenLabel: true,
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <TextFieldElement
-                              name={`transactionDetails.${index}.qtyInput`}
-                              hiddenLabel
-                              InputProps={{
-                                inputComponent: NumericFormatCustom as never,
-                                disabled: mode === "view",
-                              }}
-                              fullWidth
-                              size="small"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <AutocompleteMultipleUom
-                              name={`transactionDetails.${index}.multipleUom`}
-                              required
-                              autocompleteProps={{
-                                size: "small",
-                                disabled: mode === "view",
-                              }}
-                              textFieldProps={{
-                                hiddenLabel: true,
-                              }}
-                              itemId={transactionDetails[index]?.item?.id ?? ""}
-                              setDefault={(value) => {
-                                if (!transactionDetails[index]?.multipleUom) {
-                                  setValue(
-                                    `transactionDetails.${index}.multipleUom`,
-                                    value,
-                                  );
-                                }
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <TextFieldElement
-                              name={`transactionDetails.${index}.priceInput`}
-                              hiddenLabel
-                              InputProps={{
-                                inputComponent: NumericFormatCustom as never,
-                                disabled: mode === "view",
-                              }}
-                              fullWidth
-                              size="small"
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <TextFieldElement
-                              name={`transactionDetails.${index}.discountInput`}
-                              hiddenLabel
-                              InputProps={{
-                                inputComponent: NumericFormatCustom as never,
-                                disabled: mode === "view",
-                                inputProps: {
-                                  isAllowed: (values: {
-                                    floatValue: number;
-                                  }) => {
-                                    const { floatValue } = values;
-                                    return (
-                                      (floatValue ?? 0) <=
-                                      (transactionDetails[index]?.priceInput ??
-                                        0)
-                                    );
-                                  },
-                                },
-                              }}
-                              fullWidth
-                              size="small"
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            {formatNumber(
-                              (transactionDetails[index]?.qtyInput ?? 0) *
-                                (transactionDetails[index]?.multipleUom
-                                  ?.conversionQty ?? 0) *
-                                ((transactionDetails[index]?.priceInput ?? 0) -
-                                  (transactionDetails[index]?.discountInput ??
-                                    0)),
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <TextFieldElement
-                              name={`transactionDetails.${index}.note`}
-                              hiddenLabel
-                              InputProps={{
-                                disabled: mode === "view",
-                              }}
-                              fullWidth
-                              size="small"
-                            />
-                          </TableCell>
-                          {mode !== "view" && (
-                            <TableCell align="center">
-                              <IconButton
-                                onClick={() => void remove(index)}
-                                color="error"
-                                size="small"
-                              >
-                                <Close />
-                              </IconButton>
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                    <TableFooter>
-                      {mode !== "view" && (
-                        <TableRow>
-                          <TableCell colSpan={9}>
-                            <Button
-                              startIcon={<Add />}
-                              onClick={() =>
-                                void append({
-                                  itemId: "",
-                                  item: null,
-                                  multipleUomId: "",
-                                  multipleUom: null,
-                                  chartOfAccountId: "",
-                                  chartOfAccount: null,
-                                  qtyInput: 0,
-                                  conversionQty: 0,
-                                  priceInput: 0,
-                                  discountInput: 0,
-                                  note: "",
-                                })
-                              }
-                              size="large"
-                              fullWidth
-                            >
-                              Tambah
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableFooter>
-                  </Table>
-                </TableContainer>
-              </Box>
-            </div>
-            <Box
-              component={Paper}
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <TextareaAutosizeElement
-                name="note"
-                label="Catatan"
-                rows={3}
-                className="col-start-1"
-                disabled={mode === "view"}
-              />
-              <Box className="grid w-full gap-2 md:col-start-3">
-                {total.subTotal !== total.total && (
-                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                    <Typography variant="subtitle2">Sub Total</Typography>
-                    <Typography variant="subtitle2" align="right">
-                      {formatNumber(total.subTotal)}
-                    </Typography>
-                  </Box>
-                )}
-                {total.totalDiscountDetail > 0 && (
-                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                    <Typography variant="subtitle2">
-                      Total Diskon Baris
-                    </Typography>
-                    <Typography variant="subtitle2" align="right">
-                      {formatNumber(total.totalDiscountDetail)}
-                    </Typography>
-                  </Box>
-                )}
-                <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                  <Typography variant="subtitle2">Total</Typography>
-                  <Typography variant="subtitle2" align="right">
-                    {formatNumber(total.total)}
-                  </Typography>
-                </Box>
-                <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                  <Typography variant="subtitle2">Diskon Tambahan</Typography>
-                  <TextFieldElement
-                    variant="standard"
-                    name="discountGroupInput"
-                    hiddenLabel
-                    InputProps={{
-                      inputComponent: NumericFormatCustom as never,
-                      disabled: mode === "view",
-                      inputProps: {
-                        isAllowed: (values: { floatValue: number }) => {
-                          const { floatValue } = values;
-                          return (floatValue ?? 0) <= (total.total ?? 0);
-                        },
-                      },
-                    }}
-                    fullWidth
-                    size="small"
-                  />
-                </Box>
-                {total.totalDiscount > 0 &&
-                  total.totalDiscount !== discountGroupInput && (
+                <Box className="grid w-full gap-2 md:col-start-3">
+                  {total.subTotal !== total.total && (
                     <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                      <Typography variant="subtitle2">Total Diskon</Typography>
+                      <Typography variant="subtitle2">Sub Total</Typography>
                       <Typography variant="subtitle2" align="right">
-                        {formatNumber(total.totalDiscount)}
+                        {formatNumber(total.subTotal)}
                       </Typography>
                     </Box>
                   )}
-                <Divider />
-                <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                  <Typography variant="h6">Total Akhir</Typography>
-                  <Typography variant="h6" align="right">
-                    {formatNumber(total.grandTotal)}
-                  </Typography>
-                </Box>
-                <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                  <Typography variant="subtitle2">Bayar</Typography>
-                  <TextFieldElement
-                    variant="standard"
-                    name="paymentInput"
-                    hiddenLabel
-                    InputProps={{
-                      inputComponent: NumericFormatCustom as never,
-                      disabled: mode === "view",
-                    }}
-                    fullWidth
-                    size="small"
-                  />
-                </Box>
-                <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                  <Typography variant="subtitle2">
-                    {total.balance <= 0 ? "Kembalian" : "Kurang"}
-                  </Typography>
-                  <Typography variant="subtitle2" align="right">
-                    {formatNumber(
-                      total.balance ? total.balance * -1 : total.balance,
+                  {total.totalDiscountDetail > 0 && (
+                    <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                      <Typography variant="subtitle2">
+                        Total Diskon Baris
+                      </Typography>
+                      <Typography variant="subtitle2" align="right">
+                        {formatNumber(total.totalDiscountDetail)}
+                      </Typography>
+                    </Box>
+                  )}
+                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                    <Typography variant="subtitle2">Total</Typography>
+                    <Typography variant="subtitle2" align="right">
+                      {formatNumber(total.total)}
+                    </Typography>
+                  </Box>
+                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                    <Typography variant="subtitle2">Diskon Tambahan</Typography>
+                    <TextFieldElement
+                      variant="standard"
+                      name="discountGroupInput"
+                      hiddenLabel
+                      InputProps={{
+                        inputComponent: NumericFormatCustom as never,
+                        disabled: mode === "view",
+                        inputProps: {
+                          isAllowed: (values: { floatValue: number }) => {
+                            const { floatValue } = values;
+                            return (floatValue ?? 0) <= (total.total ?? 0);
+                          },
+                        },
+                      }}
+                      fullWidth
+                      size="small"
+                    />
+                  </Box>
+                  {total.totalDiscount > 0 &&
+                    total.totalDiscount !== discountGroupInput && (
+                      <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                        <Typography variant="subtitle2">
+                          Total Diskon
+                        </Typography>
+                        <Typography variant="subtitle2" align="right">
+                          {formatNumber(total.totalDiscount)}
+                        </Typography>
+                      </Box>
                     )}
-                  </Typography>
+                  <Divider />
+                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                    <Typography variant="h6">Total Akhir</Typography>
+                    <Typography variant="h6" align="right">
+                      {formatNumber(total.grandTotal)}
+                    </Typography>
+                  </Box>
+                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                    <Typography variant="subtitle2">Bayar</Typography>
+                    <TextFieldElement
+                      variant="standard"
+                      name="paymentInput"
+                      hiddenLabel
+                      InputProps={{
+                        inputComponent: NumericFormatCustom as never,
+                        disabled: mode === "view",
+                      }}
+                      fullWidth
+                      size="small"
+                    />
+                  </Box>
+                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                    <Typography variant="subtitle2">
+                      {total.balance <= 0 ? "Kembalian" : "Kurang"}
+                    </Typography>
+                    <Typography variant="subtitle2" align="right">
+                      {formatNumber(
+                        total.balance ? total.balance * -1 : total.balance,
+                      )}
+                    </Typography>
+                  </Box>
                 </Box>
               </Box>
+              <Button type="submit" disabled={isSubmitting} className="hidden">
+                Simpan
+              </Button>
             </Box>
-            <Button type="submit" disabled={isSubmitting} className="hidden">
-              Simpan
-            </Button>
           </div>
         </FormContainer>
       </DialogContent>

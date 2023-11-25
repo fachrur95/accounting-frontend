@@ -26,15 +26,6 @@ import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
 
-const defaultValues: IPeopleMutation = {
-  peopleCategoryId: "",
-  code: "",
-  name: "",
-  note: "",
-  isActive: true,
-  peopleCategory: null,
-};
-
 interface IMasterPeopleForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
@@ -44,6 +35,16 @@ interface IMasterPeopleForm {
 const MasterPeopleForm = (props: IMasterPeopleForm) => {
   const { slug, showIn, forType } = props;
   const router = useRouter();
+  const initialName = router.query?.name;
+
+  const defaultValues: IPeopleMutation = {
+    peopleCategoryId: "",
+    code: "",
+    name: initialName ?? "",
+    note: "",
+    isActive: true,
+    peopleCategory: null,
+  };
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const formContext = useForm<IPeopleMutation>({ defaultValues });

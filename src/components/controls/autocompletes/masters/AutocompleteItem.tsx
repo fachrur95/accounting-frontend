@@ -18,15 +18,16 @@ const AutocompleteItem = <TFieldValues extends FieldValues>(
     "options"
   > & {
     type?: "sale" | "purchase" | "stock" | "adjustment";
+    addNew?: boolean;
   },
 ): JSX.Element => {
-  const { type, ...rest } = props;
+  const { type, addNew, ...rest } = props;
   const {
     options: optionsItem,
     isFetching: isFetchingItem,
     renderOption: renderOptionItem,
     onSearch: onSearchItem,
-  } = useInfiniteItem({ type });
+  } = useInfiniteItem({ type, addNew });
 
   return (
     <AutocompleteElement
@@ -42,6 +43,8 @@ const AutocompleteItem = <TFieldValues extends FieldValues>(
         onClose: () => onSearchItem(),
         renderOption: renderOptionItem,
         disableClearable: rest.required,
+        autoHighlight: true,
+        openOnFocus: true,
       }}
     />
   );

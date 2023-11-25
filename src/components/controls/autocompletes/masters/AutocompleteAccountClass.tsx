@@ -39,6 +39,8 @@ const AutocompleteAccountClass = <TFieldValues extends FieldValues>(
         onClose: () => onSearchItem(),
         renderOption: renderOptionItem,
         disableClearable: props.required,
+        autoHighlight: true,
+        openOnFocus: true,
       }}
     />
   );

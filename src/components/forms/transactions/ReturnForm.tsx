@@ -271,7 +271,9 @@ const ReturnForm = (props: IReturnForm) => {
                 if (row.multipleUom) {
                   selectedItem = {
                     id: row.multipleUom.item?.id ?? "",
-                    label: row.multipleUom.item?.name ?? "",
+                    label:
+                      `${row.multipleUom.item?.code} - ${row.multipleUom.item?.name}` ??
+                      "",
                   };
                   selectedUnit = {
                     id: row.multipleUom.id,
@@ -369,7 +371,9 @@ const ReturnForm = (props: IReturnForm) => {
                 if (row.multipleUom) {
                   selectedItem = {
                     id: row.multipleUom.item?.id ?? "",
-                    label: row.multipleUom.item?.name ?? "",
+                    label:
+                      `${row.multipleUom.item?.code} - ${row.multipleUom.item?.name}` ??
+                      "",
                   };
                   selectedUnit = {
                     id: row.multipleUom.id,
@@ -478,223 +482,238 @@ const ReturnForm = (props: IReturnForm) => {
       </DialogTitle>
       <DialogContent>
         <FormContainer formContext={formContext} onSuccess={onSubmit}>
-          <div className="grid gap-4">
-            <Box
-              component={Paper}
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <TextFieldElement
-                name="transactionNumber"
-                label="No. Transaksi"
-                required
-                InputProps={{
-                  disabled: mode === "view",
-                }}
-              />
-              <AutocompleteTransaction
-                name="transactionParent"
-                label="No. Invoice"
-                required
-                type={`${type}_invoice`}
-                autocompleteProps={{
-                  disabled: mode !== "create",
-                }}
-              />
-              <AutocompletePeople
-                name="people"
-                label="Pemasok"
-                required
-                autocompleteProps={{
-                  disabled: true,
-                }}
-                type="supplier"
-              />
-              <DatePicker
-                label="Tanggal"
-                name="entryDate"
-                inputProps={{
-                  disabled: true,
-                }}
-                slotProps={{
-                  openPickerButton: { disabled: true },
-                }}
-              />
-              {paymentInput > 0 && (
-                <AutocompleteChartOfAccount
-                  name="chartOfAccount"
-                  label="Akun Pengembalian"
-                  autocompleteProps={{
+          <div className="flex flex-col gap-4 md:flex-row">
+            <Box className="flex flex-col gap-4 md:min-w-[250px] xl:min-w-[400px]">
+              <Box component={Paper} className="flex flex-col gap-4 p-4">
+                <Divider textAlign="left">
+                  <Typography variant="subtitle2">Informasi Nota</Typography>
+                </Divider>
+                <TextFieldElement
+                  name="transactionNumber"
+                  label="No. Transaksi"
+                  required
+                  InputProps={{
                     disabled: mode === "view",
                   }}
-                  type="cash-bank"
-                  required={paymentInput > 0}
                 />
-              )}
+                <AutocompleteTransaction
+                  name="transactionParent"
+                  label="No. Invoice"
+                  required
+                  type={`${type}_invoice`}
+                  autocompleteProps={{
+                    disabled: mode !== "create",
+                  }}
+                />
+                <DatePicker
+                  label="Tanggal"
+                  name="entryDate"
+                  inputProps={{
+                    disabled: true,
+                  }}
+                  slotProps={{
+                    openPickerButton: { disabled: true },
+                  }}
+                />
+              </Box>
+              <Box component={Paper} className="flex flex-col gap-4 p-4">
+                <Divider textAlign="left">
+                  <Typography variant="subtitle2">
+                    Informasi {type === "sales" ? "Pelanggan" : "Pemasok"}
+                  </Typography>
+                </Divider>
+                <AutocompletePeople
+                  name="people"
+                  label={type === "sales" ? "Pelanggan" : "Pemasok"}
+                  required
+                  autocompleteProps={{
+                    disabled: true,
+                  }}
+                  type={type === "sales" ? "customer" : "supplier"}
+                />
+                {paymentInput > 0 && (
+                  <AutocompleteChartOfAccount
+                    name="chartOfAccount"
+                    label="Akun Pengembalian"
+                    autocompleteProps={{
+                      disabled: mode === "view",
+                    }}
+                    type="cash-bank"
+                    required={paymentInput > 0}
+                  />
+                )}
+              </Box>
             </Box>
-            <div className="overflow-auto">
-              <Box component={Paper} className="table w-full table-fixed">
-                <TableContainer
-                  component={Paper}
-                  elevation={0}
-                  sx={{ maxHeight: 440 }}
-                >
-                  <Table
-                    stickyHeader
-                    size="small"
-                    sx={{ "& .MuiTableCell-root": { px: "6px" } }}
+            <Box className="flex flex-col gap-4 md:flex-grow">
+              <div className="overflow-auto">
+                <Box component={Paper} className="table w-full table-fixed">
+                  <TableContainer
+                    component={Paper}
+                    elevation={0}
+                    sx={{ maxHeight: 390 }}
                   >
-                    <TableHead>
-                      <TableRow>
-                        <TableCell
-                          sx={{ width: "3%", minWidth: { xs: 80, md: "auto" } }}
-                          align="right"
-                        >
-                          No
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            width: "26%",
-                            minWidth: { xs: 250, md: "auto" },
-                          }}
-                        >
-                          Produk
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            width: "8%",
-                            minWidth: { xs: 250, md: "auto" },
-                          }}
-                          align="right"
-                        >
-                          Qty
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            width: "15%",
-                            minWidth: { xs: 250, md: "auto" },
-                          }}
-                          align="right"
-                        >
-                          Satuan
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            width: "15%",
-                            minWidth: { xs: 250, md: "auto" },
-                          }}
-                          align="right"
-                        >
-                          Harga Satuan
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            width: "10%",
-                            minWidth: { xs: 250, md: "auto" },
-                          }}
-                          align="right"
-                        >
-                          Total
-                        </TableCell>
-                        <TableCell
+                    <Table
+                      stickyHeader
+                      size="small"
+                      sx={{ "& .MuiTableCell-root": { px: "6px" } }}
+                    >
+                      <TableHead>
+                        <TableRow>
+                          <TableCell
+                            sx={{
+                              width: "3%",
+                              minWidth: { xs: 80, md: "auto" },
+                            }}
+                            align="right"
+                          >
+                            No
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              width: "26%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                          >
+                            Produk
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              width: "8%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                            align="right"
+                          >
+                            Qty
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              width: "15%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                            align="right"
+                          >
+                            Satuan
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              width: "15%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                            align="right"
+                          >
+                            Harga Satuan
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              width: "10%",
+                              minWidth: { xs: 250, md: "auto" },
+                            }}
+                            align="right"
+                          >
+                            Total
+                          </TableCell>
+                          {/* <TableCell
                           sx={{
                             width: "10%",
                             minWidth: { xs: 250, md: "auto" },
                           }}
                         >
                           Catatan
-                        </TableCell>
-                        {mode !== "view" && (
-                          <TableCell
+                        </TableCell> */}
+                          {mode !== "view" && (
+                            <TableCell
+                              sx={{
+                                width: "3%",
+                                minWidth: { xs: 250, md: "auto" },
+                              }}
+                              align="center"
+                            >
+                              <Delete />
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {fields.map((row, index) => (
+                          <TableRow
+                            key={row.id}
                             sx={{
-                              width: "3%",
-                              minWidth: { xs: 250, md: "auto" },
+                              "&:last-child td, &:last-child th": { border: 0 },
                             }}
-                            align="center"
                           >
-                            <Delete />
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {fields.map((row, index) => (
-                        <TableRow
-                          key={row.id}
-                          sx={{
-                            "&:last-child td, &:last-child th": { border: 0 },
-                          }}
-                        >
-                          <TableCell component="th" scope="row" align="right">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell align="right">
-                            <AutocompleteItem
-                              name={`transactionDetails.${index}.item`}
-                              required
-                              autocompleteProps={{
-                                size: "small",
-                                disabled: true,
-                              }}
-                              textFieldProps={{
-                                hiddenLabel: true,
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <TextFieldElement
-                              name={`transactionDetails.${index}.qtyInput`}
-                              hiddenLabel
-                              InputProps={{
-                                inputComponent: NumericFormatCustom as never,
-                                disabled: mode === "view",
-                              }}
-                              fullWidth
-                              size="small"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <AutocompleteMultipleUom
-                              name={`transactionDetails.${index}.multipleUom`}
-                              required
-                              autocompleteProps={{
-                                size: "small",
-                                disabled: mode === "view",
-                              }}
-                              textFieldProps={{
-                                hiddenLabel: true,
-                              }}
-                              itemId={transactionDetails[index]?.item?.id ?? ""}
-                              setDefault={(value) => {
-                                if (!transactionDetails[index]?.multipleUom) {
-                                  setValue(
-                                    `transactionDetails.${index}.multipleUom`,
-                                    value,
-                                  );
+                            <TableCell component="th" scope="row" align="right">
+                              {index + 1}
+                            </TableCell>
+                            <TableCell align="right">
+                              <AutocompleteItem
+                                name={`transactionDetails.${index}.item`}
+                                required
+                                autocompleteProps={{
+                                  size: "small",
+                                  disabled: true,
+                                }}
+                                textFieldProps={{
+                                  hiddenLabel: true,
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell align="right">
+                              <TextFieldElement
+                                name={`transactionDetails.${index}.qtyInput`}
+                                hiddenLabel
+                                InputProps={{
+                                  inputComponent: NumericFormatCustom as never,
+                                  disabled: mode === "view",
+                                }}
+                                fullWidth
+                                size="small"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <AutocompleteMultipleUom
+                                name={`transactionDetails.${index}.multipleUom`}
+                                required
+                                autocompleteProps={{
+                                  size: "small",
+                                  disabled: mode === "view",
+                                }}
+                                textFieldProps={{
+                                  hiddenLabel: true,
+                                }}
+                                itemId={
+                                  transactionDetails[index]?.item?.id ?? ""
                                 }
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <TextFieldElement
-                              name={`transactionDetails.${index}.priceInput`}
-                              hiddenLabel
-                              InputProps={{
-                                inputComponent: NumericFormatCustom as never,
-                                disabled: mode === "view",
-                              }}
-                              fullWidth
-                              size="small"
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            {formatNumber(
-                              (transactionDetails[index]?.qtyInput ?? 0) *
-                                (transactionDetails[index]?.multipleUom
-                                  ?.conversionQty ?? 0) *
-                                (transactionDetails[index]?.priceInput ?? 0),
-                            )}
-                          </TableCell>
-                          <TableCell>
+                                setDefault={(value) => {
+                                  if (!transactionDetails[index]?.multipleUom) {
+                                    setValue(
+                                      `transactionDetails.${index}.multipleUom`,
+                                      value,
+                                    );
+                                  }
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell align="right">
+                              <TextFieldElement
+                                name={`transactionDetails.${index}.priceInput`}
+                                hiddenLabel
+                                InputProps={{
+                                  inputComponent: NumericFormatCustom as never,
+                                  disabled: mode === "view",
+                                }}
+                                fullWidth
+                                size="small"
+                              />
+                            </TableCell>
+                            <TableCell align="right">
+                              {formatNumber(
+                                (transactionDetails[index]?.qtyInput ?? 0) *
+                                  (transactionDetails[index]?.multipleUom
+                                    ?.conversionQty ?? 0) *
+                                  (transactionDetails[index]?.priceInput ?? 0),
+                              )}
+                            </TableCell>
+                            {/* <TableCell>
                             <TextFieldElement
                               name={`transactionDetails.${index}.note`}
                               hiddenLabel
@@ -704,62 +723,62 @@ const ReturnForm = (props: IReturnForm) => {
                               fullWidth
                               size="small"
                             />
-                          </TableCell>
-                          {mode !== "view" && (
-                            <TableCell align="center">
-                              <IconButton
-                                onClick={() => void remove(index)}
-                                color="error"
-                                size="small"
-                              >
-                                <Close />
-                              </IconButton>
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Box>
-            </div>
-            <Box
-              component={Paper}
-              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
-            >
-              <TextareaAutosizeElement
-                name="note"
-                label="Catatan"
-                rows={3}
-                className="col-start-1"
-                disabled={mode === "view"}
-              />
-              <Box className="grid w-full gap-2 md:col-start-3">
-                {total.subTotal !== total.total && (
-                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                    <Typography variant="subtitle2">Sub Total</Typography>
-                    <Typography variant="subtitle2" align="right">
-                      {formatNumber(total.subTotal)}
-                    </Typography>
-                  </Box>
-                )}
-                {total.totalDiscountDetail > 0 && (
-                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                    <Typography variant="subtitle2">
-                      Total Diskon Baris
-                    </Typography>
-                    <Typography variant="subtitle2" align="right">
-                      {formatNumber(total.totalDiscountDetail)}
-                    </Typography>
-                  </Box>
-                )}
-                <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                  <Typography variant="subtitle2">Total</Typography>
-                  <Typography variant="subtitle2" align="right">
-                    {formatNumber(total.total)}
-                  </Typography>
+                          </TableCell> */}
+                            {mode !== "view" && (
+                              <TableCell align="center">
+                                <IconButton
+                                  onClick={() => void remove(index)}
+                                  color="error"
+                                  size="small"
+                                >
+                                  <Close />
+                                </IconButton>
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </Box>
-                {/* <Box className="grid-child grid grid-cols-2 items-center justify-center">
+              </div>
+              <Box
+                component={Paper}
+                className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+              >
+                <TextareaAutosizeElement
+                  name="note"
+                  label="Catatan"
+                  rows={3}
+                  className="col-start-1"
+                  disabled={mode === "view"}
+                />
+                <Box className="grid w-full gap-2 md:col-start-3">
+                  {total.subTotal !== total.total && (
+                    <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                      <Typography variant="subtitle2">Sub Total</Typography>
+                      <Typography variant="subtitle2" align="right">
+                        {formatNumber(total.subTotal)}
+                      </Typography>
+                    </Box>
+                  )}
+                  {total.totalDiscountDetail > 0 && (
+                    <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                      <Typography variant="subtitle2">
+                        Total Diskon Baris
+                      </Typography>
+                      <Typography variant="subtitle2" align="right">
+                        {formatNumber(total.totalDiscountDetail)}
+                      </Typography>
+                    </Box>
+                  )}
+                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                    <Typography variant="subtitle2">Total</Typography>
+                    <Typography variant="subtitle2" align="right">
+                      {formatNumber(total.total)}
+                    </Typography>
+                  </Box>
+                  {/* <Box className="grid-child grid grid-cols-2 items-center justify-center">
                   <Typography variant="subtitle2">Diskon Tambahan</Typography>
                   <TextFieldElement
                     variant="standard"
@@ -779,44 +798,45 @@ const ReturnForm = (props: IReturnForm) => {
                     size="small"
                   />
                 </Box> */}
-                <Divider />
-                <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                  <Typography variant="h6">Total Akhir</Typography>
-                  <Typography variant="h6" align="right">
-                    {formatNumber(total.grandTotal)}
-                  </Typography>
-                </Box>
-                <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                  <Typography variant="subtitle2">
-                    Dikembalikan Langsung
-                  </Typography>
-                  <TextFieldElement
-                    variant="standard"
-                    name="paymentInput"
-                    hiddenLabel
-                    InputProps={{
-                      inputComponent: NumericFormatCustom as never,
-                      disabled: mode === "view",
-                    }}
-                    fullWidth
-                    size="small"
-                  />
-                </Box>
-                <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                  <Typography variant="subtitle2">
-                    {total.balance <= 0 ? "Kembalian" : "Kurang"}
-                  </Typography>
-                  <Typography variant="subtitle2" align="right">
-                    {formatNumber(
-                      total.balance ? total.balance * -1 : total.balance,
-                    )}
-                  </Typography>
+                  <Divider />
+                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                    <Typography variant="h6">Total Akhir</Typography>
+                    <Typography variant="h6" align="right">
+                      {formatNumber(total.grandTotal)}
+                    </Typography>
+                  </Box>
+                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                    <Typography variant="subtitle2">
+                      Dikembalikan Langsung
+                    </Typography>
+                    <TextFieldElement
+                      variant="standard"
+                      name="paymentInput"
+                      hiddenLabel
+                      InputProps={{
+                        inputComponent: NumericFormatCustom as never,
+                        disabled: mode === "view",
+                      }}
+                      fullWidth
+                      size="small"
+                    />
+                  </Box>
+                  <Box className="grid-child grid grid-cols-2 items-center justify-center">
+                    <Typography variant="subtitle2">
+                      {total.balance <= 0 ? "Kembalian" : "Kurang"}
+                    </Typography>
+                    <Typography variant="subtitle2" align="right">
+                      {formatNumber(
+                        total.balance ? total.balance * -1 : total.balance,
+                      )}
+                    </Typography>
+                  </Box>
                 </Box>
               </Box>
+              <Button type="submit" disabled={isSubmitting} className="hidden">
+                Simpan
+              </Button>
             </Box>
-            <Button type="submit" disabled={isSubmitting} className="hidden">
-              Simpan
-            </Button>
           </div>
         </FormContainer>
       </DialogContent>

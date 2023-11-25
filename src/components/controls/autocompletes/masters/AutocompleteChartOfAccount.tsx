@@ -42,6 +42,8 @@ const AutocompleteChartOfAccount = <TFieldValues extends FieldValues>(
         onClose: () => onSearchItem(),
         renderOption: renderOptionItem,
         disableClearable: rest.required,
+        autoHighlight: true,
+        openOnFocus: true,
       }}
     />
   );

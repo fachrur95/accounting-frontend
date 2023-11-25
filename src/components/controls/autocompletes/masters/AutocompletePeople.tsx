@@ -18,15 +18,16 @@ const AutocompletePeople = <TFieldValues extends FieldValues>(
     "options"
   > & {
     type?: "customer" | "supplier" | "employee";
+    addNew?: boolean;
   },
 ): JSX.Element => {
-  const { type, ...rest } = props;
+  const { type, addNew, ...rest } = props;
   const {
     options: optionsItem,
     isFetching: isFetchingItem,
     renderOption: renderOptionItem,
     onSearch: onSearchItem,
-  } = useInfinitePeople({ type });
+  } = useInfinitePeople({ type, addNew });
 
   return (
     <AutocompleteElement
@@ -42,6 +43,8 @@ const AutocompletePeople = <TFieldValues extends FieldValues>(
         onClose: () => onSearchItem(),
         renderOption: renderOptionItem,
         disableClearable: rest.required,
+        autoHighlight: true,
+        openOnFocus: true,
       }}
     />
   );

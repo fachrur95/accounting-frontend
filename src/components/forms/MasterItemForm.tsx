@@ -54,24 +54,6 @@ const defaultUom = {
   unitOfMeasure: null,
 };
 
-const defaultValues: IItemMutation = {
-  itemCategory: null,
-  tax: null,
-  itemCategoryId: "",
-  taxId: "",
-  code: "",
-  name: "",
-  description: "",
-  minQty: 0,
-  maxQty: 0,
-  manualCogs: 0,
-  price: 0,
-  note: "",
-  isActive: true,
-  multipleUoms: [defaultUom],
-  files: [],
-};
-
 interface IMasterItemForm {
   slug: FormSlugType;
   showIn: "popup" | "page";
@@ -80,6 +62,25 @@ interface IMasterItemForm {
 const MasterItemForm = (props: IMasterItemForm) => {
   const { slug, showIn } = props;
   const router = useRouter();
+  const initialName = router.query?.name;
+
+  const defaultValues: IItemMutation = {
+    itemCategory: null,
+    tax: null,
+    itemCategoryId: "",
+    taxId: "",
+    code: "",
+    name: initialName ?? "",
+    description: "",
+    minQty: 0,
+    maxQty: 0,
+    manualCogs: 0,
+    price: 0,
+    note: "",
+    isActive: true,
+    multipleUoms: [defaultUom],
+    files: [],
+  };
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [files, setFile] = useState<File[]>([]);
