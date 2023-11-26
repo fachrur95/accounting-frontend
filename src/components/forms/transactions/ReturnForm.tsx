@@ -113,6 +113,10 @@ const ReturnForm = (props: IReturnForm) => {
     control,
     name: "transactionDetails",
   });
+  const peopleSelected: IDataOption | null = useWatch({
+    control,
+    name: "people",
+  });
   const paymentInput: number = useWatch({ control, name: "paymentInput" });
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
@@ -254,7 +258,9 @@ const ReturnForm = (props: IReturnForm) => {
             if (selectedPeople) {
               setValue("people", {
                 id: selectedPeople.id,
-                label: selectedPeople.name,
+                label: `${selectedPeople.code} - ${selectedPeople.name}`,
+                phone: selectedPeople.phone ?? "-",
+                address: selectedPeople.address ?? "-",
               });
             }
             continue;
@@ -334,7 +340,9 @@ const ReturnForm = (props: IReturnForm) => {
             if (selectedPeople) {
               setValue("people", {
                 id: selectedPeople.id,
-                label: selectedPeople.name,
+                label: `${selectedPeople.code} - ${selectedPeople.name}`,
+                phone: selectedPeople.phone ?? "-",
+                address: selectedPeople.address ?? "-",
               });
             }
             continue;
@@ -531,6 +539,14 @@ const ReturnForm = (props: IReturnForm) => {
                   }}
                   type={type === "sales" ? "customer" : "supplier"}
                 />
+                <Box className="flex flex-col items-start justify-start gap-1 md:flex-row md:items-center">
+                  <Typography variant="subtitle2">Telp/ HP:</Typography>
+                  <Typography>{peopleSelected?.phone}</Typography>
+                </Box>
+                <Box className="flex flex-col items-start justify-start gap-1 md:flex-row md:items-center">
+                  <Typography variant="subtitle2">Alamat:</Typography>
+                  <Typography>{peopleSelected?.address}</Typography>
+                </Box>
                 {paymentInput > 0 && (
                   <AutocompleteChartOfAccount
                     name="chartOfAccount"

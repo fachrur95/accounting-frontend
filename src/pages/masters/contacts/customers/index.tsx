@@ -118,6 +118,16 @@ const CustomersPage: MyPage<{ userSession: Session["user"] }> = ({
 
   const columns: GridColDef[] = [
     {
+      field: "peopleCategory.name",
+      headerName: "Kategori/ Member",
+      type: "string",
+      flex: 1,
+      minWidth: 200,
+      valueGetter: (params: GridValueGetterParams<unknown, IPeople>) => {
+        return params.row.peopleCategory?.name ?? "-";
+      },
+    },
+    {
       field: "code",
       headerName: "Kode",
       type: "string",
@@ -132,14 +142,18 @@ const CustomersPage: MyPage<{ userSession: Session["user"] }> = ({
       minWidth: 200,
     },
     {
-      field: "peopleCategory.name",
-      headerName: "Kategori",
+      field: "phone",
+      headerName: "Telp/ HP",
       type: "string",
       flex: 1,
       minWidth: 200,
-      valueGetter: (params: GridValueGetterParams<unknown, IPeople>) => {
-        return params.row.peopleCategory?.name ?? "-";
-      },
+    },
+    {
+      field: "address",
+      headerName: "Alamat",
+      type: "string",
+      flex: 1,
+      minWidth: 200,
     },
     {
       field: "isActive",

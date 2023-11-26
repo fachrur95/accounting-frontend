@@ -25,6 +25,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
+import PatternFormatCustom from "@/components/controls/PatternFormatCustom";
 
 interface IMasterPeopleForm {
   slug: FormSlugType;
@@ -41,6 +42,8 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
     peopleCategoryId: "",
     code: "",
     name: query.name ?? "",
+    phone: "",
+    address: "",
     note: "",
     isActive: true,
     peopleCategory: null,
@@ -108,9 +111,13 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
   const onSubmit = (data: IPeopleMutation) => {
     const dataSave = {
       ...data,
+      phone: data.phone === "" || data.phone === null ? undefined : data.phone,
+      address:
+        data.address === "" || data.address === null ? undefined : data.address,
       note: data.note === "" || data.note === null ? undefined : data.note,
       peopleCategoryId: data.peopleCategory?.id ?? "",
     };
+    console.log({ dataSave });
     if (selectedId) {
       return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
     }
@@ -151,6 +158,8 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
             key === "peopleCategoryId" ||
             key === "code" ||
             key === "name" ||
+            key === "phone" ||
+            key === "address" ||
             key === "note" ||
             key === "isActive"
           ) {
@@ -256,6 +265,29 @@ const MasterPeopleForm = (props: IMasterPeopleForm) => {
                   disabled: mode === "view",
                 }}
                 type={forType}
+              />
+            </Box>
+            <Box
+              component={Paper}
+              className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+            >
+              <TextFieldElement
+                name="phone"
+                label="Telp/ HP (Opsional)"
+                InputProps={{
+                  inputComponent: PatternFormatCustom as never,
+                  /* inputLabelProps: {
+                    shrink: true,
+                  }, */
+                  disabled: mode === "view",
+                }}
+                InputLabelProps={{ shrink: true }}
+              />
+              <TextareaAutosizeElement
+                name="address"
+                label="Alamat (Opsional)"
+                rows={3}
+                disabled={mode === "view"}
               />
             </Box>
             <Box

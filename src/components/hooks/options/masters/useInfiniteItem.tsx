@@ -7,6 +7,10 @@ import Box from "@mui/material/Box";
 import Done from "@mui/icons-material/Done";
 import debounce from "lodash.debounce";
 import type { IItem } from "@/types/prisma-api/item";
+import Image from "next/image";
+import Avatar from "@mui/material/Avatar";
+import ImageNotSupported from "@mui/icons-material/ImageNotSupported";
+import { stringAvatar } from "@/utils/helpers";
 
 const useInfiniteItem = ({
   type,
@@ -48,7 +52,20 @@ const useInfiniteItem = ({
     return (
       <li {...props}>
         <div className="flex w-full items-center justify-between">
+          {/* <Box className="flex flex-row items-center gap-2">
+            {typeof option.image === "string" ? (
+              <Image
+                src={option.image}
+                alt={option.label}
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+            ) : (
+              <Avatar {...stringAvatar(option.label)} />
+            )} */}
           {option.label}
+          {/* </Box> */}
           <Box
             component={Done}
             sx={{ width: 17, height: 17, mr: "5px", ml: "-2px" }}
@@ -71,7 +88,8 @@ const useInfiniteItem = ({
           page.rows.map((row: IItem) => ({
             id: row.id,
             label: `${row.code} - ${row.name}` ?? "-",
-            price: row?.price ?? 0,
+            price: row.price ?? 0,
+            image: row.images?.[0]?.imageUrl ?? undefined,
           })),
         )
         .flat();

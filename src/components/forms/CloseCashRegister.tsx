@@ -71,6 +71,12 @@ const CloseCashRegisterForm = (props: ICloseCashRegisterForm) => {
   });
 
   const onSubmit = (data: ICloseCashRegisterMutation) => {
+    if (data.amount < (dataLastBalance?.balance ?? 0)) {
+      return void setOpenNotification(
+        "Setoran tutupan kasir tidak boleh lebih kecil dari Saldo Akhir Seharusnya",
+        { variant: "error" },
+      );
+    }
     return void mutation.mutate(data);
   };
 

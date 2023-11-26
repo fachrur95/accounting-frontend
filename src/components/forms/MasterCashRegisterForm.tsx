@@ -25,6 +25,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
+import HelpOutline from "@mui/icons-material/HelpOutline";
+import Tooltip from "@mui/material/Tooltip";
 
 const defaultValues: ICashRegisterMutation = {
   mainAccountId: "",
@@ -258,30 +260,66 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
               component={Paper}
               className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
             >
-              <AutocompleteChartOfAccount
-                name="mainAccount"
-                label="Akun Utama"
-                required
-                autocompleteProps={{
-                  disabled: mode === "view",
-                }}
-              />
-              <AutocompleteChartOfAccount
-                name="depositAccount"
-                label="Akun Setoran"
-                required
-                autocompleteProps={{
-                  disabled: mode === "view",
-                }}
-              />
-              <AutocompleteChartOfAccount
-                name="beginBalanceAccount"
-                label="Akun Saldo Awal"
-                required
-                autocompleteProps={{
-                  disabled: mode === "view",
-                }}
-              />
+              <Box className="flex w-full flex-row items-center gap-1">
+                <AutocompleteChartOfAccount
+                  name="mainAccount"
+                  label="Akun Utama"
+                  required
+                  autocompleteProps={{
+                    disabled: mode === "view",
+                    fullWidth: true,
+                  }}
+                />
+                <Tooltip
+                  title="Akun Utama adalah akun yang akan menampung setiap kali mesin kasir menerima uang saat proses penjualan berlangsung. Secara Umum akun ini biasanya diisi dengan Kas Kecil. Ketika memiliki banyak mesin kasir, sebaiknya Akun Kas Kecil ditambah sesuai mesin kasir yang ada."
+                  placement="top"
+                  arrow
+                >
+                  <IconButton size="small">
+                    <HelpOutline />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              <Box className="flex w-full flex-row items-center gap-1">
+                <AutocompleteChartOfAccount
+                  name="depositAccount"
+                  label="Akun Setoran"
+                  required
+                  autocompleteProps={{
+                    disabled: mode === "view",
+                    fullWidth: true,
+                  }}
+                />
+                <Tooltip
+                  title="Akun setoran adalah akun yang akan digunakan ketika setoran pada saat Kasir melakukan tutupan kasir. Misal disetorkan ke akun kas kembali atau akun lain yang Anda kehendaki."
+                  placement="top"
+                  arrow
+                >
+                  <IconButton size="small">
+                    <HelpOutline />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              <Box className="flex w-full flex-row items-center gap-1">
+                <AutocompleteChartOfAccount
+                  name="beginBalanceAccount"
+                  label="Akun Saldo Awal"
+                  required
+                  autocompleteProps={{
+                    disabled: mode === "view",
+                    fullWidth: true,
+                  }}
+                />
+                <Tooltip
+                  title="Akun saldo awal adalah akun yang menjadi sumber atas kas awal ketika kasir melakukan bukaan kasir. Secara umum akun yang digunakan adalah akun kas."
+                  placement="top"
+                  arrow
+                >
+                  <IconButton size="small">
+                    <HelpOutline />
+                  </IconButton>
+                </Tooltip>
+              </Box>
             </Box>
             <Box
               component={Paper}

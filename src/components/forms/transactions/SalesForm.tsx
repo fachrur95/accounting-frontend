@@ -7,6 +7,7 @@ import type {
 } from "@/types/prisma-api/transaction";
 import { api } from "@/utils/api";
 import Add from "@mui/icons-material/Add";
+import Keyboard from "@mui/icons-material/Keyboard";
 import Close from "@mui/icons-material/Close";
 import Delete from "@mui/icons-material/Delete";
 import DocumentScanner from "@mui/icons-material/DocumentScanner";
@@ -29,7 +30,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FormContainer,
   RadioButtonGroup,
@@ -40,7 +41,6 @@ import {
   useWatch,
 } from "react-hook-form-mui";
 import NumericFormatCustom from "../../controls/NumericFormatCustom";
-
 import useNotification from "@/components/hooks/useNotification";
 import useSessionData from "@/components/hooks/useSessionData";
 import { PaymentType } from "@/types/prisma-api/payment-type.d";
@@ -55,6 +55,7 @@ import AutocompleteItem from "../../controls/autocompletes/masters/AutocompleteI
 import AutocompleteMultipleUom from "../../controls/autocompletes/masters/AutocompleteMultipleUom";
 import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
 import OpenCashRegisterForm from "../OpenCashRegister";
+import { useHotkeys } from "react-hotkeys-hook";
 
 interface ISalesForm {
   slug: FormSlugType;
@@ -94,6 +95,8 @@ const SalesForm = (props: ISalesForm) => {
   const { slug, showIn } = props;
   const { data: sessionData } = useSessionData();
   const router = useRouter();
+  const scanBarcodeRef = useRef<HTMLInputElement>(null);
+  const buttonSaveRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState<{
     openCashRegister: boolean;
     closeCashRegister: boolean;
@@ -134,9 +137,44 @@ const SalesForm = (props: ISalesForm) => {
     name: "transactionDetails",
   });
 
+  useHotkeys(
+    "alt+n",
+    () =>
+      mode !== "view" &&
+      append({
+        itemId: "",
+        item: null,
+        multipleUomId: "",
+        multipleUom: null,
+        chartOfAccountId: "",
+        chartOfAccount: null,
+        qtyInput: 0,
+        conversionQty: 0,
+        priceInput: 0,
+        discountInput: 0,
+        note: "",
+      }),
+    { enableOnFormTags: true },
+  );
+
+  useHotkeys("alt+b", () => setFocus("paymentInput"), {
+    enableOnFormTags: true,
+  });
+  useHotkeys("alt+p", () => setFocus("people"), { enableOnFormTags: true });
+  useHotkeys("alt+q", () => scanBarcodeRef.current.focus(), {
+    enableOnFormTags: true,
+  });
+  useHotkeys("alt+s", () => buttonSaveRef.current.click(), {
+    enableOnFormTags: true,
+  });
+
   const transactionDetails: ISalesPurchaseDetailMutation[] = useWatch({
     control,
     name: "transactionDetails",
+  });
+  const peopleSelected: IDataOption | null = useWatch({
+    control,
+    name: "people",
   });
   const paymentType: PaymentType = useWatch({ control, name: "paymentType" });
   const paymentInput: number = useWatch({ control, name: "paymentInput" });
@@ -246,38 +284,6 @@ const SalesForm = (props: ISalesForm) => {
     }
     return void mutationCreate.mutate(dataSave);
   };
-
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (mode === "view") return;
-      if (event.key === "F8") {
-        append({
-          itemId: "",
-          item: null,
-          multipleUomId: "",
-          multipleUom: null,
-          chartOfAccountId: "",
-          chartOfAccount: null,
-          qtyInput: 0,
-          conversionQty: 0,
-          priceInput: 0,
-          discountInput: 0,
-          note: "",
-        });
-      }
-      if (event.key === "F9") {
-        setFocus("paymentInput");
-      }
-    };
-
-    // Tambahkan event listener pada elemen document
-    document.addEventListener("keydown", handleKeyPress);
-
-    // Membersihkan event listener saat komponen unmount
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [append, setFocus, mode]);
 
   useEffect(() => {
     const [path, id] = slug;
@@ -400,7 +406,9 @@ const SalesForm = (props: ISalesForm) => {
             if (selectedPeople) {
               setValue("people", {
                 id: selectedPeople.id,
-                label: selectedPeople.name,
+                label: `${selectedPeople.code} - ${selectedPeople.name}`,
+                phone: selectedPeople.phone ?? "-",
+                address: selectedPeople.address ?? "-",
               });
             }
             continue;
@@ -595,6 +603,7 @@ const SalesForm = (props: ISalesForm) => {
                 fullWidth
                 startIcon={<Save />}
                 onClick={() => handleSubmit(onSubmit)()}
+                ref={buttonSaveRef}
               >
                 Simpan
               </Button>
@@ -628,6 +637,10 @@ const SalesForm = (props: ISalesForm) => {
                     openPickerButton: { disabled: true },
                   }}
                 />
+                <Box className="flex flex-col items-start justify-start gap-1 md:flex-row md:items-center">
+                  <Typography variant="subtitle2">Kasir:</Typography>
+                  <Typography>{sessionData.email}</Typography>
+                </Box>
               </Box>
               <Box component={Paper} className="flex flex-col gap-4 p-4">
                 <Divider textAlign="left">
@@ -637,7 +650,7 @@ const SalesForm = (props: ISalesForm) => {
                 </Divider>
                 <AutocompletePeople
                   name="people"
-                  label="Pelanggan"
+                  label="Pelanggan (Alt + P)"
                   required
                   autocompleteProps={{
                     disabled: mode === "view",
@@ -665,6 +678,14 @@ const SalesForm = (props: ISalesForm) => {
                   type="customer"
                   addNew
                 />
+                <Box className="flex flex-col items-start justify-start gap-1 md:flex-row md:items-center">
+                  <Typography variant="subtitle2">Telp/ HP:</Typography>
+                  <Typography>{peopleSelected?.phone}</Typography>
+                </Box>
+                <Box className="flex flex-col items-start justify-start gap-1 md:flex-row md:items-center">
+                  <Typography variant="subtitle2">Alamat:</Typography>
+                  <Typography>{peopleSelected?.address}</Typography>
+                </Box>
                 {paymentInput > 0 && (
                   <>
                     <RadioButtonGroup
@@ -708,7 +729,7 @@ const SalesForm = (props: ISalesForm) => {
                   className="grid grid-cols-1 gap-4 p-4 md:grid-cols-5"
                 >
                   <TextField
-                    label="Pindai Barcode"
+                    label="Pindai Barcode (Alt + Q)"
                     value={barcode.code}
                     className="col-span-2"
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -725,6 +746,7 @@ const SalesForm = (props: ISalesForm) => {
                       ),
                     }}
                     onKeyDown={handleBarcodeKeyDown}
+                    inputRef={scanBarcodeRef}
                   />
                   <TextField
                     label="Qty"
@@ -1014,7 +1036,7 @@ const SalesForm = (props: ISalesForm) => {
                                 size="large"
                                 fullWidth
                               >
-                                Tambah
+                                Tambah (Alt + N)
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -1026,15 +1048,43 @@ const SalesForm = (props: ISalesForm) => {
               </div>
               <Box
                 component={Paper}
-                className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+                className="grid grid-cols-1 items-start gap-4 p-4 md:grid-cols-3"
               >
-                <TextareaAutosizeElement
-                  name="note"
-                  label="Catatan"
-                  rows={3}
-                  className="col-start-1"
-                  disabled={mode === "view"}
-                />
+                <Box className="flex w-full flex-col items-start gap-4">
+                  <TextareaAutosizeElement
+                    name="note"
+                    label="Catatan"
+                    rows={3}
+                    className="col-start-1"
+                    disabled={mode === "view"}
+                    fullWidth
+                  />
+                  <Box
+                    component={Paper}
+                    variant="outlined"
+                    className="grid w-full grid-cols-1 gap-2 p-2"
+                  >
+                    <Box className="col-span-1 flex flex-row items-center gap-2">
+                      <Keyboard size="small" />
+                      <Typography variant="caption">
+                        Hot Keys/ Pintasan Keyboard
+                      </Typography>
+                    </Box>
+                    <Typography variant="caption">
+                      Alt + B = Fokus ke kolom bayar
+                    </Typography>
+                    <Typography variant="caption">
+                      Alt + N = Tambah baris baru
+                    </Typography>
+                    <Typography variant="caption">
+                      Alt + P = Pilih Pelanggan
+                    </Typography>
+                    <Typography variant="caption">
+                      Alt + Q = Fokus ke kolom pindai barcode
+                    </Typography>
+                    <Typography variant="caption">Alt + S = Simpan</Typography>
+                  </Box>
+                </Box>
                 <Box className="grid w-full gap-2 md:col-start-3">
                   {total.subTotal !== total.total && (
                     <Box className="grid-child grid grid-cols-2 items-center justify-center">
@@ -1099,7 +1149,7 @@ const SalesForm = (props: ISalesForm) => {
                     </Typography>
                   </Box>
                   <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                    <Typography variant="subtitle2">Bayar</Typography>
+                    <Typography variant="subtitle2">Bayar (Alt + B)</Typography>
                     <TextFieldElement
                       variant="standard"
                       name="paymentInput"

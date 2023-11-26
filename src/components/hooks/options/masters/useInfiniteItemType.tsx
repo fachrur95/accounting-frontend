@@ -65,6 +65,7 @@ const useInfiniteItemType = () => {
           page.rows.map((row: IItemType) => ({
             id: row.id,
             label: row.name,
+            isStock: row.isStock ?? false,
           })),
         )
         .flat();

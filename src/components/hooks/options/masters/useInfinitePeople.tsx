@@ -72,6 +72,8 @@ const useInfinitePeople = ({
             id: row.id,
             label: row.name ?? "-",
             specialDiscount: row.peopleCategory?.discount ?? 0,
+            phone: row.phone ?? "-",
+            address: row.address ?? "-",
           })),
         )
         .flat();

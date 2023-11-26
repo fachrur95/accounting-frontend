@@ -7,6 +7,10 @@ export declare interface IDataOption {
   conversionQty?: number;
   price?: number;
   specialDiscount?: number;
+  isStock?: boolean;
+  image?: string;
+  phone?: string;
+  address?: string;
 }
 
 export declare type AutoDefault = {

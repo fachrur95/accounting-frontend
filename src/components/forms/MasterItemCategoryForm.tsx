@@ -10,9 +10,12 @@ import {
   TextFieldElement,
   TextareaAutosizeElement,
   useForm,
+  useWatch,
 } from "react-hook-form-mui";
+import type { IDataOption } from "@/types/options";
 import Close from "@mui/icons-material/Close";
 import Edit from "@mui/icons-material/Edit";
+import HelpOutline from "@mui/icons-material/HelpOutline";
 import Save from "@mui/icons-material/Save";
 import AutocompleteItemType from "../controls/autocompletes/masters/AutocompleteItemType";
 import AutocompleteChartOfAccount from "../controls/autocompletes/masters/AutocompleteChartOfAccount";
@@ -26,6 +29,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
+import Tooltip from "@mui/material/Tooltip";
 
 const defaultValues: IItemCategoryMutation = {
   itemTypeId: "",
@@ -57,6 +61,7 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
   const { setOpenNotification } = useNotification();
 
   const {
+    control,
     setValue,
     formState: { isSubmitting },
     handleSubmit,
@@ -72,6 +77,12 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
         refetchOnReconnect: false,
       },
     );
+
+  const itemTypeSelected: IDataOption | null = useWatch({
+    control,
+    name: "itemType",
+  });
+  console.log({ itemTypeSelected });
 
   const mutationCreate = api.itemCategory.create.useMutation({
     onSuccess: () => void router.push(basePath),
@@ -115,8 +126,14 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
       note: data.note === "" || data.note === null ? undefined : data.note,
       itemTypeId: data.itemType?.id ?? "",
       salesAccountId: data.salesAccount?.id ?? "",
-      stockAccountId: data.stockAccount?.id ?? undefined,
-      cogsAccountId: data.cogsAccount?.id ?? undefined,
+      stockAccountId:
+        itemTypeSelected?.isStock === true
+          ? data.stockAccount?.id ?? ""
+          : undefined,
+      cogsAccountId:
+        itemTypeSelected?.isStock === true
+          ? data.cogsAccount?.id ?? ""
+          : undefined,
     };
     if (selectedId) {
       return void mutationUpdate.mutate({ ...dataSave, id: selectedId });
@@ -281,28 +298,70 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
                   disabled: mode === "view",
                 }}
               />
-              <AutocompleteChartOfAccount
-                name="salesAccount"
-                label="Akun Penjualan"
-                required
-                autocompleteProps={{
-                  disabled: mode === "view",
-                }}
-              />
-              <AutocompleteChartOfAccount
-                name="stockAccount"
-                label="Akun Modal/Stock (optional)"
-                autocompleteProps={{
-                  disabled: mode === "view",
-                }}
-              />
-              <AutocompleteChartOfAccount
-                name="cogsAccount"
-                label="Akun HPP (optional)"
-                autocompleteProps={{
-                  disabled: mode === "view",
-                }}
-              />
+              <Box className="flex w-full flex-row items-center gap-1">
+                <AutocompleteChartOfAccount
+                  name="salesAccount"
+                  label="Akun Penjualan"
+                  required
+                  autocompleteProps={{
+                    disabled: mode === "view",
+                    fullWidth: true,
+                  }}
+                />
+                <Tooltip
+                  title="Akun ini adalah akun yang berkaitan dengan ketika barang yang bersangkutan dijual. Dan Akun ini lah yang akan dibandingkan dengan akun HPP dalam menentukan laba/rugi suatu barang. Ketika barang jasa, maka HPPnya tidak ada berarti laba/rugi akan dikurangi terhadap 0"
+                  placement="top"
+                  arrow
+                >
+                  <IconButton size="small">
+                    <HelpOutline />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              {itemTypeSelected?.isStock === true && (
+                <Box className="flex w-full flex-row items-center gap-1">
+                  <AutocompleteChartOfAccount
+                    name="stockAccount"
+                    label={`Akun Modal/Persediaan`}
+                    autocompleteProps={{
+                      disabled: mode === "view",
+                      fullWidth: true,
+                    }}
+                    required={itemTypeSelected?.isStock === true}
+                  />
+                  <Tooltip
+                    title="Akun ini adalah akun yang berkaitan dengan persediaan barang. Dengan kata lain akun ini adalah akun yg akan menampung persediaan ketika barang yang bersangkutan di-restock/ dibeli. Akun ini wajib diisi hanya ketika tipe barang bersifat distock/ barang bukan jasa. Pada umumnya akun ini diisi akun persediaan"
+                    placement="top"
+                    arrow
+                  >
+                    <IconButton size="small">
+                      <HelpOutline />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              )}
+              {itemTypeSelected?.isStock === true && (
+                <Box className="flex w-full flex-row items-center gap-1">
+                  <AutocompleteChartOfAccount
+                    name="cogsAccount"
+                    label="Akun HPP"
+                    autocompleteProps={{
+                      disabled: mode === "view",
+                      fullWidth: true,
+                    }}
+                    required={itemTypeSelected?.isStock === true}
+                  />
+                  <Tooltip
+                    title="Akun ini adalah akun yang berkaitan dengan HPP (Harga Pokok Penjualan). Akun yang akan menampung HPP dari barang yang bersangkutan. Akun ini wajib diisi hanya ketika tipe barang bersifat distock/ barang bukan jasa. Pada umumnya akun ini diisi akun persediaan"
+                    placement="top"
+                    arrow
+                  >
+                    <IconButton size="small">
+                      <HelpOutline />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              )}
             </Box>
             <Box
               component={Paper}

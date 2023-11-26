@@ -7,6 +7,8 @@ export declare interface IPeople {
   id: string;
   code?: string | null;
   name: string;
+  phone?: string | null;
+  address?: string | null;
   note?: string | null;
   isActive: boolean;
   createdAt: Date;
@@ -25,6 +27,8 @@ export declare type IPeopleMutation = Pick<IPeople,
   | "peopleCategoryId"
   | "code"
   | "name"
+  | "phone"
+  | "address"
   | "note"
   | "isActive"
 > & {

@@ -9,6 +9,7 @@ import type {
 import { api } from "@/utils/api";
 import { formatNumber } from "@/utils/helpers";
 import Add from "@mui/icons-material/Add";
+import Keyboard from "@mui/icons-material/Keyboard";
 import Close from "@mui/icons-material/Close";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
@@ -32,7 +33,7 @@ import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FormContainer,
   TextFieldElement,
@@ -46,6 +47,7 @@ import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/Aut
 import AutocompleteItem from "../../controls/autocompletes/masters/AutocompleteItem";
 import AutocompleteMultipleUom from "../../controls/autocompletes/masters/AutocompleteMultipleUom";
 import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
+import { useHotkeys } from "react-hotkeys-hook";
 
 interface IPurchaseForm {
   slug: FormSlugType;
@@ -83,6 +85,7 @@ const defaultValues: IPurchaseMutation = {
 const PurchaseForm = (props: IPurchaseForm) => {
   const { slug, showIn } = props;
   const router = useRouter();
+  const buttonSaveRef = useRef<HTMLButtonElement>(null);
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [total, setTotal] = useState<TotalType>({
@@ -111,9 +114,41 @@ const PurchaseForm = (props: IPurchaseForm) => {
     name: "transactionDetails",
   });
 
+  useHotkeys(
+    "alt+n",
+    () =>
+      mode !== "view" &&
+      append({
+        itemId: "",
+        item: null,
+        multipleUomId: "",
+        multipleUom: null,
+        chartOfAccountId: "",
+        chartOfAccount: null,
+        qtyInput: 0,
+        conversionQty: 0,
+        priceInput: 0,
+        discountInput: 0,
+        note: "",
+      }),
+    { enableOnFormTags: true },
+  );
+
+  useHotkeys("alt+b", () => setFocus("paymentInput"), {
+    enableOnFormTags: true,
+  });
+  useHotkeys("alt+p", () => setFocus("people"), { enableOnFormTags: true });
+  useHotkeys("alt+s", () => buttonSaveRef.current.click(), {
+    enableOnFormTags: true,
+  });
+
   const transactionDetails: ISalesPurchaseDetailMutation[] = useWatch({
     control,
     name: "transactionDetails",
+  });
+  const peopleSelected: IDataOption | null = useWatch({
+    control,
+    name: "people",
   });
   const paymentInput: number = useWatch({ control, name: "paymentInput" });
   const specialDiscount: number =
@@ -204,38 +239,6 @@ const PurchaseForm = (props: IPurchaseForm) => {
   };
 
   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (mode === "view") return;
-      if (event.key === "F8") {
-        append({
-          itemId: "",
-          item: null,
-          multipleUomId: "",
-          multipleUom: null,
-          chartOfAccountId: "",
-          chartOfAccount: null,
-          qtyInput: 0,
-          conversionQty: 0,
-          priceInput: 0,
-          discountInput: 0,
-          note: "",
-        });
-      }
-      if (event.key === "F9") {
-        setFocus("paymentInput");
-      }
-    };
-
-    // Tambahkan event listener pada elemen document
-    document.addEventListener("keydown", handleKeyPress);
-
-    // Membersihkan event listener saat komponen unmount
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [append, setFocus, mode]);
-
-  useEffect(() => {
     const [path, id] = slug;
     if ((path === "f" || path === "v") && typeof id === "string") {
       setSelectedId(id);
@@ -301,7 +304,9 @@ const PurchaseForm = (props: IPurchaseForm) => {
             if (selectedPeople) {
               setValue("people", {
                 id: selectedPeople.id,
-                label: selectedPeople.name,
+                label: `${selectedPeople.code} - ${selectedPeople.name}`,
+                phone: selectedPeople.phone ?? "-",
+                address: selectedPeople.address ?? "-",
               });
             }
             continue;
@@ -441,6 +446,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
                 fullWidth
                 startIcon={<Save />}
                 onClick={() => handleSubmit(onSubmit)()}
+                ref={buttonSaveRef}
               >
                 Simpan
               </Button>
@@ -481,7 +487,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
                 </Divider>
                 <AutocompletePeople
                   name="people"
-                  label="Pemasok"
+                  label="Pemasok (Alt + P)"
                   required
                   autocompleteProps={{
                     disabled: mode === "view",
@@ -509,6 +515,14 @@ const PurchaseForm = (props: IPurchaseForm) => {
                   type="supplier"
                   addNew
                 />
+                <Box className="flex flex-col items-start justify-start gap-1 md:flex-row md:items-center">
+                  <Typography variant="subtitle2">Telp/ HP:</Typography>
+                  <Typography>{peopleSelected?.phone}</Typography>
+                </Box>
+                <Box className="flex flex-col items-start justify-start gap-1 md:flex-row md:items-center">
+                  <Typography variant="subtitle2">Alamat:</Typography>
+                  <Typography>{peopleSelected?.address}</Typography>
+                </Box>
                 {paymentInput > 0 && (
                   <AutocompleteChartOfAccount
                     name="chartOfAccount"
@@ -804,7 +818,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
                                 size="large"
                                 fullWidth
                               >
-                                Tambah
+                                Tambah (Alt + N)
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -816,15 +830,40 @@ const PurchaseForm = (props: IPurchaseForm) => {
               </div>
               <Box
                 component={Paper}
-                className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3"
+                className="grid grid-cols-1 items-start gap-4 p-4 md:grid-cols-3"
               >
-                <TextareaAutosizeElement
-                  name="note"
-                  label="Catatan"
-                  rows={3}
-                  className="col-start-1"
-                  disabled={mode === "view"}
-                />
+                <Box className="flex w-full flex-col items-start gap-4">
+                  <TextareaAutosizeElement
+                    name="note"
+                    label="Catatan"
+                    rows={3}
+                    className="col-start-1"
+                    disabled={mode === "view"}
+                    fullWidth
+                  />
+                  <Box
+                    component={Paper}
+                    variant="outlined"
+                    className="grid w-full grid-cols-1 gap-2 p-2"
+                  >
+                    <Box className="col-span-1 flex flex-row items-center gap-2">
+                      <Keyboard size="small" />
+                      <Typography variant="caption">
+                        Hot Keys/ Pintasan Keyboard
+                      </Typography>
+                    </Box>
+                    <Typography variant="caption">
+                      Alt + B = Fokus ke kolom bayar
+                    </Typography>
+                    <Typography variant="caption">
+                      Alt + N = Tambah baris baru
+                    </Typography>
+                    <Typography variant="caption">
+                      Alt + P = Pilih Pelanggan
+                    </Typography>
+                    <Typography variant="caption">Alt + S = Simpan</Typography>
+                  </Box>
+                </Box>
                 <Box className="grid w-full gap-2 md:col-start-3">
                   {total.subTotal !== total.total && (
                     <Box className="grid-child grid grid-cols-2 items-center justify-center">
@@ -889,7 +928,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
                     </Typography>
                   </Box>
                   <Box className="grid-child grid grid-cols-2 items-center justify-center">
-                    <Typography variant="subtitle2">Bayar</Typography>
+                    <Typography variant="subtitle2">Bayar (Alt + B)</Typography>
                     <TextFieldElement
                       variant="standard"
                       name="paymentInput"
