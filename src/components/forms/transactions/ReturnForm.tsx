@@ -41,6 +41,7 @@ import AutocompleteItem from "../../controls/autocompletes/masters/AutocompleteI
 import AutocompleteMultipleUom from "../../controls/autocompletes/masters/AutocompleteMultipleUom";
 import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
 import AutocompleteTransaction from "../../controls/autocompletes/transactions/AutocompleteTransaction";
+import type { IDataOption } from "@/types/options";
 
 interface IReturnForm {
   slug: FormSlugType;

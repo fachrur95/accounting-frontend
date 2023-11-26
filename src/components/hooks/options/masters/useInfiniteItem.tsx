@@ -52,7 +52,7 @@ const useInfiniteItem = ({
     return (
       <li {...props}>
         <div className="flex w-full items-center justify-between">
-          {/* <Box className="flex flex-row items-center gap-2">
+          <Box className="flex flex-row items-center gap-2">
             {typeof option.image === "string" ? (
               <Image
                 src={option.image}
@@ -63,9 +63,9 @@ const useInfiniteItem = ({
               />
             ) : (
               <Avatar {...stringAvatar(option.label)} />
-            )} */}
-          {option.label}
-          {/* </Box> */}
+            )}
+            {option.label}
+          </Box>
           <Box
             component={Done}
             sx={{ width: 17, height: 17, mr: "5px", ml: "-2px" }}
