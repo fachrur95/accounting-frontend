@@ -37,6 +37,7 @@ import {
 import NumericFormatCustom from "../../controls/NumericFormatCustom";
 import AutocompleteChartOfAccount from "../../controls/autocompletes/masters/AutocompleteChartOfAccount";
 import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
+import useSessionData from "@/components/hooks/useSessionData";
 
 interface IPaymentForm {
   slug: FormSlugType;
@@ -47,6 +48,7 @@ interface IPaymentForm {
 const PaymentForm = (props: IPaymentForm) => {
   const { slug, showIn, type } = props;
   const router = useRouter();
+  const { data: sessionData, isFetching: isFetchingSession } = useSessionData();
 
   const defaultValues: IPaymentMutation = {
     transactionNumber: "",
@@ -202,6 +204,21 @@ const PaymentForm = (props: IPaymentForm) => {
   }, [dataDraft, mode, setValue]);
 
   useEffect(() => {
+    if (sessionData && mode === "create") {
+      const generalSetting = sessionData.session?.unit?.generalSetting;
+      if (generalSetting) {
+        if (generalSetting.defaultPaymentAccount) {
+          setValue("chartOfAccountId", generalSetting.defaultPaymentAccount.id);
+          setValue("chartOfAccount", {
+            id: generalSetting.defaultPaymentAccount.id,
+            label: `${generalSetting.defaultPaymentAccount.code} - ${generalSetting.defaultPaymentAccount.name}`,
+          });
+        }
+      }
+    }
+  }, [sessionData, mode, setValue]);
+
+  useEffect(() => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
@@ -285,7 +302,7 @@ const PaymentForm = (props: IPaymentForm) => {
     <>
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isFetchingSelected}
+        open={isFetchingSelected || isFetchingSession}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

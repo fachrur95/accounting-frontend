@@ -30,6 +30,7 @@ import DialogContent from "@mui/material/DialogContent";
 import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
 import Tooltip from "@mui/material/Tooltip";
+import useSessionData from "@/components/hooks/useSessionData";
 
 const defaultValues: IItemCategoryMutation = {
   itemTypeId: "",
@@ -55,6 +56,7 @@ const basePath = `/masters/products/categories`;
 const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
   const { slug, showIn } = props;
   const router = useRouter();
+  const { data: sessionData, isFetching: isFetchingSession } = useSessionData();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const formContext = useForm<IItemCategoryMutation>({ defaultValues });
@@ -158,6 +160,35 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
   }, [slug]);
 
   useEffect(() => {
+    if (sessionData && mode === "create") {
+      const generalSetting = sessionData.session?.unit?.generalSetting;
+      if (generalSetting) {
+        if (generalSetting.defaultSales) {
+          setValue("salesAccountId", generalSetting.defaultSales.id);
+          setValue("salesAccount", {
+            id: generalSetting.defaultSales.id,
+            label: `${generalSetting.defaultSales.code} - ${generalSetting.defaultSales.name}`,
+          });
+        }
+        if (generalSetting.defaultStock) {
+          setValue("stockAccountId", generalSetting.defaultStock.id);
+          setValue("stockAccount", {
+            id: generalSetting.defaultStock.id,
+            label: `${generalSetting.defaultStock.code} - ${generalSetting.defaultStock.name}`,
+          });
+        }
+        if (generalSetting.defaultCogs) {
+          setValue("cogsAccountId", generalSetting.defaultCogs.id);
+          setValue("cogsAccount", {
+            id: generalSetting.defaultCogs.id,
+            label: `${generalSetting.defaultCogs.code} - ${generalSetting.defaultCogs.name}`,
+          });
+        }
+      }
+    }
+  }, [sessionData, mode, setValue]);
+
+  useEffect(() => {
     if (dataSelected) {
       for (const key in dataSelected) {
         if (Object.prototype.hasOwnProperty.call(dataSelected, key)) {
@@ -221,7 +252,7 @@ const MasterItemCategoryForm = (props: IMasterItemCategoryForm) => {
     <>
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isFetchingSelected}
+        open={isFetchingSelected || isFetchingSession}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

@@ -48,6 +48,7 @@ import AutocompleteItem from "../../controls/autocompletes/masters/AutocompleteI
 import AutocompleteMultipleUom from "../../controls/autocompletes/masters/AutocompleteMultipleUom";
 import AutocompletePeople from "../../controls/autocompletes/masters/AutocompletePeople";
 import { useHotkeys } from "react-hotkeys-hook";
+import useSessionData from "@/components/hooks/useSessionData";
 
 interface IPurchaseForm {
   slug: FormSlugType;
@@ -85,6 +86,7 @@ const defaultValues: IPurchaseMutation = {
 const PurchaseForm = (props: IPurchaseForm) => {
   const { slug, showIn } = props;
   const router = useRouter();
+  const { data: sessionData, isFetching: isFetchingSession } = useSessionData();
   const buttonSaveRef = useRef<HTMLButtonElement>(null);
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -218,7 +220,10 @@ const PurchaseForm = (props: IPurchaseForm) => {
       specialDiscount: data.specialDiscount ?? 0,
       discountGroupInput: data.discountGroupInput ?? 0,
       note: data.note === "" || data.note === null ? undefined : data.note,
-      chartOfAccountId: data.chartOfAccount?.id ?? undefined,
+      chartOfAccountId:
+        data.paymentInput > 0
+          ? data.chartOfAccount?.id ?? undefined
+          : undefined,
       termId: data.term?.id ?? undefined,
       peopleId: data.people?.id ?? "",
       transactionDetails: data.transactionDetails.map((detail) => ({
@@ -288,6 +293,21 @@ const PurchaseForm = (props: IPurchaseForm) => {
       setTotal({ ...sumTotal, totalDiscount, grandTotal, balance });
     }
   }, [transactionDetails, paymentInput, specialDiscount, discountGroupInput]);
+
+  useEffect(() => {
+    if (sessionData && mode === "create") {
+      const generalSetting = sessionData.session?.unit?.generalSetting;
+      if (generalSetting) {
+        if (generalSetting.defaultPaymentAccount) {
+          setValue("chartOfAccountId", generalSetting.defaultPaymentAccount.id);
+          setValue("chartOfAccount", {
+            id: generalSetting.defaultPaymentAccount.id,
+            label: `${generalSetting.defaultPaymentAccount.code} - ${generalSetting.defaultPaymentAccount.name}`,
+          });
+        }
+      }
+    }
+  }, [sessionData, mode, setValue]);
 
   useEffect(() => {
     if (dataSelected) {
@@ -405,7 +425,7 @@ const PurchaseForm = (props: IPurchaseForm) => {
     <>
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isFetchingSelected}
+        open={isFetchingSelected || isFetchingSession}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

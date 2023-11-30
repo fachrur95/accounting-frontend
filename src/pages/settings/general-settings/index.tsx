@@ -21,11 +21,13 @@ import {
   FormContainer,
   RadioButtonGroup,
   TextFieldElement,
+  TextareaAutosizeElement,
   useForm,
 } from "react-hook-form-mui";
 import React, { useEffect } from "react";
 import { Role } from "@/types/prisma-api/role.d";
 import { RecalculateMethod } from "@/types/prisma-api/recalculate-method.d";
+import Divider from "@mui/material/Divider";
 
 const title = "Pengaturan Umum";
 
@@ -33,15 +35,27 @@ const basePath = "/settings/general-settings";
 
 const defaultValues: IGeneralSettingMutation = {
   companyName: "",
+  address: "",
+  additionalMessage: "",
   leader: "",
   accountant: "",
   recalculateMethod: RecalculateMethod.FIFO,
   currentProfitAccountId: "",
   debitAccountId: "",
   creditAccountId: "",
+  defaultSalesId: "",
+  defaultStockId: "",
+  defaultCogsId: "",
+  defaultPaymentBankAccountId: "",
+  defaultPaymentAccountId: "",
   currentProfitAccount: null,
   debitAccount: null,
   creditAccount: null,
+  defaultSales: null,
+  defaultStock: null,
+  defaultCogs: null,
+  defaultPaymentBankAccount: null,
+  defaultPaymentAccount: null,
 };
 
 const GeneralSettingsPage: MyPage = () => {
@@ -81,11 +95,18 @@ const GeneralSettingsPage: MyPage = () => {
   const onSubmit = (data: IGeneralSettingMutation) => {
     const dataSave = {
       ...data,
+      address: data.address ?? undefined,
+      additionalMessage: data.additionalMessage ?? undefined,
       leader: data.leader ?? undefined,
       accountant: data.accountant ?? undefined,
       currentProfitAccountId: data.currentProfitAccount?.id ?? null,
       debitAccountId: data.debitAccount?.id ?? null,
       creditAccountId: data.creditAccount?.id ?? null,
+      defaultSalesId: data.defaultSales?.id ?? null,
+      defaultStockId: data.defaultStock?.id ?? null,
+      defaultCogsId: data.defaultCogs?.id ?? null,
+      defaultPaymentBankAccountId: data.defaultPaymentBankAccount?.id ?? null,
+      defaultPaymentAccountId: data.defaultPaymentAccount?.id ?? null,
     };
     console.log({ dataSave });
     return void mutation.mutate(dataSave);
@@ -96,6 +117,8 @@ const GeneralSettingsPage: MyPage = () => {
       const generalSetting = sessionData.session?.unit?.generalSetting;
       if (generalSetting) {
         setValue("companyName", generalSetting.companyName);
+        setValue("address", generalSetting.address ?? "");
+        setValue("additionalMessage", generalSetting.additionalMessage ?? "");
         setValue("leader", generalSetting.leader ?? "");
         setValue("accountant", generalSetting.accountant ?? "");
         setValue("recalculateMethod", generalSetting.recalculateMethod);
@@ -121,6 +144,47 @@ const GeneralSettingsPage: MyPage = () => {
           setValue("currentProfitAccount", {
             id: generalSetting.currentProfitAccount.id,
             label: `${generalSetting.currentProfitAccount.code} - ${generalSetting.currentProfitAccount.name}`,
+          });
+        }
+        if (generalSetting.defaultSales) {
+          setValue("defaultSalesId", generalSetting.defaultSales.id);
+          setValue("defaultSales", {
+            id: generalSetting.defaultSales.id,
+            label: `${generalSetting.defaultSales.code} - ${generalSetting.defaultSales.name}`,
+          });
+        }
+        if (generalSetting.defaultStock) {
+          setValue("defaultStockId", generalSetting.defaultStock.id);
+          setValue("defaultStock", {
+            id: generalSetting.defaultStock.id,
+            label: `${generalSetting.defaultStock.code} - ${generalSetting.defaultStock.name}`,
+          });
+        }
+        if (generalSetting.defaultCogs) {
+          setValue("defaultCogsId", generalSetting.defaultCogs.id);
+          setValue("defaultCogs", {
+            id: generalSetting.defaultCogs.id,
+            label: `${generalSetting.defaultCogs.code} - ${generalSetting.defaultCogs.name}`,
+          });
+        }
+        if (generalSetting.defaultPaymentBankAccount) {
+          setValue(
+            "defaultPaymentBankAccountId",
+            generalSetting.defaultPaymentBankAccount.id,
+          );
+          setValue("defaultPaymentBankAccount", {
+            id: generalSetting.defaultPaymentBankAccount.id,
+            label: `${generalSetting.defaultPaymentBankAccount.code} - ${generalSetting.defaultPaymentBankAccount.name}`,
+          });
+        }
+        if (generalSetting.defaultPaymentAccount) {
+          setValue(
+            "defaultPaymentAccountId",
+            generalSetting.defaultPaymentAccount.id,
+          );
+          setValue("defaultPaymentAccount", {
+            id: generalSetting.defaultPaymentAccount.id,
+            label: `${generalSetting.defaultPaymentAccount.code} - ${generalSetting.defaultPaymentAccount.name}`,
           });
         }
       }
@@ -171,6 +235,18 @@ const GeneralSettingsPage: MyPage = () => {
               className="grid grid-cols-1 gap-4 p-4"
             >
               <TextFieldElement name="companyName" label="Nama Unit" required />
+              <TextareaAutosizeElement
+                name="address"
+                label="Alamat"
+                rows={2}
+                fullWidth
+              />
+              <TextareaAutosizeElement
+                name="additionalMessage"
+                label="Ucapan Terimakasi"
+                rows={2}
+                fullWidth
+              />
               <TextFieldElement name="leader" label="Ka. Unit" required />
               <TextFieldElement name="accountant" label="Akuntan" required />
               <RadioButtonGroup
@@ -205,6 +281,34 @@ const GeneralSettingsPage: MyPage = () => {
               <AutocompleteChartOfAccount
                 name="creditAccount"
                 label="Akun Piutang"
+                required
+              />
+              <Divider textAlign="center">
+                <Typography variant="subtitle2">Akun Bawaan</Typography>
+              </Divider>
+              <AutocompleteChartOfAccount
+                name="defaultSales"
+                label="Default Penjualan"
+                required
+              />
+              <AutocompleteChartOfAccount
+                name="defaultStock"
+                label="Default Persediaan"
+                required
+              />
+              <AutocompleteChartOfAccount
+                name="defaultCogs"
+                label="Default HPP"
+                required
+              />
+              <AutocompleteChartOfAccount
+                name="defaultPaymentBankAccount"
+                label="Default Pembayaran Bank"
+                required
+              />
+              <AutocompleteChartOfAccount
+                name="defaultPaymentAccount"
+                label="Default Pembayaran"
                 required
               />
             </Box>

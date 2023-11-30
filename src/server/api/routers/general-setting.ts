@@ -14,12 +14,19 @@ export const generalSettingRouter = createTRPCRouter({
   update: protectedProcedure.input(
     z.object({
       companyName: z.string(),
+      address: z.string().nullish(),
+      additionalMessage: z.string().nullish(),
       leader: z.string().nullish(),
       accountant: z.string().nullish(),
       recalculateMethod: z.enum(["FIFO", "AVG", "MANUAL"]),
       currentProfitAccountId: z.string().nullish(),
       debitAccountId: z.string().nullish(),
       creditAccountId: z.string().nullish(),
+      defaultSalesId: z.string().nullish(),
+      defaultStockId: z.string().nullish(),
+      defaultCogsId: z.string().nullish(),
+      defaultPaymentBankAccountId: z.string().nullish(),
+      defaultPaymentAccountId: z.string().nullish(),
     }),
   ).mutation(async ({ ctx, input }) => {
     try {

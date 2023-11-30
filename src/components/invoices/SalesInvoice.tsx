@@ -17,6 +17,9 @@ import useSessionData from "../hooks/useSessionData";
 import { dateConvertID, formatNumber } from "@/utils/helpers";
 import Divider from "@mui/material/Divider";
 import { PaymentType } from "@/types/prisma-api/payment-type.d";
+import { useHotkeys } from "react-hotkeys-hook";
+import { useRouter } from "next/router";
+import Keyboard from "@mui/icons-material/Keyboard";
 
 // import useNotification from "@/components/hooks/useNotification";
 
@@ -39,8 +42,10 @@ type TotalType = {
 
 const SalesInvoice = (props: ISalesInvoice) => {
   const { id, showIn } = props;
-  const { data: sessionData } = useSessionData();
+  const router = useRouter();
+  const { data: sessionData, isFetching: isFetchingSession } = useSessionData();
   const componentRef = useRef<HTMLDivElement | null>(null);
+  const buttonPrintRef = useRef<HTMLButtonElement>(null);
   const [total, setTotal] = useState<TotalType>({
     subTotal: 0,
     total: 0,
@@ -52,6 +57,12 @@ const SalesInvoice = (props: ISalesInvoice) => {
   });
   // const formContext = useForm<IUnitMutation>({ defaultValues });
   // const { setOpenNotification } = useNotification();
+  useHotkeys("enter", () => buttonPrintRef.current.click(), {
+    enableOnFormTags: true,
+  });
+  useHotkeys("alt+n", () => router.push("/sales/f"), {
+    enableOnFormTags: true,
+  });
 
   const { data: dataSelected, isFetching: isFetchingSelected } =
     api.globalTransaction.findOne.useQuery(
@@ -113,7 +124,7 @@ const SalesInvoice = (props: ISalesInvoice) => {
     <>
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isFetchingSelected}
+        open={isFetchingSelected || isFetchingSession}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -141,6 +152,7 @@ const SalesInvoice = (props: ISalesInvoice) => {
               fullWidth
               startIcon={<Print />}
               onClick={handlePrint}
+              ref={buttonPrintRef}
             >
               Cetak
             </Button>
@@ -148,7 +160,10 @@ const SalesInvoice = (props: ISalesInvoice) => {
         </Box>
       </DialogTitle>
       <DialogContent>
-        <Box component={Paper} className="flex items-center justify-center p-4">
+        <Box
+          component={Paper}
+          className="flex flex-col items-center justify-center gap-2 p-4"
+        >
           <Box
             ref={componentRef}
             className="max-w-full md:max-w-md"
@@ -158,9 +173,15 @@ const SalesInvoice = (props: ISalesInvoice) => {
               <Typography variant="h6" className="font-print font-bold">
                 {sessionData?.session?.unit?.name ?? ""}
               </Typography>
+              <Typography variant="caption" className="font-print">
+                {sessionData?.session?.unit?.generalSetting?.address ?? ""}
+              </Typography>
             </Box>
             <Box className="flex flex-col gap-2">
-              <Typography className="font-print text-xs md:text-sm">
+              <Typography
+                variant="caption"
+                className="font-print text-xs md:text-sm"
+              >
                 {dateConvertID(new Date(dataSelected.entryDate), {
                   dateStyle: "full",
                   timeStyle: "short",
@@ -235,7 +256,7 @@ const SalesInvoice = (props: ISalesInvoice) => {
                       detail.multipleUom?.unitOfMeasure?.name ??
                       ""}
                   </Typography>
-                  <Typography className="font-print text-xs font-bold md:text-sm">
+                  <Typography className="self-end font-print text-xs font-bold md:text-sm">
                     {formatNumber(detail.priceInput)}
                   </Typography>
                 </Box>
@@ -298,7 +319,38 @@ const SalesInvoice = (props: ISalesInvoice) => {
                   {dataSelected.createdBy ?? "-"}
                 </Typography>
               </Box>
+              <Divider
+                variant="middle"
+                component="hr"
+                className="border-dashed"
+              />
+              <Box className="flex w-full flex-row items-center justify-center text-center">
+                <Typography
+                  variant="caption"
+                  className="font-print"
+                  style={{ whiteSpace: "pre-wrap" }}
+                >
+                  {sessionData?.session?.unit?.generalSetting
+                    ?.additionalMessage ?? ""}
+                </Typography>
+              </Box>
             </Box>
+          </Box>
+          <Box
+            component={Paper}
+            variant="outlined"
+            className="grid w-full grid-cols-1 gap-2 p-2"
+          >
+            <Box className="col-span-1 flex flex-row items-center gap-2">
+              <Keyboard size="small" />
+              <Typography variant="caption">
+                Hot Keys/ Pintasan Keyboard
+              </Typography>
+            </Box>
+            <Typography variant="caption">Enter = Cetak Struk/Nota</Typography>
+            <Typography variant="caption">
+              Alt + N = Kembali ke halaman Formulir Penjualan
+            </Typography>
           </Box>
         </Box>
       </DialogContent>
