@@ -9,7 +9,7 @@ import debounce from "lodash.debounce";
 import type { IItem } from "@/types/prisma-api/item";
 import Image from "next/image";
 import Avatar from "@mui/material/Avatar";
-import ImageNotSupported from "@mui/icons-material/ImageNotSupported";
+// import ImageNotSupported from "@mui/icons-material/ImageNotSupported";
 import { stringAvatar } from "@/utils/helpers";
 
 const useInfiniteItem = ({
@@ -100,6 +100,7 @@ const useInfiniteItem = ({
         );
         if (search !== "" && !isExisting) {
           dataOptions.push({
+            id: search,
             label: `Tambah "${search}"`,
             inputValue: search,
           });
