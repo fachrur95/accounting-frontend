@@ -27,6 +27,7 @@ import { useRouter } from "next/router";
 import useNotification from "@/components/hooks/useNotification";
 import HelpOutline from "@mui/icons-material/HelpOutline";
 import Tooltip from "@mui/material/Tooltip";
+import useSessionData from "@/components/hooks/useSessionData";
 
 const defaultValues: ICashRegisterMutation = {
   mainAccountId: "",
@@ -50,6 +51,7 @@ const basePath = `/masters/other/cash-registers`;
 const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
   const { slug, showIn } = props;
   const router = useRouter();
+  const { data: sessionData, isFetching: isFetchingSession } = useSessionData();
   const [mode, setMode] = useState<"create" | "update" | "view">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const formContext = useForm<ICashRegisterMutation>({ defaultValues });
@@ -137,6 +139,30 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
       setMode("create");
     }
   }, [slug]);
+
+  useEffect(() => {
+    if (sessionData && mode === "create") {
+      const generalSetting = sessionData.session?.unit?.generalSetting;
+      if (generalSetting) {
+        if (generalSetting.defaultPaymentAccount) {
+          setValue("depositAccountId", generalSetting.defaultPaymentAccount.id);
+          setValue("depositAccount", {
+            id: generalSetting.defaultPaymentAccount.id,
+            label: `${generalSetting.defaultPaymentAccount.code} - ${generalSetting.defaultPaymentAccount.name}`,
+          });
+
+          setValue(
+            "beginBalanceAccountId",
+            generalSetting.defaultPaymentAccount.id,
+          );
+          setValue("beginBalanceAccount", {
+            id: generalSetting.defaultPaymentAccount.id,
+            label: `${generalSetting.defaultPaymentAccount.code} - ${generalSetting.defaultPaymentAccount.name}`,
+          });
+        }
+      }
+    }
+  }, [sessionData, mode, setValue]);
 
   useEffect(() => {
     if (dataSelected) {
