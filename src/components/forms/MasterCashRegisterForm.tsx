@@ -217,7 +217,7 @@ const MasterCashRegisterForm = (props: IMasterCashRegisterForm) => {
     <>
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isFetchingSelected}
+        open={isFetchingSelected || isFetchingSession}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
