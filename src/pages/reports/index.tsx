@@ -91,6 +91,11 @@ const dataReports = [
     title: "Barang Terlaris",
     url: "/reports/best-selling-product",
   },
+  {
+    icon: <Summarize />,
+    title: "Sisa Stock",
+    url: "/reports/remaining-stock",
+  },
 ];
 
 const ReportsPage: MyPage = () => {
