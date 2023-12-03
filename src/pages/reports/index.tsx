@@ -16,19 +16,39 @@ import Summarize from "@mui/icons-material/Summarize";
 import Head from "next/head";
 import Link from "next/link";
 import { Role } from "@/types/prisma-api/role.d";
+import { Typography } from "@mui/material";
 
-const title = "Laporan";
+const title = "Daftar Laporan";
 
 const dataReports = [
   {
-    icon: <Summarize />,
-    title: "Neraca",
-    url: "/reports/balance-sheet",
+    title: "Penjualan",
   },
   {
     icon: <Summarize />,
-    title: "Laba Rugi",
-    url: "/reports/profit-loss",
+    title: "Penjualan - Ringkas",
+    url: "/reports/sales-summary",
+  },
+  {
+    icon: <Summarize />,
+    title: "Penjualan - Rinci",
+    url: "/reports/sales-detail",
+  },
+  {
+    title: "Pembelian",
+  },
+  {
+    icon: <Summarize />,
+    title: "Pembelian - Ringkas",
+    url: "/reports/purchase-summary",
+  },
+  {
+    icon: <Summarize />,
+    title: "Pembelian - Rinci",
+    url: "/reports/purchase-detail",
+  },
+  {
+    title: "Hutang-Piutang",
   },
   {
     icon: <Summarize />,
@@ -41,6 +61,9 @@ const dataReports = [
     url: "/reports/receivable",
   },
   {
+    title: "Kas dan Bank",
+  },
+  {
     icon: <Summarize />,
     title: "Arus Kas",
     url: "/reports/cash-flow",
@@ -49,6 +72,19 @@ const dataReports = [
     icon: <Summarize />,
     title: "Rekening Bank",
     url: "/reports/bank-summary",
+  },
+  {
+    title: "Lain-lain",
+  },
+  {
+    icon: <Summarize />,
+    title: "Neraca",
+    url: "/reports/balance-sheet",
+  },
+  {
+    icon: <Summarize />,
+    title: "Laba Rugi",
+    url: "/reports/profit-loss",
   },
   {
     icon: <Summarize />,
@@ -64,31 +100,53 @@ const ReportsPage: MyPage = () => {
         <title>{`Bidang Usaha | ${title}`}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <Box component={Paper} sx={{ width: "100%" }}>
-        <nav aria-label="main mailbox folders">
-          <List
-            subheader={
-              <ListSubheader component="div" id="nested-list-subheader">
-                Daftar Laporan
-              </ListSubheader>
-            }
-          >
-            {dataReports.map((report, index) => (
-              <Link
-                key={index}
-                href={report.url}
-                className="text-[#202020] no-underline transition-all duration-300 dark:text-white"
+      <Box className="flex flex-col gap-2">
+        <Box
+          component={Paper}
+          elevation={4}
+          className="relative w-full flex-grow p-4"
+        >
+          <Box className="mb-2 flex flex-col items-center md:flex-row md:justify-between">
+            <Typography variant="h5" gutterBottom>
+              {title}
+            </Typography>
+          </Box>
+          <Box component={Paper} sx={{ width: "100%" }}>
+            <nav aria-label="main mailbox folders">
+              <List
+                sx={{
+                  position: "relative",
+                  overflow: "auto",
+                  maxHeight: "80vh",
+                }}
+                /* subheader={
+                  <ListSubheader component="div" id="nested-list-subheader">
+                    Daftar Laporan
+                  </ListSubheader>
+                } */
               >
-                <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon>{report.icon}</ListItemIcon>
-                    <ListItemText primary={report.title} />
-                  </ListItemButton>
-                </ListItem>
-              </Link>
-            ))}
-          </List>
-        </nav>
+                {dataReports.map((report, index) =>
+                  report.url && report.icon ? (
+                    <Link
+                      key={index}
+                      href={report.url}
+                      className="text-[#202020] no-underline transition-all duration-300 dark:text-white"
+                    >
+                      <ListItem disablePadding>
+                        <ListItemButton>
+                          <ListItemIcon>{report.icon}</ListItemIcon>
+                          <ListItemText primary={report.title} />
+                        </ListItemButton>
+                      </ListItem>
+                    </Link>
+                  ) : (
+                    <ListSubheader key={index}>{report.title}</ListSubheader>
+                  ),
+                )}
+              </List>
+            </nav>
+          </Box>
+        </Box>
       </Box>
     </>
   );
