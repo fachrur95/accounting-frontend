@@ -111,7 +111,6 @@ const PurchaseDetailReportPage: MyPage = () => {
               minDate={startDate}
               required
             />
-            <AutocompletePeople name="people" label="Pemasok" type="supplier" />
             <Button
               type="submit"
               variant="contained"
@@ -120,6 +119,7 @@ const PurchaseDetailReportPage: MyPage = () => {
             >
               Terapkan
             </Button>
+            <AutocompletePeople name="people" label="Pemasok" type="supplier" />
           </Box>
         </FormContainer>
         {/* {pdfBlob && (

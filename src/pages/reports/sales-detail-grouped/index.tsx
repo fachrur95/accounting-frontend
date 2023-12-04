@@ -116,11 +116,6 @@ const SalesDetailGroupedReportPage: MyPage = () => {
               minDate={startDate}
               required
             />
-            <AutocompletePeople
-              name="people"
-              label="Pelanggan"
-              type="customer"
-            />
             <Button
               type="submit"
               variant="contained"
@@ -129,6 +124,11 @@ const SalesDetailGroupedReportPage: MyPage = () => {
             >
               Terapkan
             </Button>
+            <AutocompletePeople
+              name="people"
+              label="Pelanggan"
+              type="customer"
+            />
           </Box>
         </FormContainer>
         {/* {pdfBlob && (
