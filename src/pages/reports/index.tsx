@@ -35,6 +35,16 @@ const dataReports = [
     url: "/reports/sales-detail",
   },
   {
+    icon: <Summarize />,
+    title: "Penjualan - Rinci (Dikelompokkan)",
+    url: "/reports/sales-detail-grouped",
+  },
+  {
+    icon: <Summarize />,
+    title: "Barang Terlaris",
+    url: "/reports/best-selling-product",
+  },
+  {
     title: "Pembelian",
   },
   {
@@ -46,6 +56,11 @@ const dataReports = [
     icon: <Summarize />,
     title: "Pembelian - Rinci",
     url: "/reports/purchase-detail",
+  },
+  {
+    icon: <Summarize />,
+    title: "Pembelian - Rinci (Dikelompokkan)",
+    url: "/reports/purchase-detail-grouped",
   },
   {
     title: "Hutang-Piutang",
@@ -65,7 +80,7 @@ const dataReports = [
   },
   {
     icon: <Summarize />,
-    title: "Arus Kas",
+    title: "Arus Kas/ Buku Besar",
     url: "/reports/cash-flow",
   },
   {
@@ -88,8 +103,8 @@ const dataReports = [
   },
   {
     icon: <Summarize />,
-    title: "Barang Terlaris",
-    url: "/reports/best-selling-product",
+    title: "Kartu Stock Barang",
+    url: "/reports/stock-card",
   },
   {
     icon: <Summarize />,
@@ -124,11 +139,11 @@ const ReportsPage: MyPage = () => {
                   overflow: "auto",
                   maxHeight: "80vh",
                 }}
-                /* subheader={
+                subheader={
                   <ListSubheader component="div" id="nested-list-subheader">
                     Daftar Laporan
                   </ListSubheader>
-                } */
+                }
               >
                 {dataReports.map((report, index) =>
                   report.url && report.icon ? (

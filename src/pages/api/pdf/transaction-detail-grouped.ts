@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     if (!startDate || !endDate) return res.status(404).json({ message: "Date Not found!" });
     const config: AxiosRequestConfig = {
-      url: `/reports/transaction-detail/pdf/${type as string}/${startDate as string}/${endDate as string}${peopleId ? `?peopleId=${peopleId as string}` : ""}`,
+      url: `/reports/transaction-detail-grouped/pdf/${type as string}/${startDate as string}/${endDate as string}${peopleId ? `?peopleId=${peopleId as string}` : ""}`,
       method: "GET",
       responseType: "arraybuffer",
       headers: {

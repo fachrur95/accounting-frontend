@@ -21,9 +21,15 @@ import Link from "next/link";
 import IconButton from "@mui/material/IconButton";
 import Close from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
+import AutocompletePeople from "@/components/controls/autocompletes/masters/AutocompletePeople";
+import type { IDataOption } from "@/types/options";
 import { Role } from "@/types/prisma-api/role.d";
 
 const title = "Laporan Pembelian - Rinci";
+
+type FilterReportExtends = FilterReportType & {
+  people: IDataOption | null;
+};
 
 const PurchaseDetailReportPage: MyPage = () => {
   const { data: sessionData } = useSession();
@@ -31,11 +37,12 @@ const PurchaseDetailReportPage: MyPage = () => {
   const date = new Date(); // Misalnya, gunakan tanggal saat ini
   const firstDayOfMonth = startOfMonth(date);
   const lastDayOfMonth = endOfMonth(date);
-  const defaultValues: FilterReportType = {
+  const defaultValues: FilterReportExtends = {
     startDate: firstDayOfMonth,
     endDate: lastDayOfMonth,
+    people: null,
   };
-  const formContext = useForm<FilterReportType>({ defaultValues });
+  const formContext = useForm<FilterReportExtends>({ defaultValues });
 
   const {
     control,
@@ -45,9 +52,11 @@ const PurchaseDetailReportPage: MyPage = () => {
   const startDate = useWatch({ control, name: "startDate" });
   const endDate = useWatch({ control, name: "endDate" });
 
-  const onSubmit = async (data: FilterReportType) => {
+  const onSubmit = async (data: FilterReportExtends) => {
     const config: AxiosRequestConfig = {
-      url: `/api/pdf/transaction-detail?type=purchase&startDate=${data.startDate.toISOString()}&endDate=${data.endDate.toISOString()}`,
+      url: `/api/pdf/transaction-detail?type=purchase&startDate=${data.startDate.toISOString()}&endDate=${data.endDate.toISOString()}${
+        data.people ? `&peopleId=${data.people.id}` : ""
+      }`,
       method: "GET",
       responseType: "arraybuffer",
       headers: {
@@ -102,6 +111,7 @@ const PurchaseDetailReportPage: MyPage = () => {
               minDate={startDate}
               required
             />
+            <AutocompletePeople name="people" label="Pemasok" type="supplier" />
             <Button
               type="submit"
               variant="contained"

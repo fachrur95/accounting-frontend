@@ -25,13 +25,13 @@ import AutocompletePeople from "@/components/controls/autocompletes/masters/Auto
 import type { IDataOption } from "@/types/options";
 import { Role } from "@/types/prisma-api/role.d";
 
-const title = "Laporan Penjualan - Rinci";
+const title = "Laporan Penjualan - Rinci (Dikelompokkan)";
 
 type FilterReportExtends = FilterReportType & {
   people: IDataOption | null;
 };
 
-const SalesDetailReportPage: MyPage = () => {
+const SalesDetailGroupedReportPage: MyPage = () => {
   const { data: sessionData } = useSession();
   const [pdfBlob, setPdfBlob] = useState<string | null>(null);
   const date = new Date(); // Misalnya, gunakan tanggal saat ini
@@ -53,8 +53,13 @@ const SalesDetailReportPage: MyPage = () => {
   const endDate = useWatch({ control, name: "endDate" });
 
   const onSubmit = async (data: FilterReportExtends) => {
+    console.log({
+      url: `/api/pdf/transaction-detail-grouped?type=sales&startDate=${data.startDate.toISOString()}&endDate=${data.endDate.toISOString()}${
+        data.people ? `&peopleId=${data.people.id}` : ""
+      }`,
+    });
     const config: AxiosRequestConfig = {
-      url: `/api/pdf/transaction-detail?type=sales&startDate=${data.startDate.toISOString()}&endDate=${data.endDate.toISOString()}${
+      url: `/api/pdf/transaction-detail-grouped?type=sales&startDate=${data.startDate.toISOString()}&endDate=${data.endDate.toISOString()}${
         data.people ? `&peopleId=${data.people.id}` : ""
       }`,
       method: "GET",
@@ -193,5 +198,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default SalesDetailReportPage;
-SalesDetailReportPage.Layout = "Dashboard";
+export default SalesDetailGroupedReportPage;
+SalesDetailGroupedReportPage.Layout = "Dashboard";

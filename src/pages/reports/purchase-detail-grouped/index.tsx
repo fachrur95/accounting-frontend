@@ -25,13 +25,13 @@ import AutocompletePeople from "@/components/controls/autocompletes/masters/Auto
 import type { IDataOption } from "@/types/options";
 import { Role } from "@/types/prisma-api/role.d";
 
-const title = "Laporan Penjualan - Rinci";
+const title = "Laporan Pembelian - Rinci (Dikelompokkan)";
 
 type FilterReportExtends = FilterReportType & {
   people: IDataOption | null;
 };
 
-const SalesDetailReportPage: MyPage = () => {
+const PurchaseDetailGroupedReportPage: MyPage = () => {
   const { data: sessionData } = useSession();
   const [pdfBlob, setPdfBlob] = useState<string | null>(null);
   const date = new Date(); // Misalnya, gunakan tanggal saat ini
@@ -54,7 +54,7 @@ const SalesDetailReportPage: MyPage = () => {
 
   const onSubmit = async (data: FilterReportExtends) => {
     const config: AxiosRequestConfig = {
-      url: `/api/pdf/transaction-detail?type=sales&startDate=${data.startDate.toISOString()}&endDate=${data.endDate.toISOString()}${
+      url: `/api/pdf/transaction-detail-grouped?type=purchase&startDate=${data.startDate.toISOString()}&endDate=${data.endDate.toISOString()}${
         data.people ? `&peopleId=${data.people.id}` : ""
       }`,
       method: "GET",
@@ -111,11 +111,7 @@ const SalesDetailReportPage: MyPage = () => {
               minDate={startDate}
               required
             />
-            <AutocompletePeople
-              name="people"
-              label="Pelanggan"
-              type="customer"
-            />
+            <AutocompletePeople name="people" label="Pemasok" type="supplier" />
             <Button
               type="submit"
               variant="contained"
@@ -193,5 +189,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default SalesDetailReportPage;
-SalesDetailReportPage.Layout = "Dashboard";
+export default PurchaseDetailGroupedReportPage;
+PurchaseDetailGroupedReportPage.Layout = "Dashboard";

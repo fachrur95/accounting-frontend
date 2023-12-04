@@ -21,28 +21,21 @@ import Link from "next/link";
 import IconButton from "@mui/material/IconButton";
 import Close from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
-import AutocompletePeople from "@/components/controls/autocompletes/masters/AutocompletePeople";
-import type { IDataOption } from "@/types/options";
 import { Role } from "@/types/prisma-api/role.d";
 
-const title = "Laporan Penjualan - Rinci";
+const title = "Kartu Stok Barang";
 
-type FilterReportExtends = FilterReportType & {
-  people: IDataOption | null;
-};
-
-const SalesDetailReportPage: MyPage = () => {
+const StockCardReportPage: MyPage = () => {
   const { data: sessionData } = useSession();
   const [pdfBlob, setPdfBlob] = useState<string | null>(null);
   const date = new Date(); // Misalnya, gunakan tanggal saat ini
   const firstDayOfMonth = startOfMonth(date);
   const lastDayOfMonth = endOfMonth(date);
-  const defaultValues: FilterReportExtends = {
+  const defaultValues: FilterReportType = {
     startDate: firstDayOfMonth,
     endDate: lastDayOfMonth,
-    people: null,
   };
-  const formContext = useForm<FilterReportExtends>({ defaultValues });
+  const formContext = useForm<FilterReportType>({ defaultValues });
 
   const {
     control,
@@ -52,11 +45,9 @@ const SalesDetailReportPage: MyPage = () => {
   const startDate = useWatch({ control, name: "startDate" });
   const endDate = useWatch({ control, name: "endDate" });
 
-  const onSubmit = async (data: FilterReportExtends) => {
+  const onSubmit = async (data: FilterReportType) => {
     const config: AxiosRequestConfig = {
-      url: `/api/pdf/transaction-detail?type=sales&startDate=${data.startDate.toISOString()}&endDate=${data.endDate.toISOString()}${
-        data.people ? `&peopleId=${data.people.id}` : ""
-      }`,
+      url: `/api/pdf/stock-card?startDate=${data.startDate.toISOString()}&endDate=${data.endDate.toISOString()}`,
       method: "GET",
       responseType: "arraybuffer",
       headers: {
@@ -110,11 +101,6 @@ const SalesDetailReportPage: MyPage = () => {
               name="endDate"
               minDate={startDate}
               required
-            />
-            <AutocompletePeople
-              name="people"
-              label="Pelanggan"
-              type="customer"
             />
             <Button
               type="submit"
@@ -193,5 +179,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default SalesDetailReportPage;
-SalesDetailReportPage.Layout = "Dashboard";
+export default StockCardReportPage;
+StockCardReportPage.Layout = "Dashboard";

@@ -7,12 +7,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const session = await getServerAuthSession({ req, res });
   if (!session) return res.status(401);
 
-  const { type, startDate, endDate, peopleId } = req.query;
+  const { startDate, endDate } = req.query;
 
   if (req.method === "GET") {
     if (!startDate || !endDate) return res.status(404).json({ message: "Date Not found!" });
     const config: AxiosRequestConfig = {
-      url: `/reports/transaction-detail/pdf/${type as string}/${startDate as string}/${endDate as string}${peopleId ? `?peopleId=${peopleId as string}` : ""}`,
+      url: `/reports/stock-card/pdf/${startDate as string}/${endDate as string}`,
       method: "GET",
       responseType: "arraybuffer",
       headers: {
